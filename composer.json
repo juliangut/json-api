@@ -1,0 +1,108 @@
+{
+  "name": "juliangut/json-api",
+  "description": "PSR7 aware json-api integration",
+  "keywords": [
+    "json-api",
+    "annotations"
+  ],
+  "homepage": "https://github.com/juliangut/json-api",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Julián Gutiérrez",
+      "email": "juliangut@gmail.com",
+      "homepage": "http://juliangut.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "source": "https://github.com/juliangut/json-api",
+    "issues": "https://github.com/juliangut/json-api/issues"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": "^7.1",
+    "doctrine/annotations": "^1.4",
+    "juliangut/mapping": "~0.2",
+    "neomerx/json-api": "^2.0",
+    "psr/http-message": "^1.0",
+    "psr/http-server-middleware": "^1.0",
+    "zendframework/zend-diactoros": "^1.0"
+  },
+  "require-dev": {
+    "brainmaestro/composer-git-hooks": "^2.1",
+    "friendsofphp/php-cs-fixer": "^2.0",
+    "infection/infection": "^0.7.0",
+    "phpmd/phpmd": "^2.0",
+    "phpmetrics/phpmetrics": "^2.0",
+    "phpstan/phpstan": "~0.8",
+    "phpstan/phpstan-strict-rules": "^0.9",
+    "phpunit/phpunit": "^5.7|^6.0",
+    "povils/phpmnd": "^1.1",
+    "sebastian/phpcpd": "^2.0",
+    "squizlabs/php_codesniffer": "^2.0",
+    "thecodingmachine/phpstan-strict-rules": "~0.8"
+  },
+  "suggest": {
+    "symfony/yaml": "In order to load mappings from YAML files"
+  },
+  "autoload": {
+    "psr-4": {
+      "Jgut\\JsonApi\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Jgut\\JsonApi\\Tests\\": "tests/JsonApi/"
+    }
+  },
+  "bin": [
+  ],
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "scripts": {
+    "cghooks": "cghooks",
+    "post-install-cmd": "cghooks add --ignore-lock",
+    "post-update-cmd": "cghooks update",
+    "php-lint": "php -l src && php -l tests",
+    "phpcs": "phpcs --standard=PSR2 src tests",
+    "phpcs-lint": "php-cs-fixer fix --dry-run --verbose",
+    "phpcpd": "phpcpd src",
+    "phpmd": "phpmd src text unusedcode,naming,design,controversial,codesize",
+    "phpmnd": "phpmnd ./ --exclude=tests",
+    "phpmetrics-report": "phpmetrics --report-html=build/metrics --report-violations=build/logs/violations.xml --offline .",
+    "phpstan": "phpstan analyse --level max -c phpstan.neon src",
+    "phpunit": "phpunit",
+    "phpunit-coverage": "phpunit --coverage-html build/coverage",
+    "phpunit-clover": "phpunit --coverage-clover build/logs/clover.xml",
+    "infection": "infection",
+    "qa": [
+      "@php-lint",
+      "@phpcs",
+      "@phpcs-lint",
+      "@phpcpd",
+      "@phpmd",
+      "@phpmnd",
+      "@phpstan"
+    ],
+    "reports": [
+      "@phpmetrics-report",
+      "@phpunit-coverage"
+    ],
+    "fix": "php-cs-fixer fix --verbose",
+    "security": "composer outdated",
+    "test": [
+      "@php-lint",
+      "@phpunit",
+      "@infection"
+    ]
+  },
+  "extra": {
+    "hooks": {
+      "pre-commit": "composer qa && composer phpunit"
+    }
+  }
+}

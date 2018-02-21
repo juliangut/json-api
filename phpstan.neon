@@ -1,0 +1,8 @@
+includes:
+  - vendor/phpstan/phpstan-strict-rules/rules.neon
+  - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon
+
+parameters:
+  ignoreErrors:
+    - '/^Internal error: Could not find item at .+\/Mapping\/Driver\/.+Driver\.php/'
+    - '/^Parameter \#\d \$.+ of class Neomerx\\JsonApi\\Encoder\\Parameters\\EncodingParameters constructor expects array(<string>)?\|null, iterable given\.$/'
