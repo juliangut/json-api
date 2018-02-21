@@ -17,6 +17,7 @@ use Jgut\JsonApi\Mapping\Driver\MappingTrait;
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
+use Jgut\JsonApi\Schema\MetadataSchema;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -61,6 +62,26 @@ class MappingTraitTest extends TestCase
         $driver->getMetadata();
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /Schema class ".+" does not exist or does not implement ".+"/
+     */
+    public function testInvalidSchemaClass()
+    {
+        $driver = $this->getMockForTrait(MappingTrait::class);
+        $driver->expects($this->once())
+            ->method('getMappingData')
+            ->will($this->returnValue([
+                [
+                    'class' => 'ClassName',
+                    'schemaClass' => self::class,
+                ],
+            ]));
+        /* @var MappingTrait $driver */
+
+        $driver->getMetadata();
+    }
+
     public function testResources()
     {
         $driver = $this->getMockForTrait(MappingTrait::class);
@@ -70,7 +91,7 @@ class MappingTraitTest extends TestCase
                 [
                     'class' => 'My\Class',
                     'includeAttributes' => false,
-                    'schemaClass' => '\My\Schema\Class',
+                    'schemaClass' => MetadataSchema::class,
                     'id' => [
                         'name' => 'uuid',
                         'setter' => 'setUuid',
@@ -108,7 +129,7 @@ class MappingTraitTest extends TestCase
         self::assertInstanceOf(ResourceMetadata::class, $resource);
         self::assertEquals('My\Class', $resource->getClass());
         self::assertEquals('class', $resource->getName());
-        self::assertEquals('\My\Schema\Class', $resource->getSchemaClass());
+        self::assertEquals(MetadataSchema::class, $resource->getSchemaClass());
         self::assertInstanceOf(AttributeMetadata::class, $resource->getIdentifier());
         self::assertEquals('My\Class', $resource->getIdentifier()->getClass());
         self::assertEquals('uuid', $resource->getIdentifier()->getName());

@@ -188,7 +188,7 @@ class Manager
      * Get JSON API encoder.
      *
      * @param SchemaInterface[]|\Closure[] $schemaProviders
-     * @param EncoderOptions               $encoderOptions
+     * @param EncoderOptions|null          $encoderOptions
      *
      * @return EncoderInterface
      */

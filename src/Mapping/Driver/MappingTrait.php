@@ -16,6 +16,7 @@ namespace Jgut\JsonApi\Mapping\Driver;
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
+use Jgut\JsonApi\Schema\MetadataSchemaInterface;
 
 /**
  * Mapping definition trait.
@@ -85,10 +86,16 @@ trait MappingTrait
 
         $schemaClass = $this->getSchemaClass($mapping);
         if ($schemaClass !== null) {
-            if (!\class_exists($schemaClass)) {
-//                throw new \InvalidArgumentException(
-//                    sprintf('Schema provider class "%s" does not exist', $schemaClass)
-//                );
+            if (!\class_exists($schemaClass)
+                || !\in_array(MetadataSchemaInterface::class, \class_implements($schemaClass))
+            ) {
+                throw new \InvalidArgumentException(
+                    \sprintf(
+                        'Schema class "%s" does not exist or does not implement "%s"',
+                        $schemaClass,
+                        MetadataSchemaInterface::class
+                    )
+                );
             }
 
             $resource->setSchemaClass($schemaClass);
