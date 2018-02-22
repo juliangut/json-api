@@ -26,7 +26,7 @@ use PHPUnit\Framework\TestCase;
 class MappingTraitTest extends TestCase
 {
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Jgut\Mapping\Exception\DriverException
      * @expectedExceptionMessage Resource class missing
      */
     public function testNoClass()
@@ -43,7 +43,7 @@ class MappingTraitTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Jgut\Mapping\Exception\DriverException
      * @expectedExceptionMessage Resource relationship class missing
      */
     public function testNoRelationshipClass()
@@ -63,7 +63,7 @@ class MappingTraitTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Jgut\Mapping\Exception\DriverException
      * @expectedExceptionMessageRegExp /Schema class ".+" does not exist or does not implement ".+"/
      */
     public function testInvalidSchemaClass()

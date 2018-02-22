@@ -17,6 +17,7 @@ use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Schema\MetadataSchemaInterface;
+use Jgut\Mapping\Exception\DriverException;
 
 /**
  * Mapping definition trait.
@@ -45,7 +46,7 @@ trait MappingTrait
      *
      * @param array $mappingData
      *
-     * @throws \InvalidArgumentException
+     * @throws DriverException
      *
      * @return ResourceMetadata[]
      */
@@ -65,14 +66,14 @@ trait MappingTrait
      *
      * @param array $mapping
      *
-     * @throws \InvalidArgumentException
+     * @throws DriverException
      *
      * @return ResourceMetadata
      */
     protected function getResourceMetadata(array $mapping): ResourceMetadata
     {
         if (!isset($mapping['class'])) {
-            throw new \InvalidArgumentException('Resource class missing');
+            throw new DriverException('Resource class missing');
         }
 
         if (!isset($mapping['name'])) {
@@ -89,7 +90,7 @@ trait MappingTrait
             if (!\class_exists($schemaClass)
                 || !\in_array(MetadataSchemaInterface::class, \class_implements($schemaClass))
             ) {
-                throw new \InvalidArgumentException(
+                throw new DriverException(
                     \sprintf(
                         'Schema class "%s" does not exist or does not implement "%s"',
                         $schemaClass,
@@ -194,12 +195,14 @@ trait MappingTrait
      *
      * @param array $mapping
      *
+     * @throws DriverException
+     *
      * @return RelationshipMetadata
      */
     protected function getRelationshipMetadata(array $mapping): RelationshipMetadata
     {
         if (!isset($mapping['class'])) {
-            throw new \InvalidArgumentException('Resource relationship class missing');
+            throw new DriverException('Resource relationship class missing');
         }
 
         if (!isset($mapping['name'])) {

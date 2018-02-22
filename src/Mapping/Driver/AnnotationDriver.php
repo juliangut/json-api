@@ -21,6 +21,7 @@ use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\Mapping\Driver\AbstractAnnotationDriver;
+use Jgut\Mapping\Exception\DriverException;
 
 /**
  * Annotation driver.
@@ -66,7 +67,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
      * @param \ReflectionClass   $class
      * @param ResourceAnnotation $annotation
      *
-     * @throws \RuntimeException
+     * @throws DriverException
      *
      * @return ResourceMetadata
      */
@@ -101,7 +102,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         }
 
         if ($resource->getIdentifier() === null) {
-            throw new \RuntimeException(
+            throw new DriverException(
                 \sprintf('Resource "%s" does not define an id attribute', $resourceName)
             );
         }
