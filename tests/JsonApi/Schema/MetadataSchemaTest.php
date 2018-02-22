@@ -41,9 +41,9 @@ class MetadataSchemaTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage No id attribute defined for "Class" resource
+     * @expectedExceptionMessage Class "stdClass" is not a "Class"
      */
-    public function testNoId()
+    public function testInvalidResource()
     {
         $metadata = new ResourceMetadata('Class', 'Resource');
 
@@ -52,16 +52,21 @@ class MetadataSchemaTest extends TestCase
         $schema->getId(new \stdClass());
     }
 
-    public function testGetId()
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage No id attribute defined for "stdClass" resource
+     */
+    public function testNoId()
     {
-        $identifier = (new AttributeMetadata('Class', 'Id'))
-            ->setGetter('getId');
-
-        $metadata = (new ResourceMetadata('Class', 'Resource'))
-            ->setIdentifier($identifier);
+        $metadata = new ResourceMetadata(\stdClass::class, 'Resource');
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
+        $schema->getId(new \stdClass());
+    }
+
+    public function testGetId()
+    {
         $resource = new class() {
             public function getId(): string
             {
@@ -69,19 +74,19 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
+        $identifier = (new AttributeMetadata(\stdClass::class, 'Id'))
+            ->setGetter('getId');
+
+        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+            ->setIdentifier($identifier);
+
+        $schema = new MetadataSchema($this->factory, $metadata);
+
         $this->assertEquals('aaa', $schema->getId($resource));
     }
 
     public function testGetAttributes()
     {
-        $attribute = (new AttributeMetadata('Class', 'Attribute'))
-            ->setGetter('getAttribute');
-
-        $metadata = (new ResourceMetadata('Class', 'Resource'))
-            ->addAttribute($attribute);
-
-        $schema = new MetadataSchema($this->factory, $metadata);
-
         $resource = new class() {
             public function getAttribute(): string
             {
@@ -89,12 +94,20 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $this->assertEquals(['Attribute' => 'aaa'], $schema->getAttributes($resource));
+        $attribute = (new AttributeMetadata(\stdClass::class, 'attribute'))
+            ->setGetter('getAttribute');
+
+        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+            ->addAttribute($attribute);
+
+        $schema = new MetadataSchema($this->factory, $metadata);
+
+        $this->assertEquals(['attribute' => 'aaa'], $schema->getAttributes($resource, ['attribute']));
     }
 
     public function testNoRelationship()
     {
-        $metadata = (new ResourceMetadata('Class', 'Resource'));
+        $metadata = (new ResourceMetadata(\stdClass::class, 'Resource'));
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
@@ -107,34 +120,26 @@ class MetadataSchemaTest extends TestCase
      */
     public function testUnknownRelationship()
     {
-        $relationship = (new RelationshipMetadata('Class', 'Relationship'))
-            ->setGetter('getRelationship');
-
-        $metadata = (new ResourceMetadata('Class', 'Resource'))
-            ->addRelationship($relationship);
-
-        $schema = new MetadataSchema($this->factory, $metadata);
-
         $resource = new class() {
-            public function getRelationship(): string
+            public function getAttribute(): string
             {
                 return 'aaa';
             }
         };
 
-        $relationships = $schema->getRelationships($resource, true, ['One' => null, 'Two' => null]);
+        $relationship = (new RelationshipMetadata(\stdClass::class, 'relationship'))
+            ->setGetter('getRelationship');
+
+        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+            ->addRelationship($relationship);
+
+        $schema = new MetadataSchema($this->factory, $metadata);
+
+        $schema->getRelationships($resource, true, ['One' => null, 'Two' => null]);
     }
 
     public function testRelationships()
     {
-        $relationship = (new RelationshipMetadata('Class', 'Relationship'))
-            ->setGetter('getRelationship');
-
-        $metadata = (new ResourceMetadata('Class', 'Resource'))
-            ->addRelationship($relationship);
-
-        $schema = new MetadataSchema($this->factory, $metadata);
-
         $resource = new class() {
             public function getRelationship(): string
             {
@@ -142,22 +147,30 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $relationships = $schema->getRelationships($resource, true, ['Relationship' => null]);
+        $relationship = (new RelationshipMetadata(\stdClass::class, 'relationship'))
+            ->setGetter('getRelationship');
 
-        $this->assertTrue(isset($relationships['Relationship']));
-        $this->assertInstanceOf(\Closure::class, $relationships['Relationship']['data']);
-        $this->assertEquals('aaa', $relationships['Relationship']['data']());
-        $this->assertFalse($relationships['Relationship']['showSelf']);
-        $this->assertFalse($relationships['Relationship']['related']);
+        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+            ->addRelationship($relationship);
+
+        $schema = new MetadataSchema($this->factory, $metadata);
+
+        $relationships = $schema->getRelationships($resource, true, ['relationship' => null]);
+
+        $this->assertTrue(isset($relationships['relationship']));
+        $this->assertInstanceOf(\Closure::class, $relationships['relationship']['data']);
+        $this->assertEquals('aaa', $relationships['relationship']['data']());
+        $this->assertFalse($relationships['relationship']['showSelf']);
+        $this->assertFalse($relationships['relationship']['related']);
     }
 
     public function testIncludePaths()
     {
-        $relationship = (new RelationshipMetadata('Class', 'Relationship'))
+        $relationship = (new RelationshipMetadata(\stdClass::class, 'Relationship'))
             ->setGetter('getRelationship')
             ->setDefaultIncluded(true);
 
-        $metadata = (new ResourceMetadata('Class', 'Resource'))
+        $metadata = (new ResourceMetadata(\stdClass::class, 'Resource'))
             ->addRelationship($relationship);
 
         $schema = new MetadataSchema($this->factory, $metadata);

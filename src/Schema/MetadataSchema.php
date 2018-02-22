@@ -50,6 +50,8 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      */
     public function getId($resource): string
     {
+        $this->checkResourceType($resource);
+
         $idAttribute = $this->resourceMetadata->getIdentifier();
         if ($idAttribute === null) {
             throw new \RuntimeException(
@@ -62,13 +64,19 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \RuntimeException
      */
     public function getAttributes($resource, array $fieldKeysFilter = null): array
     {
+        $this->checkResourceType($resource);
+
         $attributes = [];
 
-        foreach ($this->resourceMetadata->getAttributes() as $name => $attribute) {
-            $attributes[$name] = $resource->{$attribute->getGetter()}();
+        foreach ($this->resourceMetadata->getAttributes() as $attribute) {
+            if ($fieldKeysFilter === null || \in_array($attribute->getName(), $fieldKeysFilter, true)) {
+                $attributes[$attribute->getName()] = $resource->{$attribute->getGetter()}();
+            }
         }
 
         return $attributes;
@@ -78,9 +86,12 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      * {@inheritdoc}
      *
      * @throws \LogicException
+     * @throws \RuntimeException
      */
     public function getRelationships($resource, bool $isPrimary, array $includeRelationships): array
     {
+        $this->checkResourceType($resource);
+
         if (\count($includeRelationships) === 0) {
             return [];
         }
@@ -123,5 +134,21 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             },
             $this->resourceMetadata->getRelationships()
         )));
+    }
+
+    /**
+     * Check resource type.
+     *
+     * @param object $resource
+     *
+     * @throws \RuntimeException
+     */
+    private function checkResourceType($resource): void
+    {
+        if (!\is_a($resource, $this->resourceMetadata->getClass())) {
+            throw new \RuntimeException(
+                \sprintf('Class "%s" is not a "%s"', \get_class($resource), $this->resourceMetadata->getClass())
+            );
+        }
     }
 }

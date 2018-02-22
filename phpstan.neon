@@ -6,3 +6,4 @@ parameters:
   ignoreErrors:
     - '/^Internal error: Could not find item at .+\/Mapping\/Driver\/.+Driver\.php/'
     - '/^Parameter \#\d \$.+ of class Neomerx\\JsonApi\\Encoder\\Parameters\\EncodingParameters constructor expects array(<string>)?\|null, iterable given\.$/'
+    - '/^In method "Jgut\\JsonApi\\Schema\\MetadataSchema::checkResourceType", parameter \$resource can be type-hinted to "object"\.$/'
