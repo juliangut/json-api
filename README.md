@@ -62,6 +62,7 @@ $jsonApiManager->encodeResources(new MyClass(), new RequestInstance());
     * `driver` an already created \Jgut\JsonApi\Mapping\Driver\DriverInterface object **REQUIRED if no type AND path**
 * `attributeName` name of the PSR-7 Request attribute that will hold query parameters for resource encoding
 * `encoderOptions` an instance of \Neomerx\JsonApi\Encoder\EncoderOptions
+* `urlPrefix` prefix for generated URLs
 * `schemaClass` an instance of \Jgut\JsonApi\Schema\MetadataSchemaInterface (\Jgut\JsonApi\Schema\MetadataSchema by default)
 * `metadata` array of JSON-API global "meta" data
 

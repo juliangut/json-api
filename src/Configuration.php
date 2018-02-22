@@ -63,6 +63,13 @@ class Configuration
     protected $encoderOptions;
 
     /**
+     * URL prefix for links.
+     *
+     * @var string
+     */
+    protected $urlPrefix;
+
+    /**
      * Metadata schema class.
      *
      * @var string
@@ -254,7 +261,10 @@ class Configuration
                 | \JSON_UNESCAPED_SLASHES
                 | \JSON_PRESERVE_ZERO_FRACTION;
 
-            $this->encoderOptions = new EncoderOptions($jsonFlags);
+            $this->encoderOptions = new EncoderOptions(
+                $jsonFlags,
+                \is_string($this->urlPrefix) ? \rtrim($this->urlPrefix, '/') : null
+            );
         }
 
         return $this->encoderOptions;
@@ -270,6 +280,30 @@ class Configuration
     public function setEncoderOptions(EncoderOptions $encoderOptions): self
     {
         $this->encoderOptions = $encoderOptions;
+
+        return $this;
+    }
+
+    /**
+     * Get URL prefix for links.
+     *
+     * @return string
+     */
+    public function getUrlPrefix(): ?string
+    {
+        return $this->urlPrefix;
+    }
+
+    /**
+     * Set URL prefix for links.
+     *
+     * @param string $urlPrefix
+     *
+     * @return self
+     */
+    public function setUrlPrefix(string $urlPrefix): self
+    {
+        $this->urlPrefix = $urlPrefix;
 
         return $this;
     }

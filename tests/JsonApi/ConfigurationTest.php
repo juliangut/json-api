@@ -44,6 +44,7 @@ class ConfigurationTest extends TestCase
         self::assertInstanceOf(MetadataResolver::class, $configuration->getMetadataResolver());
         self::assertInstanceOf(Resolver::class, $configuration->getSchemaResolver());
         self::assertInstanceOf(EncoderOptions::class, $configuration->getEncoderOptions());
+        self::assertNull($configuration->getUrlPrefix());
         self::assertEquals(MetadataSchema::class, $configuration->getSchemaClass());
         self::assertEmpty($configuration->getMetadata());
     }
@@ -114,6 +115,13 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(['encoderOptions' => $encoderOptions]);
 
         self::assertEquals($encoderOptions, $configuration->getEncoderOptions());
+    }
+
+    public function testUrlPrefix()
+    {
+        $configuration = new Configuration(['urlPrefix' => 'http://example.com']);
+
+        self::assertEquals('http://example.com', $configuration->getUrlPrefix());
     }
 
     public function testSchemaClass()
