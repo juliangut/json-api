@@ -105,6 +105,7 @@ class Manager
      *
      * @param object|object[]                  $resources
      * @param ServerRequestInterface           $request
+     * @param string[]                         $resourceTypes
      * @param EncodingParametersInterface|null $encodingParameters
      * @param EncoderOptions|null              $encoderOptions
      *
@@ -113,6 +114,7 @@ class Manager
     public function encodeResources(
         $resources,
         ServerRequestInterface $request,
+        array $resourceTypes = [],
         EncodingParametersInterface $encodingParameters = null,
         EncoderOptions $encoderOptions = null
     ): string {
@@ -131,7 +133,7 @@ class Manager
             }
         }
 
-        return $this->getResourceEncoder($encoderOptions)->encodeData($resources, $encodingParameters);
+        return $this->getResourceEncoder($resourceTypes, $encoderOptions)->encodeData($resources, $encodingParameters);
     }
 
     /**
@@ -154,15 +156,15 @@ class Manager
     /**
      * Get JSON API resource encoder.
      *
+     * @param string[]            $resourceTypes
      * @param EncoderOptions|null $encoderOptions
      *
      * @return EncoderInterface
      */
-    protected function getResourceEncoder(EncoderOptions $encoderOptions = null): EncoderInterface
+    protected function getResourceEncoder(array $resourceTypes, EncoderOptions $encoderOptions = null): EncoderInterface
     {
-        $providers = $this->getSchemaFactories();
-
-        $encoder = $this->getEncoder($providers, $encoderOptions);
+        $schemaFactories = $this->getSchemaFactories($resourceTypes);
+        $encoder = $this->getEncoder($schemaFactories, $encoderOptions);
 
         $metadata = $this->configuration->getMetadata();
         if ($metadata !== null) {
@@ -187,15 +189,15 @@ class Manager
     /**
      * Get JSON API encoder.
      *
-     * @param SchemaInterface[]|\Closure[] $schemaProviders
+     * @param SchemaInterface[]|\Closure[] $schemaFactories
      * @param EncoderOptions|null          $encoderOptions
      *
      * @return EncoderInterface
      */
-    private function getEncoder(array $schemaProviders, EncoderOptions $encoderOptions = null): EncoderInterface
+    private function getEncoder(array $schemaFactories, EncoderOptions $encoderOptions = null): EncoderInterface
     {
         return $this->factory->createEncoder(
-            $this->factory->createContainer($schemaProviders),
+            $this->factory->createContainer($schemaFactories),
             $encoderOptions ?? $this->configuration->getEncoderOptions()
         );
     }
@@ -203,9 +205,11 @@ class Manager
     /**
      * Get schema factories.
      *
+     * @param string[] $resourceTypes
+     *
      * @return \Closure[]
      */
-    protected function getSchemaFactories(): array
+    protected function getSchemaFactories(array $resourceTypes): array
     {
         if ($this->schemaFactories === null) {
             $resolver = $this->configuration->getSchemaResolver();
@@ -216,7 +220,9 @@ class Manager
             $resources = $this->configuration->getMetadataResolver()->getMetadata($this->configuration->getSources());
 
             foreach ($resources as $resource) {
-                $schemaFactories[$resource->getClass()] = $resolver->getSchemaFactory($resource);
+                if (\count($resourceTypes) === 0 || \in_array($resource->getName(), $resourceTypes, true)) {
+                    $schemaFactories[$resource->getClass()] = $resolver->getSchemaFactory($resource);
+                }
             }
 
             $this->schemaFactories = $schemaFactories;

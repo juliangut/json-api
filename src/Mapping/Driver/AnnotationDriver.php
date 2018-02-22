@@ -50,7 +50,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
                 $resourceName = $resource->getName();
                 if ($resourceName === null) {
                     $nameParts = \explode('\\', $class->name);
-                    $resourceName = \lcfirst(\end($nameParts));
+                    $resourceName = \end($nameParts);
                 }
 
                 $resources[$resourceName] = $this->getResourceMetadata($resourceName, $class, $resource);

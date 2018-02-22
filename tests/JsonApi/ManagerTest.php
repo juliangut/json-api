@@ -100,7 +100,11 @@ class ManagerTest extends TestCase
             ->will($this->returnValue($encoder));
         $factory->expects(self::once())
             ->method('createContainer')
-            ->will($this->returnValue($container));
+            ->will($this->returnCallback(function (array $metadata) use ($container) {
+                $this->assertCount(1, $metadata);
+
+                return $container;
+            }));
         /* @var Factory $factory */
 
         $configuration = $this->getMockBuilder(Configuration::class)
@@ -118,6 +122,6 @@ class ManagerTest extends TestCase
 
         $request = $manager->setRequestQueryParameters($request, $queryParameters);
 
-        self::assertEquals('ENCODED', $manager->encodeResources(new \stdClass(), $request));
+        self::assertEquals('ENCODED', $manager->encodeResources(new \stdClass(), $request, ['resourceB']));
     }
 }
