@@ -122,6 +122,6 @@ class ManagerTest extends TestCase
 
         $request = $manager->setRequestQueryParameters($request, $queryParameters);
 
-        self::assertEquals('ENCODED', $manager->encodeResources(new \stdClass(), $request, ['resourceB']));
+        self::assertEquals('ENCODED', $manager->encodeResources(new \stdClass(), $request, 'test', ['resourceB']));
     }
 }

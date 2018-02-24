@@ -39,7 +39,7 @@ class AttributeTest extends TestCase
         self::assertNull($this->annotation->getName());
         self::assertNull($this->annotation->getGetter());
         self::assertNull($this->annotation->getSetter());
-        self::assertEquals(['default'], $this->annotation->getGroups());
+        self::assertEquals([], $this->annotation->getGroups());
     }
 
     public function testName()

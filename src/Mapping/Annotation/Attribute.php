@@ -49,9 +49,9 @@ class Attribute extends AbstractAnnotation
     /**
      * Attribute encoding groups.
      *
-     * @var array<string>
+     * @var string[]
      */
-    protected $groups = ['default'];
+    protected $groups = [];
 
     /**
      * Get attribute name.

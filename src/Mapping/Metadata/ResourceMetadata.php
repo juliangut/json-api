@@ -61,6 +61,13 @@ class ResourceMetadata extends AbstractMetadata
     protected $attributesInInclude = true;
 
     /**
+     * Encoding group.
+     *
+     * @var string
+     */
+    protected $group;
+
+    /**
      * Get schema provider class.
      *
      * @return string|null
@@ -200,6 +207,30 @@ class ResourceMetadata extends AbstractMetadata
     public function setAttributesInInclude(bool $attributesInInclude): self
     {
         $this->attributesInInclude = $attributesInInclude;
+
+        return $this;
+    }
+
+    /**
+     * Get encoding group.
+     *
+     * @return string|null
+     */
+    public function getGroup(): ?string
+    {
+        return $this->group;
+    }
+
+    /**
+     * Set encoding group.
+     *
+     * @param string $group
+     *
+     * @return self
+     */
+    public function setGroup(string $group): self
+    {
+        $this->group = $group;
 
         return $this;
     }

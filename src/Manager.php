@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Jgut\JsonApi;
 
 use Jgut\JsonApi\Encoding\FactoryInterface;
-use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
-use Jgut\JsonApi\Schema\MetadataSchema;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
@@ -44,13 +42,6 @@ class Manager
      * @var FactoryInterface
      */
     protected $factory;
-
-    /**
-     * Schema providers.
-     *
-     * @var MetadataSchema[]
-     */
-    protected $schemaFactories;
 
     /**
      * JSON API manager constructor.
@@ -105,6 +96,7 @@ class Manager
      *
      * @param object|object[]                  $resources
      * @param ServerRequestInterface           $request
+     * @param string|null                      $group
      * @param string[]                         $resourceTypes
      * @param EncodingParametersInterface|null $encodingParameters
      * @param EncoderOptions|null              $encoderOptions
@@ -114,6 +106,7 @@ class Manager
     public function encodeResources(
         $resources,
         ServerRequestInterface $request,
+        ?string $group,
         array $resourceTypes = [],
         EncodingParametersInterface $encodingParameters = null,
         EncoderOptions $encoderOptions = null
@@ -133,7 +126,8 @@ class Manager
             }
         }
 
-        return $this->getResourceEncoder($resourceTypes, $encoderOptions)->encodeData($resources, $encodingParameters);
+        return $this->getResourceEncoder($resourceTypes, $group, $encoderOptions)
+            ->encodeData($resources, $encodingParameters);
     }
 
     /**
@@ -157,13 +151,17 @@ class Manager
      * Get JSON API resource encoder.
      *
      * @param string[]            $resourceTypes
+     * @param string|null         $group
      * @param EncoderOptions|null $encoderOptions
      *
      * @return EncoderInterface
      */
-    public function getResourceEncoder(array $resourceTypes, ?EncoderOptions $encoderOptions): EncoderInterface
-    {
-        $schemaFactories = $this->getSchemaFactories($resourceTypes);
+    public function getResourceEncoder(
+        array $resourceTypes,
+        ?string $group,
+        ?EncoderOptions $encoderOptions
+    ): EncoderInterface {
+        $schemaFactories = $this->getSchemaFactories($resourceTypes, $group);
         $encoder = $this->getEncoder($schemaFactories, $encoderOptions);
 
         $metadata = $this->configuration->getMetadata();
@@ -205,29 +203,38 @@ class Manager
     /**
      * Get schema factories.
      *
-     * @param string[] $resourceTypes
+     * @param string[]    $resourceTypes
+     * @param string|null $group
      *
      * @return \Closure[]
      */
-    protected function getSchemaFactories(array $resourceTypes): array
+    protected function getSchemaFactories(array $resourceTypes, ?string $group): array
     {
-        if ($this->schemaFactories === null) {
-            $resolver = $this->configuration->getSchemaResolver();
+        $resolver = $this->configuration->getSchemaResolver();
 
-            $schemaFactories = [];
+        $schemaFactories = [];
 
-            /** @var ResourceMetadata[] $resources */
-            $resources = $this->configuration->getMetadataResolver()->getMetadata($this->configuration->getSources());
-
-            foreach ($resources as $resource) {
-                if (\count($resourceTypes) === 0 || \in_array($resource->getName(), $resourceTypes, true)) {
-                    $schemaFactories[$resource->getClass()] = $resolver->getSchemaFactory($resource);
+        foreach ($this->getResourceMetadata() as $resource) {
+            if (\count($resourceTypes) === 0 || \in_array($resource->getName(), $resourceTypes, true)) {
+                if ($group !== null) {
+                    $resource->setGroup($group);
                 }
-            }
 
-            $this->schemaFactories = $schemaFactories;
+                $schemaFactories[$resource->getClass()] = $resolver->getSchemaFactory($resource);
+            }
         }
 
-        return $this->schemaFactories;
+        return $schemaFactories;
+    }
+
+    /**
+     * Get list of resources metadata.
+     *
+     * @return \Jgut\JsonApi\Mapping\Metadata\ResourceMetadata[]
+     */
+    protected function getResourceMetadata(): array
+    {
+        /* @var \Jgut\JsonApi\Mapping\Metadata\ResourceMetadata[] */
+        return $this->configuration->getMetadataResolver()->getMetadata($this->configuration->getSources());
     }
 }

@@ -137,7 +137,7 @@ class MappingTraitTest extends TestCase
         self::assertEquals('uuid', $resource->getIdentifier()->getName());
         self::assertEquals('getUuid', $resource->getIdentifier()->getGetter());
         self::assertEquals('setUuid', $resource->getIdentifier()->getSetter());
-        self::assertEquals(['default'], $resource->getIdentifier()->getGroups());
+        self::assertEquals([], $resource->getIdentifier()->getGroups());
 
         $attributes = $resource->getAttributes();
 
@@ -155,7 +155,7 @@ class MappingTraitTest extends TestCase
         self::assertEquals('attributeTwo', $attribute->getName());
         self::assertEquals('getAttributeTwo', $attribute->getGetter());
         self::assertEquals('setAttributeTwo', $attribute->getSetter());
-        self::assertEquals(['default'], $attribute->getGroups());
+        self::assertEquals([], $attribute->getGroups());
 
         $relationships = $resource->getRelationships();
 
@@ -165,7 +165,7 @@ class MappingTraitTest extends TestCase
         self::assertEquals('relationshipOne', $relationship->getName());
         self::assertEquals('getRelationshipOne', $relationship->getGetter());
         self::assertEquals('setRelationshipOne', $relationship->getSetter());
-        self::assertEquals(['default'], $relationship->getGroups());
+        self::assertEquals([], $relationship->getGroups());
         self::assertEquals(false, $relationship->isDefaultIncluded());
         self::assertEquals(true, $relationship->isSelfLinkIncluded());
         self::assertEquals(false, $relationship->isRelatedLinkIncluded());

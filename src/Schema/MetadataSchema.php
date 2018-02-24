@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Schema;
 
+use Jgut\JsonApi\Exception\SchemaException;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
@@ -51,7 +52,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \RuntimeException
+     * @throws SchemaException
      */
     public function getId($resource): string
     {
@@ -59,7 +60,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
 
         $idAttribute = $this->resourceMetadata->getIdentifier();
         if ($idAttribute === null) {
-            throw new \RuntimeException(
+            throw new SchemaException(
                 \sprintf('No id attribute defined for "%s" resource', $this->resourceMetadata->getClass())
             );
         }
@@ -70,17 +71,36 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \RuntimeException
+     * @throws SchemaException
      */
     public function getAttributes($resource, array $fieldKeysFilter = null): array
     {
         $this->checkResourceType($resource);
 
+        $group = $this->resourceMetadata->getGroup();
         $attributes = [];
 
         foreach ($this->resourceMetadata->getAttributes() as $attribute) {
-            if ($fieldKeysFilter === null || \in_array($attribute->getName(), $fieldKeysFilter, true)) {
-                $attributes[$attribute->getName()] = $resource->{$attribute->getGetter()}();
+            $groups = $attribute->getGroups();
+            $name = $attribute->getName();
+
+            if (($fieldKeysFilter === null || \in_array($name, $fieldKeysFilter, true))
+                && ($group === null || \in_array($group, $groups, true))
+            ) {
+                $attributes[$name] = $resource->{$attribute->getGetter()}();
+            }
+        }
+
+        if ($fieldKeysFilter !== null) {
+            $unknownAttributes = \array_diff(\array_values($fieldKeysFilter), \array_keys($attributes));
+            if (\count($unknownAttributes) !== 0) {
+                throw new SchemaException(
+                    \sprintf(
+                        'Requested attribute%s "%s" does not exist',
+                        \count($unknownAttributes) > 1 ? 's' : '',
+                        \implode('", "', $unknownAttributes)
+                    )
+                );
             }
         }
 
@@ -90,8 +110,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \LogicException
-     * @throws \RuntimeException
+     * @throws SchemaException
      */
     public function getRelationships($resource, bool $isPrimary, array $includeRelationships): array
     {
@@ -101,31 +120,40 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             return [];
         }
 
-        $relationships = $this->resourceMetadata->getRelationships();
+        $group = $this->resourceMetadata->getGroup();
+        $relationships = [];
 
-        $unknownRelationships = \array_diff(\array_keys($includeRelationships), \array_keys($relationships));
-        if (\count($unknownRelationships) !== 0) {
-            throw new \LogicException(
-                \sprintf(
-                    'Requested include relationship%s "%s" does not exist',
-                    \count($unknownRelationships) > 1 ? 's' : '',
-                    \implode('", "', $unknownRelationships)
-                )
-            );
-        }
+        foreach ($this->resourceMetadata->getRelationships() as $relationship) {
+            $groups = $relationship->getGroups();
+            $name = $relationship->getName();
 
-        return \array_map(
-            function (RelationshipMetadata $relationship) use ($resource) {
-                return [
+            if (\array_key_exists($name, $includeRelationships)
+                && ($group === null || \in_array($group, $groups, true))
+            ) {
+                $relationships[$name] = [
                     self::DATA => function () use ($resource, $relationship) {
                         return $resource->{$relationship->getGetter()}();
                     },
                     self::SHOW_SELF => $relationship->isSelfLinkIncluded(),
                     self::SHOW_RELATED => $relationship->isRelatedLinkIncluded(),
                 ];
-            },
-            \array_intersect_key($relationships, $includeRelationships)
-        );
+            }
+        }
+
+        if (\count($includeRelationships) !== 0) {
+            $unknownRelationships = \array_diff(\array_keys($includeRelationships), \array_keys($relationships));
+            if (\count($unknownRelationships) !== 0) {
+                throw new SchemaException(
+                    \sprintf(
+                        'Requested relationship%s "%s" does not exist',
+                        \count($unknownRelationships) > 1 ? 's' : '',
+                        \implode('", "', $unknownRelationships)
+                    )
+                );
+            }
+        }
+
+        return $relationships;
     }
 
     /**
@@ -135,7 +163,13 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     {
         return \array_values(\array_filter(\array_map(
             function (RelationshipMetadata $relationship) {
-                return $relationship->isDefaultIncluded() ? $relationship->getName() : null;
+                $group = $this->resourceMetadata->getGroup();
+                $name = $relationship->getName();
+
+                return $relationship->isDefaultIncluded()
+                    && ($group === null || \in_array($group, $relationship->getGroups(), true))
+                    ? $name
+                    : null;
             },
             $this->resourceMetadata->getRelationships()
         )));
@@ -146,12 +180,12 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      *
      * @param object $resource
      *
-     * @throws \RuntimeException
+     * @throws SchemaException
      */
     private function checkResourceType($resource): void
     {
         if (!\is_a($resource, $this->resourceMetadata->getClass())) {
-            throw new \RuntimeException(
+            throw new SchemaException(
                 \sprintf('Class "%s" is not a "%s"', \get_class($resource), $this->resourceMetadata->getClass())
             );
         }

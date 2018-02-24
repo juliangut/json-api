@@ -35,7 +35,7 @@ class AttributeMetadata extends AbstractMetadata
     /**
      * Attribute encoding groups.
      *
-     * @var array<string>
+     * @var string[]
      */
     protected $groups = [];
 

@@ -300,7 +300,7 @@ trait MappingTrait
      */
     protected function getGroups(array $mapping): array
     {
-        return $mapping['groups'] ?? ['default'];
+        return $mapping['groups'] ?? [];
     }
 
     /**
