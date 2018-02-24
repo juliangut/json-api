@@ -78,11 +78,33 @@ class MetadataSchemaTest extends TestCase
             ->setGetter('getId');
 
         $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
-            ->setIdentifier($identifier);
+            ->setIdentifier($identifier)
+            ->setUrl('/resource');
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
         $this->assertEquals('aaa', $schema->getId($resource));
+    }
+
+    public function testGetUrl()
+    {
+        $resource = new class() {
+            public function getId(): string
+            {
+                return 'aaa';
+            }
+        };
+
+        $identifier = (new AttributeMetadata(\stdClass::class, 'Id'))
+            ->setGetter('getId');
+
+        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+            ->setIdentifier($identifier)
+            ->setUrl('/custom/resource');
+
+        $schema = new MetadataSchema($this->factory, $metadata);
+
+        $this->assertEquals('/custom/resource/aaa', $schema->getSelfSubUrl($resource));
     }
 
     public function testGetAttributes()

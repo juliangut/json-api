@@ -161,7 +161,7 @@ class Manager
      *
      * @return EncoderInterface
      */
-    protected function getResourceEncoder(array $resourceTypes, EncoderOptions $encoderOptions = null): EncoderInterface
+    public function getResourceEncoder(array $resourceTypes, EncoderOptions $encoderOptions = null): EncoderInterface
     {
         $schemaFactories = $this->getSchemaFactories($resourceTypes);
         $encoder = $this->getEncoder($schemaFactories, $encoderOptions);
@@ -181,7 +181,7 @@ class Manager
      *
      * @return EncoderInterface
      */
-    protected function getErrorEncoder(EncoderOptions $encoderOptions = null): EncoderInterface
+    public function getErrorEncoder(EncoderOptions $encoderOptions = null): EncoderInterface
     {
         return $this->getEncoder([], $encoderOptions);
     }

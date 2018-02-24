@@ -102,6 +102,11 @@ trait MappingTrait
             $resource->setSchemaClass($schemaClass);
         }
 
+        $url = $this->getUrl($mapping);
+        if ($url !== null) {
+            $resource->setUrl($url);
+        }
+
         $this->populateRelationships($resource, $mapping);
         $this->populateAttributes($resource, $mapping);
 
@@ -121,7 +126,7 @@ trait MappingTrait
     }
 
     /**
-     * Get schema provider class.
+     * Get schema class.
      *
      * @param array $mapping
      *
@@ -130,6 +135,18 @@ trait MappingTrait
     protected function getSchemaClass(array $mapping): ?string
     {
         return $mapping['schemaClass'] ?? null;
+    }
+
+    /**
+     * Get resource url.
+     *
+     * @param array $mapping
+     *
+     * @return string|null
+     */
+    protected function getUrl(array $mapping): ?string
+    {
+        return $mapping['url'] ?? null;
     }
 
     /**

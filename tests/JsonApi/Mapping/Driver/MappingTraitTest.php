@@ -92,6 +92,7 @@ class MappingTraitTest extends TestCase
                     'class' => 'My\Class',
                     'includeAttributes' => false,
                     'schemaClass' => MetadataSchema::class,
+                    'url' => 'resource',
                     'id' => [
                         'name' => 'uuid',
                         'setter' => 'setUuid',
@@ -129,6 +130,7 @@ class MappingTraitTest extends TestCase
         self::assertInstanceOf(ResourceMetadata::class, $resource);
         self::assertEquals('My\Class', $resource->getClass());
         self::assertEquals('class', $resource->getName());
+        self::assertEquals('/resource', $resource->getUrl());
         self::assertEquals(MetadataSchema::class, $resource->getSchemaClass());
         self::assertInstanceOf(AttributeMetadata::class, $resource->getIdentifier());
         self::assertEquals('My\Class', $resource->getIdentifier()->getClass());

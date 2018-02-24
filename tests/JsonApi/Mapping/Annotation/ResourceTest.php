@@ -61,4 +61,11 @@ class ResourceTest extends TestCase
 
         self::assertFalse($this->annotation->isIncludeAttributes());
     }
+
+    public function testUrl()
+    {
+        $this->annotation->setUrl('/resource');
+
+        self::assertEquals('/resource', $this->annotation->getUrl());
+    }
 }

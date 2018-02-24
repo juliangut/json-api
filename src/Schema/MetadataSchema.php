@@ -38,6 +38,11 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
         $this->resourceMetadata = $resourceMetadata;
         $this->resourceType = $resourceMetadata->getName();
 
+        $url = $resourceMetadata->getUrl();
+        if ($url !== null) {
+            $this->selfSubUrl = $url;
+        }
+
         parent::__construct($factory);
 
         $this->isShowAttributesInIncluded = $resourceMetadata->isIncludeAttributes();

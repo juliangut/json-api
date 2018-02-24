@@ -40,6 +40,13 @@ class Resource extends AbstractAnnotation
     protected $schemaClass;
 
     /**
+     * Resource URL.
+     *
+     * @var string
+     */
+    protected $url;
+
+    /**
      * Show attributes in include section.
      *
      * @var bool
@@ -90,6 +97,30 @@ class Resource extends AbstractAnnotation
     public function setSchemaClass(string $schemaClass): self
     {
         $this->schemaClass = $schemaClass;
+
+        return $this;
+    }
+
+    /**
+     * Get resource URL.
+     *
+     * @return string|null
+     */
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    /**
+     * Set resource URL.
+     *
+     * @param string $url
+     *
+     * @return self
+     */
+    public function setUrl(string $url): self
+    {
+        $this->url = $url;
 
         return $this;
     }

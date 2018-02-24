@@ -47,6 +47,13 @@ class ResourceMetadata extends AbstractMetadata
     protected $relationships = [];
 
     /**
+     * Resource URL.
+     *
+     * @var string
+     */
+    protected $url;
+
+    /**
      * @var bool
      */
     protected $includeAttributes = true;
@@ -65,8 +72,6 @@ class ResourceMetadata extends AbstractMetadata
      * Set schema provider class.
      *
      * @param string $schemaClass
-     *
-     * @throws \InvalidArgumentException
      *
      * @return self
      */
@@ -145,6 +150,30 @@ class ResourceMetadata extends AbstractMetadata
     public function addRelationship(RelationshipMetadata $relationship): self
     {
         $this->relationships[$relationship->getName()] = $relationship;
+
+        return $this;
+    }
+
+    /**
+     * Get resource URL.
+     *
+     * @return string|null
+     */
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    /**
+     * Set resource URL.
+     *
+     * @param string $url
+     *
+     * @return self
+     */
+    public function setUrl(string $url): self
+    {
+        $this->url = '/' . \trim($url, '/ ');
 
         return $this;
     }

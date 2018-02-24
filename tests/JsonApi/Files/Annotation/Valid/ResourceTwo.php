@@ -20,7 +20,8 @@ use Jgut\JsonApi\Mapping\Annotation as JJA;
  *
  * @JJA\Resource(
  *     name="resourceB",
- *     schemaClass="\Jgut\JsonApi\Test\Stubs\Schema"
+ *     schemaClass="\Jgut\JsonApi\Test\Stubs\Schema",
+ *     url="resource"
  * )
  */
 class ResourceTwo

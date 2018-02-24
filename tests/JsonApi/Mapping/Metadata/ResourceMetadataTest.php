@@ -71,6 +71,13 @@ class ResourceMetadataTest extends TestCase
         self::assertFalse($this->resource->isIncludeAttributes());
     }
 
+    public function testUrl()
+    {
+        $this->resource->setUrl('resource');
+
+        self::assertEquals('/resource', $this->resource->getUrl());
+    }
+
     public function testAttributes()
     {
         $attribute = $this->getMockBuilder(AttributeMetadata::class)

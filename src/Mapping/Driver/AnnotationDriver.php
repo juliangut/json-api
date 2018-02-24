@@ -78,11 +78,6 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
     ): ResourceMetadata {
         $resource = new ResourceMetadata($class->getName(), $resourceName);
 
-        if ($annotation->getSchemaClass() !== null) {
-            $resource->setSchemaClass($annotation->getSchemaClass());
-        }
-        $resource->setIncludeAttributes($annotation->isIncludeAttributes());
-
         foreach ($class->getProperties() as $property) {
             // @codeCoverageIgnoreStart
             if ($property->getDeclaringClass()->name !== $class->name) {
@@ -107,7 +102,32 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             );
         }
 
+        $this->populateResourceMetadata($resource, $annotation);
+
         return $resource;
+    }
+
+    /**
+     * Populate resource metadata.
+     *
+     * @param ResourceMetadata   $resourceMetadata
+     * @param ResourceAnnotation $resourceAnnotation
+     */
+    protected function populateResourceMetadata(
+        ResourceMetadata $resourceMetadata,
+        ResourceAnnotation $resourceAnnotation
+    ): void {
+        $schemaClass = $resourceAnnotation->getSchemaClass();
+        if ($schemaClass !== null) {
+            $resourceMetadata->setSchemaClass($schemaClass);
+        }
+
+        $url = $resourceAnnotation->getUrl();
+        if ($url !== null) {
+            $resourceMetadata->setUrl($url);
+        }
+
+        $resourceMetadata->setIncludeAttributes($resourceAnnotation->isIncludeAttributes());
     }
 
     /**
