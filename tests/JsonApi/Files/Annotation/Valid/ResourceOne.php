@@ -20,7 +20,7 @@ use Jgut\JsonApi\Mapping\Annotation as JJA;
  *
  * @JJA\Resource(
  *     name="resourceA",
- *     includeAttributes=false
+ *     attributesInInclude=false
  * )
  */
 class ResourceOne

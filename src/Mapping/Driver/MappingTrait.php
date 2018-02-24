@@ -83,7 +83,7 @@ trait MappingTrait
 
         $resource = (new ResourceMetadata($mapping['class'], $mapping['name']))
             ->setIdentifier($this->getIdAttribute($mapping))
-            ->setIncludeAttributes($this->isIncludeAttributes($mapping));
+            ->setAttributesInInclude($this->hasAttributesInInclude($mapping));
 
         $schemaClass = $this->getSchemaClass($mapping);
         if ($schemaClass !== null) {
@@ -120,9 +120,9 @@ trait MappingTrait
      *
      * @return bool
      */
-    protected function isIncludeAttributes(array $mapping): bool
+    protected function hasAttributesInInclude(array $mapping): bool
     {
-        return isset($mapping['includeAttributes']) ? (bool) $mapping['includeAttributes'] : true;
+        return isset($mapping['attributesInInclude']) ? (bool) $mapping['attributesInInclude'] : true;
     }
 
     /**

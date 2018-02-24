@@ -90,7 +90,7 @@ class MappingTraitTest extends TestCase
             ->will($this->returnValue([
                 [
                     'class' => 'My\Class',
-                    'includeAttributes' => false,
+                    'attributesInInclude' => false,
                     'schemaClass' => MetadataSchema::class,
                     'url' => 'resource',
                     'id' => [

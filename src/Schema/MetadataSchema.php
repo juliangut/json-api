@@ -45,7 +45,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
 
         parent::__construct($factory);
 
-        $this->isShowAttributesInIncluded = $resourceMetadata->isIncludeAttributes();
+        $this->isShowAttributesInIncluded = $resourceMetadata->hasAttributesInInclude();
     }
 
     /**

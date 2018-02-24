@@ -47,11 +47,11 @@ class Resource extends AbstractAnnotation
     protected $url;
 
     /**
-     * Show attributes in include section.
+     * Show attributes visibility when included.
      *
      * @var bool
      */
-    protected $includeAttributes = true;
+    protected $attributesInInclude = true;
 
     /**
      * Get resource name.
@@ -126,25 +126,25 @@ class Resource extends AbstractAnnotation
     }
 
     /**
-     * Should attributes be shown when on include section.
+     * Should attributes be shown when being included.
      *
      * @return bool
      */
-    public function isIncludeAttributes(): bool
+    public function hasAttributesInInclude(): bool
     {
-        return $this->includeAttributes;
+        return $this->attributesInInclude;
     }
 
     /**
-     * Set show attributes in include section.
+     * Set show attributes visibility when included.
      *
-     * @param bool $includeAttributes
+     * @param bool $attributesInInclude
      *
      * @return self
      */
-    public function setIncludeAttributes(bool $includeAttributes)
+    public function setAttributesInInclude(bool $attributesInInclude)
     {
-        $this->includeAttributes = $includeAttributes;
+        $this->attributesInInclude = $attributesInInclude;
 
         return $this;
     }

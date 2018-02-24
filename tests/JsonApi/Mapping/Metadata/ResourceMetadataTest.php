@@ -40,7 +40,7 @@ class ResourceMetadataTest extends TestCase
     {
         self::assertNull($this->resource->getSchemaClass());
         self::assertNull($this->resource->getIdentifier());
-        self::assertTrue($this->resource->isIncludeAttributes());
+        self::assertTrue($this->resource->hasAttributesInInclude());
         self::assertEquals([], $this->resource->getAttributes());
         self::assertEquals([], $this->resource->getRelationships());
     }
@@ -64,11 +64,11 @@ class ResourceMetadataTest extends TestCase
         self::assertEquals($identifier, $this->resource->getIdentifier());
     }
 
-    public function testIncludeAttributes()
+    public function testAttributesInInclude()
     {
-        $this->resource->setIncludeAttributes(false);
+        $this->resource->setAttributesInInclude(false);
 
-        self::assertFalse($this->resource->isIncludeAttributes());
+        self::assertFalse($this->resource->hasAttributesInInclude());
     }
 
     public function testUrl()

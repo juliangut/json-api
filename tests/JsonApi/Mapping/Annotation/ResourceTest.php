@@ -38,7 +38,7 @@ class ResourceTest extends TestCase
     {
         self::assertNull($this->annotation->getName());
         self::assertNull($this->annotation->getSchemaClass());
-        self::assertTrue($this->annotation->isIncludeAttributes());
+        self::assertTrue($this->annotation->hasAttributesInInclude());
     }
 
     public function testName()
@@ -55,11 +55,11 @@ class ResourceTest extends TestCase
         self::assertEquals('Class', $this->annotation->getSchemaClass());
     }
 
-    public function testIncludeAttributes()
+    public function testAttributesInInclude()
     {
-        $this->annotation->setIncludeAttributes(false);
+        $this->annotation->setAttributesInInclude(false);
 
-        self::assertFalse($this->annotation->isIncludeAttributes());
+        self::assertFalse($this->annotation->hasAttributesInInclude());
     }
 
     public function testUrl()

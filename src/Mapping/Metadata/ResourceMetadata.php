@@ -54,9 +54,11 @@ class ResourceMetadata extends AbstractMetadata
     protected $url;
 
     /**
+     * Attributes visibility when included.
+     *
      * @var bool
      */
-    protected $includeAttributes = true;
+    protected $attributesInInclude = true;
 
     /**
      * Get schema provider class.
@@ -179,25 +181,25 @@ class ResourceMetadata extends AbstractMetadata
     }
 
     /**
-     * Get include attributes.
+     * Get attributes visibility when included.
      *
      * @return bool
      */
-    public function isIncludeAttributes(): bool
+    public function hasAttributesInInclude(): bool
     {
-        return $this->includeAttributes;
+        return $this->attributesInInclude;
     }
 
     /**
-     * Set include attributes.
+     * Set attributes visibility when included.
      *
-     * @param bool $includeAttributes
+     * @param bool $attributesInInclude
      *
      * @return self
      */
-    public function setIncludeAttributes(bool $includeAttributes): self
+    public function setAttributesInInclude(bool $attributesInInclude): self
     {
-        $this->includeAttributes = $includeAttributes;
+        $this->attributesInInclude = $attributesInInclude;
 
         return $this;
     }
