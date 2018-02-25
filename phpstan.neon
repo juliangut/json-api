@@ -8,3 +8,4 @@ parameters:
     - '/^Parameter \#\d \$.+ of class Neomerx\\JsonApi\\Encoder\\Parameters\\EncodingParameters constructor expects array(<string>)?\|null, iterable given\.$/'
     - '/^In method "Jgut\\JsonApi\\Schema\\MetadataSchema::checkResourceType", parameter \$resource can be type-hinted to "object"\.$/'
     - '/^Method Jgut\\JsonApi\\Manager::getResourceMetadata\(\) should return array<Jgut\\JsonApi\\Mapping\\Metadata\\ResourceMetadata> but returns array<Jgut\\Mapping\\Metadata\\MetadataInterface>\.$/'
+    - '/^In method "Jgut\\JsonApi\\Schema\\MetadataSchema::getRelationshipDescription", parameter \$resource can be type-hinted to "object"\.$/'
