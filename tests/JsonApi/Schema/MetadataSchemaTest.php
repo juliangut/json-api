@@ -195,7 +195,34 @@ class MetadataSchemaTest extends TestCase
         $schema->getRelationships($resource, true, ['One' => null, 'Two' => null]);
     }
 
-    public function testRelationships()
+    public function testRelationshipsWithLinks()
+    {
+        $resource = new class() {
+            public function getRelationshipA(): string
+            {
+                return 'aaa';
+            }
+        };
+
+        $relationshipA = (new RelationshipMetadata(\stdClass::class, 'relationshipA'))
+            ->setGetter('getRelationshipA')
+            ->setSelfLinkIncluded(true)
+            ->setRelatedLinkIncluded(true);
+
+        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+            ->addRelationship($relationshipA);
+
+        $schema = new MetadataSchema($this->factory, $metadata);
+
+        $relationships = $schema->getRelationships($resource, true, ['relationshipA' => null]);
+
+        $this->assertTrue(isset($relationships['relationshipA']));
+        $this->assertFalse($relationships['relationshipA']['showData']);
+        $this->assertTrue($relationships['relationshipA']['showSelf']);
+        $this->assertFalse($relationships['relationshipA']['related']);
+    }
+
+    public function testRelationshipsWithData()
     {
         $resource = new class() {
             public function getRelationshipA(): string
@@ -228,8 +255,9 @@ class MetadataSchemaTest extends TestCase
         $this->assertTrue(isset($relationships['relationshipA']));
         $this->assertInstanceOf(\Closure::class, $relationships['relationshipA']['data']);
         $this->assertEquals('aaa', $relationships['relationshipA']['data']());
-        $this->assertFalse($relationships['relationshipA']['showSelf']);
-        $this->assertFalse($relationships['relationshipA']['related']);
+        $this->assertFalse(isset($relationships['relationshipA']['showData']));
+        $this->assertFalse(isset($relationships['relationshipA']['showSelf']));
+        $this->assertFalse(isset($relationships['relationshipA']['related']));
         $this->assertFalse(isset($relationships['relationshipB']));
     }
 

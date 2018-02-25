@@ -92,7 +92,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
         }
 
         if ($fieldKeysFilter !== null) {
-            $unknownAttributes = \array_diff(\array_values($fieldKeysFilter), \array_keys($attributes));
+            $unknownAttributes = \array_diff($fieldKeysFilter, \array_keys($attributes));
             if (\count($unknownAttributes) !== 0) {
                 throw new SchemaException(
                     \sprintf(
@@ -130,30 +130,55 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             if (\array_key_exists($name, $includeRelationships)
                 && ($group === null || \in_array($group, $groups, true))
             ) {
-                $relationships[$name] = [
-                    self::DATA => function () use ($resource, $relationship) {
-                        return $resource->{$relationship->getGetter()}();
-                    },
-                    self::SHOW_SELF => $relationship->isSelfLinkIncluded(),
-                    self::SHOW_RELATED => $relationship->isRelatedLinkIncluded(),
-                ];
+                $relationships[$name] = $this->getRelationshipDescription($resource, $relationship, $isPrimary);
             }
         }
 
         if (\count($includeRelationships) !== 0) {
-            $unknownRelationships = \array_diff(\array_keys($includeRelationships), \array_keys($relationships));
+            $unknownRelationships = \array_diff_key($includeRelationships, $relationships);
             if (\count($unknownRelationships) !== 0) {
                 throw new SchemaException(
                     \sprintf(
                         'Requested relationship%s "%s" does not exist',
                         \count($unknownRelationships) > 1 ? 's' : '',
-                        \implode('", "', $unknownRelationships)
+                        \implode('", "', \array_keys($unknownRelationships))
                     )
                 );
             }
         }
 
         return $relationships;
+    }
+
+    /**
+     * Get relationship description.
+     *
+     * @param object               $resource
+     * @param RelationshipMetadata $relationship
+     * @param bool                 $primary
+     *
+     * @return mixed[]
+     */
+    protected function getRelationshipDescription(
+        $resource,
+        RelationshipMetadata $relationship,
+        bool $primary
+    ): array {
+        if (($primary && $relationship->isSelfLinkIncluded())
+            || (!$primary && $relationship->isRelatedLinkIncluded())
+        ) {
+            return [
+                self::SHOW_DATA => false,
+                self::SHOW_SELF => $primary && $relationship->isSelfLinkIncluded(),
+                self::SHOW_RELATED => !$primary && $relationship->isRelatedLinkIncluded(),
+            ];
+        }
+
+        return [
+            self::DATA => function () use ($resource, $relationship) {
+                return $resource->{$relationship->getGetter()}();
+            },
+        ];
     }
 
     /**
