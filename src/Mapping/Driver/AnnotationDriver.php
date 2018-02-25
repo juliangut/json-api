@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Driver;
 
+use Doctrine\Common\Annotations\Annotation\Attribute;
 use Jgut\JsonApi\Mapping\Annotation\Attribute as AttributeAnnotation;
 use Jgut\JsonApi\Mapping\Annotation\Id as IdAnnotation;
 use Jgut\JsonApi\Mapping\Annotation\Relationship as RelationshipAnnotation;
@@ -190,12 +191,21 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
     ): void {
         $getter = $attributeAnnotation->getGetter();
         if ($getter === null) {
-            $getter = 'get' . \ucfirst($property->getName());
+            $getterPrefix = 'get';
+
+            $docComment = $property->getDeclaringClass()->getProperty($property->getName())->getDocComment();
+            if (\preg_match('/@var\s+([a-zA-Z]+)(\s|\n)/', $docComment, $matches) === 1) {
+                if (\in_array('bool', \explode('|', $matches[1]), true)) {
+                    $getterPrefix = 'is';
+                }
+            }
+
+            $getter = $getterPrefix . \ucfirst($attributeMetadata->getName());
         }
 
         $setter = $attributeAnnotation->getSetter();
         if ($setter === null) {
-            $setter = 'set' . \ucfirst($property->getName());
+            $setter = 'set' . \ucfirst($attributeMetadata->getName());
         }
 
         $attributeMetadata

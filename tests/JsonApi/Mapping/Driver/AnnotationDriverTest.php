@@ -79,6 +79,8 @@ class AnnotationDriverTest extends TestCase
         self::assertEquals('getId', $resource->getIdentifier()->getGetter());
         self::assertEquals('setId', $resource->getIdentifier()->getSetter());
         self::assertEquals([], $resource->getIdentifier()->getGroups());
+        self::assertEquals('isTheOne', $resource->getAttributes()['theOne']->getGetter());
+        self::assertEquals('setTheOne', $resource->getAttributes()['theOne']->getSetter());
 
         $resource = $resources['resourceB'];
         self::assertInstanceOf(ResourceMetadata::class, $resource);
@@ -93,5 +95,7 @@ class AnnotationDriverTest extends TestCase
         self::assertEquals('getUuid', $resource->getIdentifier()->getGetter());
         self::assertEquals('setUuid', $resource->getIdentifier()->getSetter());
         self::assertEquals([], $resource->getIdentifier()->getGroups());
+        self::assertEquals('getTwo', $resource->getAttributes()['two']->getGetter());
+        self::assertEquals('setTwo', $resource->getAttributes()['two']->getSetter());
     }
 }

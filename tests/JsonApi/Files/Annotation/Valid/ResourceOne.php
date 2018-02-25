@@ -37,7 +37,7 @@ class ResourceOne
      *     name="theOne"
      * )
      *
-     * @var string
+     * @var bool
      */
     protected $one;
 
