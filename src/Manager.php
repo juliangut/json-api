@@ -19,6 +19,7 @@ use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
+use Neomerx\JsonApi\Document\Link;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
@@ -46,7 +47,8 @@ class Manager
     /**
      * JSON API manager constructor.
      *
-     * @param Configuration $configuration
+     * @param Configuration    $configuration
+     * @param FactoryInterface $factory
      */
     public function __construct(Configuration $configuration, FactoryInterface $factory)
     {
@@ -114,7 +116,7 @@ class Manager
         if ($encodingParameters === null) {
             $queryParameters = $this->getRequestQueryParameters($request);
 
-            if ($queryParameters instanceof BaseQueryParserInterface) {
+            if ($queryParameters !== null) {
                 $encodingParameters = new EncodingParameters(
                     $queryParameters->getIncludes(),
                     $queryParameters->getFields()
@@ -169,7 +171,36 @@ class Manager
             $encoder->withMeta($metadata);
         }
 
+        $links = $this->getLinks();
+        if (\count($links) !== 0) {
+            $encoder->withLinks($links);
+        }
+
         return $encoder;
+    }
+
+    /**
+     * Get general API links.
+     *
+     * @return string[]|Link[]
+     */
+    protected function getLinks(): array
+    {
+        $links = \array_merge(
+            $this->configuration->getUrlPrefix() !== null ? ['base' => $this->configuration->getUrlPrefix()] : [],
+            $this->configuration->getLinks() ?? []
+        );
+
+        return \array_map(
+            function ($link) {
+                if (\is_string($link) && \preg_match('/^https?:\/\//', $link) === 1) {
+                    $link = new Link($link, null, true);
+                }
+
+                return $link;
+            },
+            $links
+        );
     }
 
     /**
@@ -192,7 +223,7 @@ class Manager
      *
      * @return EncoderInterface
      */
-    private function getEncoder(array $schemaFactories, ?EncoderOptions $encoderOptions): EncoderInterface
+    protected function getEncoder(array $schemaFactories, ?EncoderOptions $encoderOptions): EncoderInterface
     {
         return $this->factory->createEncoder(
             $this->factory->createContainer($schemaFactories),
@@ -208,7 +239,7 @@ class Manager
      *
      * @return \Closure[]
      */
-    protected function getSchemaFactories(array $resourceTypes, ?string $group): array
+    private function getSchemaFactories(array $resourceTypes, ?string $group): array
     {
         $resolver = $this->configuration->getSchemaResolver();
 
@@ -232,7 +263,7 @@ class Manager
      *
      * @return \Jgut\JsonApi\Mapping\Metadata\ResourceMetadata[]
      */
-    protected function getResourceMetadata(): array
+    private function getResourceMetadata(): array
     {
         /* @var \Jgut\JsonApi\Mapping\Metadata\ResourceMetadata[] */
         return $this->configuration->getMetadataResolver()->getMetadata($this->configuration->getSources());

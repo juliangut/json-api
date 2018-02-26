@@ -79,9 +79,16 @@ class Configuration
     /**
      * General API metadata.
      *
-     * @var array
+     * @var mixed[]
      */
     protected $metadata;
+
+    /**
+     * General API links.
+     *
+     * @var string[]|\Neomerx\JsonApi\Document\Link[]
+     */
+    protected $links;
 
     /**
      * Configuration constructor.
@@ -155,6 +162,8 @@ class Configuration
      * Set mapping sources.
      *
      * @param mixed[] $sources
+     *
+     * @throws \InvalidArgumentException
      *
      * @return self
      */
@@ -352,6 +361,30 @@ class Configuration
     public function setMetadata(array $metadata): self
     {
         $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    /**
+     * Get general API links.
+     *
+     * @return string[]|\Neomerx\JsonApi\Document\Link[]
+     */
+    public function getLinks(): ?array
+    {
+        return $this->links;
+    }
+
+    /**
+     * Set general API links.
+     *
+     * @param string[]|\Neomerx\JsonApi\Document\Link[] $links
+     *
+     * @return self
+     */
+    public function setLinks(array $links): self
+    {
+        $this->links = $links;
 
         return $this;
     }

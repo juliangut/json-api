@@ -108,11 +108,14 @@ class ManagerTest extends TestCase
         /* @var Factory $factory */
 
         $configuration = $this->getMockBuilder(Configuration::class)
-            ->setMethods(['getMetadata', 'getSources'])
+            ->setMethods(['getMetadata', 'getLinks', 'getSources'])
             ->getMock();
         $configuration->expects(self::once())
             ->method('getMetadata')
             ->will($this->returnValue([]));
+        $configuration->expects(self::once())
+            ->method('getLinks')
+            ->will($this->returnValue(['custom' => 'http://example.com']));
         $configuration->expects(self::once())
             ->method('getSources')
             ->will($this->returnValue([__DIR__ . '/Files/Annotation/Valid']));
