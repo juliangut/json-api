@@ -63,7 +63,7 @@ $jsonApiManager->encodeResources(new MyClass(), new RequestInstance());
 * `attributeName` name of the PSR-7 Request attribute that will hold query parameters for resource encoding
 * `encoderOptions` an instance of \Neomerx\JsonApi\Encoder\EncoderOptions
 * `urlPrefix` prefix for generated URLs
-* `schemaClass` an instance of \Jgut\JsonApi\Schema\MetadataSchemaInterface (\Jgut\JsonApi\Schema\MetadataSchema by default)
+* `schemaClass` class name implementing \Jgut\JsonApi\Schema\MetadataSchemaInterface (\Jgut\JsonApi\Schema\MetadataSchema by default)
 * `metadata` array of JSON-API global "meta" data
 
 ### Resources

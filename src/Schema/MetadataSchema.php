@@ -20,7 +20,7 @@ use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
 use Neomerx\JsonApi\Schema\BaseSchema;
 
 /**
- * Dynamic metadata based schema.
+ * Resource metadata based schema.
  */
 class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
 {

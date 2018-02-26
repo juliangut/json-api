@@ -25,7 +25,7 @@ use Neomerx\JsonApi\Encoder\EncoderOptions;
  */
 class Configuration
 {
-    const QUERY_PARAMETERS_REQUEST_KEY = 'JSON_API_query_parameters';
+    public const QUERY_PARAMETERS_REQUEST_KEY = 'JSON_API_query_parameters';
 
     /**
      * Request attribute name.
@@ -70,7 +70,7 @@ class Configuration
     protected $urlPrefix;
 
     /**
-     * Metadata schema class.
+     * Metadata resource schema class.
      *
      * @var string
      */
@@ -309,7 +309,7 @@ class Configuration
     }
 
     /**
-     * Get metadata schema class.
+     * Get metadata resource schema class.
      *
      * @return string
      */
@@ -319,7 +319,7 @@ class Configuration
     }
 
     /**
-     * Set metadata schema class.
+     * Set metadata resource schema class.
      *
      * @param string $schemaClass
      *

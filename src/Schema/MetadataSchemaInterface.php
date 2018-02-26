@@ -18,12 +18,12 @@ use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 
 /**
- * Metadata schema interface.
+ * Resource metadata schema interface.
  */
 interface MetadataSchemaInterface extends SchemaInterface
 {
     /**
-     * Metadata schema provider constructor.
+     * Metadata resource schema constructor.
      *
      * @param SchemaFactoryInterface $factory
      * @param ResourceMetadata       $resourceMetadata

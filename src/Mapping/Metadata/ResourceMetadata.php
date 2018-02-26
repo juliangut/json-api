@@ -19,7 +19,7 @@ namespace Jgut\JsonApi\Mapping\Metadata;
 class ResourceMetadata extends AbstractMetadata
 {
     /**
-     * Schema provider class.
+     * Metadata resource schema class.
      *
      * @var string
      */
@@ -68,7 +68,7 @@ class ResourceMetadata extends AbstractMetadata
     protected $group;
 
     /**
-     * Get schema provider class.
+     * Get metadata resource schema class.
      *
      * @return string|null
      */
@@ -78,7 +78,7 @@ class ResourceMetadata extends AbstractMetadata
     }
 
     /**
-     * Set schema provider class.
+     * Set metadata resource schema class.
      *
      * @param string $schemaClass
      *

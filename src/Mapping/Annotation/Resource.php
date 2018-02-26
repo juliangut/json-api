@@ -33,7 +33,7 @@ class Resource extends AbstractAnnotation
     protected $name;
 
     /**
-     * Schema provider class.
+     * Metadata resource schema class.
      *
      * @var string
      */
@@ -78,7 +78,7 @@ class Resource extends AbstractAnnotation
     }
 
     /**
-     * Get schema provider class.
+     * Get metadata resource schema class.
      *
      * @return string|null
      */
@@ -88,7 +88,7 @@ class Resource extends AbstractAnnotation
     }
 
     /**
-     * Set schema provider class.
+     * Set metadata resource schema class.
      *
      * @param string $schemaClass
      *
