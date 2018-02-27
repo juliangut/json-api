@@ -79,7 +79,7 @@ class MetadataSchemaTest extends TestCase
 
         $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
             ->setIdentifier($identifier)
-            ->setUrl('/resource');
+            ->setUrlPrefix('/resource');
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
@@ -100,7 +100,7 @@ class MetadataSchemaTest extends TestCase
 
         $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
             ->setIdentifier($identifier)
-            ->setUrl('/custom/resource');
+            ->setUrlPrefix('/custom/resource');
 
         $schema = new MetadataSchema($this->factory, $metadata);
 

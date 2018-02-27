@@ -123,9 +123,9 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             $resourceMetadata->setSchemaClass($schemaClass);
         }
 
-        $url = $resourceAnnotation->getUrl();
+        $url = $resourceAnnotation->getUrlPrefix();
         if ($url !== null) {
-            $resourceMetadata->setUrl($url);
+            $resourceMetadata->setUrlPrefix($url);
         }
 
         $resourceMetadata->setAttributesInInclude($resourceAnnotation->hasAttributesInInclude());

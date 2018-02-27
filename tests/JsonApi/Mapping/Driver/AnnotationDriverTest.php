@@ -70,7 +70,7 @@ class AnnotationDriverTest extends TestCase
         self::assertInstanceOf(ResourceMetadata::class, $resource);
         self::assertEquals(ResourceOne::class, $resource->getClass());
         self::assertEquals('resourceA', $resource->getName());
-        self::assertNull($resource->getUrl());
+        self::assertNull($resource->getUrlPrefix());
         self::assertNull($resource->getSchemaClass());
         self::assertFalse($resource->hasAttributesInInclude());
         self::assertInstanceOf(AttributeMetadata::class, $resource->getIdentifier());
@@ -86,7 +86,7 @@ class AnnotationDriverTest extends TestCase
         self::assertInstanceOf(ResourceMetadata::class, $resource);
         self::assertEquals(ResourceTwo::class, $resource->getClass());
         self::assertEquals('resourceB', $resource->getName());
-        self::assertEquals('/resource', $resource->getUrl());
+        self::assertEquals('/resource', $resource->getUrlPrefix());
         self::assertEquals('\Jgut\JsonApi\Test\Stubs\Schema', $resource->getSchemaClass());
         self::assertTrue($resource->hasAttributesInInclude());
         self::assertInstanceOf(AttributeMetadata::class, $resource->getIdentifier());

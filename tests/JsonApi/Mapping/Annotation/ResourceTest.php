@@ -64,8 +64,8 @@ class ResourceTest extends TestCase
 
     public function testUrl()
     {
-        $this->annotation->setUrl('/resource');
+        $this->annotation->setUrlPrefix('/resource');
 
-        self::assertEquals('/resource', $this->annotation->getUrl());
+        self::assertEquals('/resource', $this->annotation->getUrlPrefix());
     }
 }

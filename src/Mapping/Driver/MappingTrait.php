@@ -102,9 +102,9 @@ trait MappingTrait
             $resource->setSchemaClass($schemaClass);
         }
 
-        $url = $this->getUrl($mapping);
-        if ($url !== null) {
-            $resource->setUrl($url);
+        $urlPrefix = $this->getUrlPrefix($mapping);
+        if ($urlPrefix !== null) {
+            $resource->setUrlPrefix($urlPrefix);
         }
 
         $this->populateRelationships($resource, $mapping);
@@ -138,15 +138,15 @@ trait MappingTrait
     }
 
     /**
-     * Get resource url.
+     * Get resource URL prefix.
      *
      * @param array $mapping
      *
      * @return string|null
      */
-    protected function getUrl(array $mapping): ?string
+    protected function getUrlPrefix(array $mapping): ?string
     {
-        return $mapping['url'] ?? null;
+        return $mapping['urlPrefix'] ?? null;
     }
 
     /**

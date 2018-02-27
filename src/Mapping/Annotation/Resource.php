@@ -40,11 +40,11 @@ class Resource extends AbstractAnnotation
     protected $schemaClass;
 
     /**
-     * Resource URL.
+     * Resource URL prefix.
      *
      * @var string
      */
-    protected $url;
+    protected $urlPrefix;
 
     /**
      * Show attributes visibility when included.
@@ -102,25 +102,25 @@ class Resource extends AbstractAnnotation
     }
 
     /**
-     * Get resource URL.
+     * Get resource URL prefix.
      *
      * @return string|null
      */
-    public function getUrl(): ?string
+    public function getUrlPrefix(): ?string
     {
-        return $this->url;
+        return $this->urlPrefix;
     }
 
     /**
-     * Set resource URL.
+     * Set resource URL prefix.
      *
-     * @param string $url
+     * @param string $urlPrefix
      *
      * @return self
      */
-    public function setUrl(string $url): self
+    public function setUrlPrefix(string $urlPrefix): self
     {
-        $this->url = $url;
+        $this->urlPrefix = $urlPrefix;
 
         return $this;
     }

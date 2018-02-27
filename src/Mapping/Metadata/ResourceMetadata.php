@@ -47,11 +47,11 @@ class ResourceMetadata extends AbstractMetadata
     protected $relationships = [];
 
     /**
-     * Resource URL.
+     * Resource URL prefix.
      *
      * @var string
      */
-    protected $url;
+    protected $urlPrefix;
 
     /**
      * Attributes visibility when included.
@@ -164,25 +164,25 @@ class ResourceMetadata extends AbstractMetadata
     }
 
     /**
-     * Get resource URL.
+     * Get resource URL prefix.
      *
      * @return string|null
      */
-    public function getUrl(): ?string
+    public function getUrlPrefix(): ?string
     {
-        return $this->url;
+        return $this->urlPrefix;
     }
 
     /**
-     * Set resource URL.
+     * Set resource URL prefix.
      *
-     * @param string $url
+     * @param string $urlPrefix
      *
      * @return self
      */
-    public function setUrl(string $url): self
+    public function setUrlPrefix(string $urlPrefix): self
     {
-        $this->url = '/' . \trim($url, '/ ');
+        $this->urlPrefix = '/' . \trim($urlPrefix, '/ ');
 
         return $this;
     }
