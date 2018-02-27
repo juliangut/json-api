@@ -39,6 +39,8 @@ class RelationshipMetadataTest extends TestCase
         self::assertFalse($this->relationship->isDefaultIncluded());
         self::assertFalse($this->relationship->isSelfLinkIncluded());
         self::assertFalse($this->relationship->isRelatedLinkIncluded());
+        self::assertFalse($this->relationship->isRelatedLinkIncluded());
+        self::assertEmpty($this->relationship->getLinks());
     }
 
     public function testDefaultIncluded()
@@ -60,5 +62,12 @@ class RelationshipMetadataTest extends TestCase
         $this->relationship->setRelatedLinkIncluded(true);
 
         self::assertTrue($this->relationship->isRelatedLinkIncluded());
+    }
+
+    public function testLinks()
+    {
+        $this->relationship->setLinks(['custom' => '/custom']);
+
+        self::assertEquals(['custom' => '/custom'], $this->relationship->getLinks());
     }
 }

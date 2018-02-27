@@ -229,11 +229,26 @@ trait MappingTrait
 
         $relationship = new RelationshipMetadata($mapping['class'], $mapping['name']);
 
+        $this->populateRelationship($relationship, $mapping);
+
+        return $relationship;
+    }
+
+    /**
+     * Populate relationship.
+     *
+     * @param RelationshipMetadata $relationship
+     * @param array                $mapping
+     */
+    protected function populateRelationship(RelationshipMetadata $relationship, array $mapping): void
+    {
         $this->populateAttribute($relationship, $mapping);
 
-        return $relationship->setDefaultIncluded($this->isDefaultIncluded($mapping))
+        $relationship
+            ->setDefaultIncluded($this->isDefaultIncluded($mapping))
             ->setSelfLinkIncluded($this->isSelfLinkIncluded($mapping))
-            ->setRelatedLinkIncluded($this->isRelatedLinkIncluded($mapping));
+            ->setRelatedLinkIncluded($this->isRelatedLinkIncluded($mapping))
+            ->setLinks($this->getRelationshipLinks($mapping));
     }
 
     /**
@@ -337,5 +352,17 @@ trait MappingTrait
     protected function isRelatedLinkIncluded(array $mapping): bool
     {
         return isset($mapping['relatedLinkIncluded']) ? (bool) $mapping['relatedLinkIncluded'] : false;
+    }
+
+    /**
+     * Get relationship links.
+     *
+     * @param array $mapping
+     *
+     * @return array
+     */
+    protected function getRelationshipLinks(array $mapping): array
+    {
+        return $mapping['links'] ?? [];
     }
 }

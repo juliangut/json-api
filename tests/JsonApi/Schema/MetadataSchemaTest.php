@@ -18,6 +18,7 @@ use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Schema\MetadataSchema;
+use Neomerx\JsonApi\Document\Link;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -207,7 +208,11 @@ class MetadataSchemaTest extends TestCase
         $relationshipA = (new RelationshipMetadata(\stdClass::class, 'relationshipA'))
             ->setGetter('getRelationshipA')
             ->setSelfLinkIncluded(true)
-            ->setRelatedLinkIncluded(true);
+            ->setRelatedLinkIncluded(true)
+            ->setLinks([
+                'custom' => '/custom',
+                'external' => 'http://example.com',
+            ]);
 
         $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
             ->addRelationship($relationshipA);
@@ -220,6 +225,8 @@ class MetadataSchemaTest extends TestCase
         $this->assertFalse($relationships['relationshipA']['showData']);
         $this->assertTrue($relationships['relationshipA']['showSelf']);
         $this->assertFalse($relationships['relationshipA']['related']);
+        $this->assertEquals('/custom', $relationships['relationshipA']['links']['custom']);
+        $this->assertInstanceOf(Link::class, $relationships['relationshipA']['links']['external']);
     }
 
     public function testRelationshipsWithData()

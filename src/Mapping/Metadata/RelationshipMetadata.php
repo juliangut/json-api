@@ -40,6 +40,13 @@ class RelationshipMetadata extends AttributeMetadata
     protected $relatedLinkIncluded = false;
 
     /**
+     * Relationship links.
+     *
+     * @var string[]
+     */
+    protected $links = [];
+
+    /**
      * Is included by default.
      *
      * @return bool
@@ -107,6 +114,30 @@ class RelationshipMetadata extends AttributeMetadata
     public function setRelatedLinkIncluded(bool $relatedLinkIncluded): self
     {
         $this->relatedLinkIncluded = $relatedLinkIncluded;
+
+        return $this;
+    }
+
+    /**
+     * Get relationship links.
+     *
+     * @return string[]
+     */
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+
+    /**
+     * Set relationship links.
+     *
+     * @param string[] $links
+     *
+     * @return self
+     */
+    public function setLinks(array $links): self
+    {
+        $this->links = $links;
 
         return $this;
     }

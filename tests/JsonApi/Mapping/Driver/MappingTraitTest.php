@@ -112,6 +112,9 @@ class MappingTraitTest extends TestCase
                             'class' => 'My\Class\Relationship\One',
                             'name' => 'relationshipOne',
                             'selfLinkIncluded' => true,
+                            'links' => [
+                                'custom' => '/custom',
+                            ],
                         ],
                         [
                             'class' => 'My\Class\Relationship\Two',
@@ -169,6 +172,7 @@ class MappingTraitTest extends TestCase
         self::assertEquals(false, $relationship->isDefaultIncluded());
         self::assertEquals(true, $relationship->isSelfLinkIncluded());
         self::assertEquals(false, $relationship->isRelatedLinkIncluded());
+        self::assertEquals(['custom' => '/custom'], $relationship->getLinks());
 
         $relationship = $relationships['two'];
         self::assertInstanceOf(RelationshipMetadata::class, $relationship);

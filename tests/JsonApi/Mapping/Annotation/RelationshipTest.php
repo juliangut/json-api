@@ -39,6 +39,7 @@ class RelationshipTest extends TestCase
         self::assertFalse($this->annotation->isIncluded());
         self::assertFalse($this->annotation->isSelfLinkIncluded());
         self::assertFalse($this->annotation->isRelatedLinkIncluded());
+        self::assertEmpty($this->annotation->getLinks());
     }
 
     public function testDefaultIncluded()
@@ -60,5 +61,12 @@ class RelationshipTest extends TestCase
         $this->annotation->setRelatedLinkIncluded(true);
 
         self::assertTrue($this->annotation->isRelatedLinkIncluded());
+    }
+
+    public function testLinks()
+    {
+        $this->annotation->setLinks(['custom' => '/custom']);
+
+        self::assertEquals(['custom' => '/custom'], $this->annotation->getLinks());
     }
 }

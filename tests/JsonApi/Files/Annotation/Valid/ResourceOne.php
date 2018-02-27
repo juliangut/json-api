@@ -42,7 +42,9 @@ class ResourceOne
     protected $one;
 
     /**
-     * @JJA\Relationship()
+     * @JJA\Relationship(
+     *     links={"custom"="/custom"}
+     * )
      *
      * @var ResourceTwo
      */

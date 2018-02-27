@@ -17,6 +17,7 @@ use Jgut\JsonApi\Exception\SchemaException;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
+use Neomerx\JsonApi\Document\Link;
 use Neomerx\JsonApi\Schema\BaseSchema;
 
 /**
@@ -164,21 +165,23 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
         RelationshipMetadata $relationship,
         bool $primary
     ): array {
+        $description = [];
+
         if (($primary && $relationship->isSelfLinkIncluded())
             || (!$primary && $relationship->isRelatedLinkIncluded())
         ) {
-            return [
-                self::SHOW_DATA => false,
-                self::SHOW_SELF => $primary && $relationship->isSelfLinkIncluded(),
-                self::SHOW_RELATED => !$primary && $relationship->isRelatedLinkIncluded(),
-            ];
+            $description[self::SHOW_DATA] = false;
+            $description[self::SHOW_SELF] = $primary && $relationship->isSelfLinkIncluded();
+            $description[self::SHOW_RELATED] = !$primary && $relationship->isRelatedLinkIncluded();
+        } else {
+            $description[self::DATA] = function () use ($resource, $relationship) {
+                return $resource->{$relationship->getGetter()}();
+            };
         }
 
-        return [
-            self::DATA => function () use ($resource, $relationship) {
-                return $resource->{$relationship->getGetter()}();
-            },
-        ];
+        $description[self::LINKS] = $this->normalizeLinks($relationship->getLinks());
+
+        return $description;
     }
 
     /**
@@ -198,6 +201,27 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             },
             $this->resourceMetadata->getRelationships()
         )));
+    }
+
+    /**
+     * Normalize links format.
+     *
+     * @param string[] $links
+     *
+     * @return string[]|Link[]
+     */
+    private function normalizeLinks(array $links): array
+    {
+        return \array_map(
+            function ($link) {
+                if (\is_string($link) && \preg_match('/^https?:\/\//', $link) === 1) {
+                    $link = new Link($link, null, true);
+                }
+
+                return $link;
+            },
+            $links
+        );
     }
 
     /**
