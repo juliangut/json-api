@@ -24,7 +24,7 @@
   "require": {
     "php": "^7.1",
     "doctrine/annotations": "^1.4",
-    "juliangut/mapping": "~0.3",
+    "juliangut/mapping": "~0.4",
     "neomerx/json-api": "^2.0",
     "psr/http-message": "^1.0",
     "psr/http-server-middleware": "^1.0",

@@ -65,6 +65,7 @@ $jsonApiManager->encodeResources(new MyClass(), new RequestInstance());
 * `urlPrefix` prefix for generated URLs
 * `schemaClass` class name implementing \Jgut\JsonApi\Schema\MetadataSchemaInterface (\Jgut\JsonApi\Schema\MetadataSchema by default)
 * `metadata` array of JSON-API global "meta" data
+* `MetadataResolver` an instance of \Jgut\Mapping\Metadata\MetadataResolver. It is highly recommended to provide a PSR-16 cache to metadata resolver on production
 * `links` array of JSON-API global "links", could be strings or instances of \Neomerx\JsonApi\Document\Link
 
 ### Resources

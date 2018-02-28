@@ -37,8 +37,8 @@ class DriverFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException Jgut\Mapping\Exception\DriverException
-     * @expectedExceptionMessage Mapping driver should be of the type Jgut\Mapping\Driver\DriverInterface, string given
+     * @expectedException \Jgut\Mapping\Exception\DriverException
+     * @expectedExceptionMessageRegExp /^Metadata mapping driver should be of the type .+, string given$/
      */
     public function testInvalidDriver()
     {

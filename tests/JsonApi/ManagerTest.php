@@ -83,6 +83,8 @@ class ManagerTest extends TestCase
         $encoder->expects(self::once())
             ->method('withMeta');
         $encoder->expects(self::once())
+            ->method('withLinks');
+        $encoder->expects(self::once())
             ->method('encodeData')
             ->will($this->returnValue('ENCODED'));
         /* @var Encoder $encoder */
