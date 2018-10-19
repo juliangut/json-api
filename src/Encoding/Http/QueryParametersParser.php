@@ -85,7 +85,7 @@ class QueryParametersParser implements BaseQueryParserInterface
     /**
      * Parse query parameters.
      *
-     * @param mixed[] $parameters
+     * @param array<string, mixed> $parameters
      *
      * @throws JsonApiException
      */
@@ -277,7 +277,7 @@ class QueryParametersParser implements BaseQueryParserInterface
     /**
      * Parse page query parameter.
      *
-     * @param mixed[] $paging
+     * @param array<string, mixed> $paging
      *
      * @throws JsonApiException
      *

@@ -105,13 +105,13 @@ class Manager
      *
      * @return string
      */
-    public function encodeResources(
+    final public function encodeResources(
         $resources,
         ServerRequestInterface $request,
         ?string $group,
         array $resourceTypes = [],
-        EncodingParametersInterface $encodingParameters = null,
-        EncoderOptions $encoderOptions = null
+        ?EncodingParametersInterface $encodingParameters = null,
+        ?EncoderOptions $encoderOptions = null
     ): string {
         if ($encodingParameters === null) {
             $queryParameters = $this->getRequestQueryParameters($request);
@@ -140,7 +140,7 @@ class Manager
      *
      * @return string
      */
-    public function encodeErrors($errors, EncoderOptions $encoderOptions = null): string
+    final public function encodeErrors($errors, ?EncoderOptions $encoderOptions = null): string
     {
         if (!$errors instanceof ErrorCollection) {
             $errors = (new ErrorCollection())->add($errors);
@@ -158,7 +158,7 @@ class Manager
      *
      * @return EncoderInterface
      */
-    public function getResourceEncoder(
+    protected function getResourceEncoder(
         array $resourceTypes,
         ?string $group,
         ?EncoderOptions $encoderOptions
@@ -210,8 +210,15 @@ class Manager
      *
      * @return EncoderInterface
      */
-    public function getErrorEncoder(?EncoderOptions $encoderOptions): EncoderInterface
+    protected function getErrorEncoder(?EncoderOptions $encoderOptions): EncoderInterface
     {
+        $encoderOptions = $encoderOptions ?? $this->configuration->getEncoderOptions();
+        $encoderOptions = new EncoderOptions(
+            $encoderOptions->getOptions() | \JSON_PARTIAL_OUTPUT_ON_ERROR,
+            $encoderOptions->getUrlPrefix(),
+            $encoderOptions->getDepth()
+        );
+
         return $this->getEncoder([], $encoderOptions);
     }
 
@@ -223,7 +230,7 @@ class Manager
      *
      * @return EncoderInterface
      */
-    protected function getEncoder(array $schemaFactories, ?EncoderOptions $encoderOptions): EncoderInterface
+    private function getEncoder(array $schemaFactories, ?EncoderOptions $encoderOptions): EncoderInterface
     {
         return $this->factory->createEncoder(
             $this->factory->createContainer($schemaFactories),

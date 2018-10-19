@@ -11,8 +11,9 @@
 
 declare(strict_types=1);
 
-namespace Jgut\JsonApi\Tests;
+namespace Jgut\JsonApi\Tests\Middleware;
 
+use Jgut\JsonApi\Configuration;
 use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Encoding\Http\HeadersChecker;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
@@ -29,12 +30,12 @@ use Zend\Diactoros\ServerRequest;
  */
 class JsonApiMiddlewareTest extends TestCase
 {
-    public function testPSR15NoResponse()
+    public function testIncorrectHeaders()
     {
         $headersChecker = $this->getMockBuilder(HeadersChecker::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $headersChecker->expects(self::any())
+        $headersChecker->expects(self::once())
             ->method('checkHeaders')
             ->will($this->throwException(new JsonApiException([])));
         /* @var HeadersChecker $headersChecker */
@@ -42,50 +43,50 @@ class JsonApiMiddlewareTest extends TestCase
         $factory = $this->getMockBuilder(Factory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $factory->expects(self::any())
+        $factory->expects(self::once())
             ->method('createHeadersChecker')
             ->will($this->returnValue($headersChecker));
         /* @var Factory $factory */
 
         $manager = $this->getMockBuilder(Manager::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([new Configuration(), $factory])
             ->getMock();
         $manager->expects(self::once())
             ->method('getFactory')
             ->will($this->returnValue($factory));
         /* @var Manager $manager */
 
+        /* @var RequestHandlerInterface $handler */
         $handler = $this->getMockBuilder(RequestHandlerInterface::class)
             ->getMock();
-        /* @var RequestHandlerInterface $handler */
 
         $response = (new JsonApiMiddleware($manager))->process(new ServerRequest(), $handler);
 
         self::assertEquals(400, $response->getStatusCode());
     }
 
-    public function testPSR15Response()
+    public function testCorrectHeaders()
     {
         $headersChecker = $this->getMockBuilder(HeadersChecker::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $headersChecker->expects(self::any())
+        $headersChecker->expects(self::once())
             ->method('checkHeaders');
         /* @var HeadersChecker $headersChecker */
 
         $factory = $this->getMockBuilder(Factory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $factory->expects(self::any())
+        $factory->expects(self::once())
             ->method('createHeadersChecker')
             ->will($this->returnValue($headersChecker));
-        $factory->expects(self::any())
+        $factory->expects(self::once())
             ->method('createQueryParametersParser')
             ->will($this->returnValue(new QueryParametersParser()));
         /* @var Factory $factory */
 
         $manager = $this->getMockBuilder(Manager::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([new Configuration(), $factory])
             ->getMock();
         $manager->expects(self::once())
             ->method('getFactory')
@@ -103,84 +104,6 @@ class JsonApiMiddlewareTest extends TestCase
         /* @var RequestHandlerInterface $handler */
 
         $response = (new JsonApiMiddleware($manager))->process(new ServerRequest(), $handler);
-
-        self::assertEquals(200, $response->getStatusCode());
-        self::assertEquals('application/vnd.api+json; charset=utf-8', $response->getHeaderLine('Content-Type'));
-    }
-
-    public function testCallableNoResponse()
-    {
-        $headersChecker = $this->getMockBuilder(HeadersChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $headersChecker->expects(self::any())
-            ->method('checkHeaders')
-            ->will($this->throwException(new JsonApiException([])));
-        /* @var HeadersChecker $headersChecker */
-
-        $factory = $this->getMockBuilder(Factory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $factory->expects(self::any())
-            ->method('createHeadersChecker')
-            ->will($this->returnValue($headersChecker));
-        /* @var Factory $factory */
-
-        $manager = $this->getMockBuilder(Manager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $manager->expects(self::once())
-            ->method('getFactory')
-            ->will($this->returnValue($factory));
-        /* @var Manager $manager */
-
-        $callable = function ($request, $response) {
-            return $response;
-        };
-
-        /** @var Response $response */
-        $response = (new JsonApiMiddleware($manager))(new ServerRequest(), new Response(), $callable);
-
-        self::assertEquals(400, $response->getStatusCode());
-    }
-
-    public function testCallableResponse()
-    {
-        $headersChecker = $this->getMockBuilder(HeadersChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $headersChecker->expects(self::any())
-            ->method('checkHeaders');
-        /* @var HeadersChecker $headersChecker */
-
-        $factory = $this->getMockBuilder(Factory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $factory->expects(self::any())
-            ->method('createHeadersChecker')
-            ->will($this->returnValue($headersChecker));
-        $factory->expects(self::any())
-            ->method('createQueryParametersParser')
-            ->will($this->returnValue(new QueryParametersParser()));
-        /* @var Factory $factory */
-
-        $manager = $this->getMockBuilder(Manager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $manager->expects(self::once())
-            ->method('getFactory')
-            ->will($this->returnValue($factory));
-        $manager->expects(self::once())
-            ->method('setRequestQueryParameters')
-            ->will($this->returnArgument(0));
-        /* @var Manager $manager */
-
-        $callable = function ($request, $response) {
-            return $response;
-        };
-
-        /** @var Response $response */
-        $response = (new JsonApiMiddleware($manager))(new ServerRequest(), new Response(), $callable);
 
         self::assertEquals(200, $response->getStatusCode());
         self::assertEquals('application/vnd.api+json; charset=utf-8', $response->getHeaderLine('Content-Type'));

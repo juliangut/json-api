@@ -22,6 +22,12 @@ PSR-7 aware json-api integration.
 composer require juliangut/json-api
 ```
 
+doctrine/annotations to parse annotations
+
+```php
+composer require doctrine/annotations
+```
+
 symfony/yaml to parse yaml files
 
 ```

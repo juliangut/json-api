@@ -169,9 +169,9 @@ class MappingTraitTest extends TestCase
         self::assertEquals('getRelationshipOne', $relationship->getGetter());
         self::assertEquals('setRelationshipOne', $relationship->getSetter());
         self::assertEquals([], $relationship->getGroups());
-        self::assertEquals(false, $relationship->isDefaultIncluded());
-        self::assertEquals(true, $relationship->isSelfLinkIncluded());
-        self::assertEquals(false, $relationship->isRelatedLinkIncluded());
+        self::assertFalse($relationship->isDefaultIncluded());
+        self::assertTrue($relationship->isSelfLinkIncluded());
+        self::assertFalse($relationship->isRelatedLinkIncluded());
         self::assertEquals(['custom' => '/custom'], $relationship->getLinks());
 
         $relationship = $relationships['two'];
@@ -181,8 +181,8 @@ class MappingTraitTest extends TestCase
         self::assertEquals('getTwo', $relationship->getGetter());
         self::assertEquals('setTwo', $relationship->getSetter());
         self::assertEquals(['relationship', 'two'], $relationship->getGroups());
-        self::assertEquals(false, $relationship->isDefaultIncluded());
-        self::assertEquals(false, $relationship->isSelfLinkIncluded());
-        self::assertEquals(true, $relationship->isRelatedLinkIncluded());
+        self::assertFalse($relationship->isDefaultIncluded());
+        self::assertFalse($relationship->isSelfLinkIncluded());
+        self::assertTrue($relationship->isRelatedLinkIncluded());
     }
 }

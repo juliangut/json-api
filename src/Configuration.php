@@ -27,6 +27,14 @@ class Configuration
 {
     public const QUERY_PARAMETERS_REQUEST_KEY = 'JSON_API_query_parameters';
 
+    protected const JSON_ENCODE_OPTIONS = \JSON_UNESCAPED_UNICODE
+        | \JSON_UNESCAPED_SLASHES
+        | \JSON_PRESERVE_ZERO_FRACTION
+        | \JSON_HEX_AMP
+        | \JSON_HEX_APOS
+        | \JSON_HEX_QUOT
+        | \JSON_HEX_TAG;
+
     /**
      * Request attribute name.
      *
@@ -65,7 +73,7 @@ class Configuration
     /**
      * URL prefix for links.
      *
-     * @var string
+     * @var string|null
      */
     protected $urlPrefix;
 
@@ -93,16 +101,12 @@ class Configuration
     /**
      * Configuration constructor.
      *
-     * @param array|\Traversable $configurations
+     * @param mixed[] $configurations
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($configurations = [])
+    public function __construct(array $configurations = [])
     {
-        if (!\is_iterable($configurations)) {
-            throw new \InvalidArgumentException('Configurations must be an iterable');
-        }
-
         $configs = \array_keys(\get_object_vars($this));
 
         $unknownParameters = \array_diff(\array_keys($configurations), $configs);
@@ -117,6 +121,7 @@ class Configuration
 
         foreach ($configs as $config) {
             if (isset($configurations[$config])) {
+                /** @var callable $callback */
                 $callback = [$this, 'set' . \ucfirst($config)];
 
                 \call_user_func($callback, $configurations[$config]);
@@ -181,7 +186,7 @@ class Configuration
     /**
      * Add mapping source.
      *
-     * @param string|mixed[]|DriverInterface[] $source
+     * @param mixed $source
      *
      * @throws \InvalidArgumentException
      *
@@ -266,12 +271,8 @@ class Configuration
     public function getEncoderOptions(): EncoderOptions
     {
         if ($this->encoderOptions === null) {
-            $jsonFlags = \JSON_UNESCAPED_UNICODE
-                | \JSON_UNESCAPED_SLASHES
-                | \JSON_PRESERVE_ZERO_FRACTION;
-
             $this->encoderOptions = new EncoderOptions(
-                $jsonFlags,
+                static::JSON_ENCODE_OPTIONS,
                 \is_string($this->urlPrefix) ? \rtrim($this->urlPrefix, '/') : null
             );
         }

@@ -26,15 +26,6 @@ use PHPUnit\Framework\TestCase;
  */
 class ConfigurationTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Configurations must be an iterable
-     */
-    public function testInvalidConfigurations()
-    {
-        new Configuration('');
-    }
-
     public function testDefaults()
     {
         $configuration = new Configuration();

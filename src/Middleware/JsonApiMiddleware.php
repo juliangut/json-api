@@ -45,35 +45,6 @@ class JsonApiMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Invoke middleware.
-     *
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface      $response
-     * @param callable               $next
-     *
-     * @return ResponseInterface
-     */
-    public function __invoke(
-        ServerRequestInterface $request,
-        ResponseInterface $response,
-        callable $next
-    ): ResponseInterface {
-        try {
-            $request = $this->getRequestWithQueryParameters($request);
-        } catch (JsonApiException $exception) {
-            $response = $this->getNewResponse($response->getProtocolVersion());
-            $response->getBody()->write($this->manager->encodeErrors($exception->getErrors()));
-
-            return $response->withStatus($exception->getHttpCode());
-        }
-
-        /** @var ResponseInterface $response */
-        $response = $next($request, $response);
-
-        return $response->withHeader('Content-Type', MediaTypeInterface::JSON_API_MEDIA_TYPE . '; charset=utf-8');
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -81,10 +52,7 @@ class JsonApiMiddleware implements MiddlewareInterface
         try {
             $request = $this->getRequestWithQueryParameters($request);
         } catch (JsonApiException $exception) {
-            $response = $this->getNewResponse();
-            $response->getBody()->write($this->manager->encodeErrors($exception->getErrors()));
-
-            return $response->withStatus($exception->getHttpCode());
+            return $this->getResponseFromException($exception);
         }
 
         $response = $handler->handle($request);
@@ -113,14 +81,17 @@ class JsonApiMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Get new response object.
+     * Get new response object from exception.
      *
-     * @param string $protocol
+     * @param JsonApiException $exception
      *
      * @return ResponseInterface
      */
-    protected function getNewResponse(string $protocol = '1.1'): ResponseInterface
+    protected function getResponseFromException(JsonApiException $exception): ResponseInterface
     {
-        return (new Response('php://temp'))->withProtocolVersion($protocol);
+        $response = new Response('php://temp', $exception->getHttpCode());
+        $response->getBody()->write($this->manager->encodeErrors($exception->getErrors()));
+
+        return $response;
     }
 }

@@ -51,13 +51,17 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Get resource identity.
+     *
+     * @param object $resource
      *
      * @throws SchemaException
+     *
+     * @return string
      */
     public function getId($resource): string
     {
-        $this->checkResourceType($resource);
+        $this->assertResourceType($resource);
 
         $idAttribute = $this->resourceMetadata->getIdentifier();
         if ($idAttribute === null) {
@@ -70,13 +74,18 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Get resource attributes.
+     *
+     * @param object        $resource
+     * @param string[]|null $fieldKeysFilter
      *
      * @throws SchemaException
+     *
+     * @return array<string, string>
      */
     public function getAttributes($resource, array $fieldKeysFilter = null): array
     {
-        $this->checkResourceType($resource);
+        $this->assertResourceType($resource);
 
         $group = $this->resourceMetadata->getGroup();
         $attributes = [];
@@ -115,7 +124,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      */
     public function getRelationships($resource, bool $isPrimary, array $includeRelationships): array
     {
-        $this->checkResourceType($resource);
+        $this->assertResourceType($resource);
 
         if (\count($includeRelationships) === 0) {
             return [];
@@ -231,7 +240,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      *
      * @throws SchemaException
      */
-    private function checkResourceType($resource): void
+    private function assertResourceType($resource): void
     {
         if (!\is_a($resource, $this->resourceMetadata->getClass())) {
             throw new SchemaException(

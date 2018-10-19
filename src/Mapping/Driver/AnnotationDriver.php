@@ -194,7 +194,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             $getterPrefix = 'get';
 
             $docComment = $property->getDeclaringClass()->getProperty($property->getName())->getDocComment();
-            if (\preg_match('/@var\s+([a-zA-Z]+)(\s|\n)/', $docComment, $matches) === 1) {
+            if (\is_string($docComment) && \preg_match('/@var\s+([a-zA-Z]+)(\s|\n)/', $docComment, $matches) === 1) {
                 if (\in_array('bool', \explode('|', $matches[1]), true)) {
                     $getterPrefix = 'is';
                 }

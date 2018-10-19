@@ -44,7 +44,7 @@ trait MappingTrait
     /**
      * Get resources metadata.
      *
-     * @param array $mappingData
+     * @param array<string, mixed> $mappingData
      *
      * @throws DriverException
      *
@@ -64,7 +64,7 @@ trait MappingTrait
     /**
      * Get resource metadata.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @throws DriverException
      *
@@ -88,7 +88,7 @@ trait MappingTrait
         $schemaClass = $this->getSchemaClass($mapping);
         if ($schemaClass !== null) {
             if (!\class_exists($schemaClass)
-                || !\in_array(MetadataSchemaInterface::class, \class_implements($schemaClass))
+                || !\in_array(MetadataSchemaInterface::class, \class_implements($schemaClass), true)
             ) {
                 throw new DriverException(
                     \sprintf(
@@ -116,7 +116,7 @@ trait MappingTrait
     /**
      * Set attributes visibility when being included.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return bool
      */
@@ -128,7 +128,7 @@ trait MappingTrait
     /**
      * Get schema class.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return string|null
      */
@@ -140,7 +140,7 @@ trait MappingTrait
     /**
      * Get resource URL prefix.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return string|null
      */
@@ -152,7 +152,7 @@ trait MappingTrait
     /**
      * Get resource id attribute.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @throws \InvalidArgumentException
      *
@@ -170,8 +170,8 @@ trait MappingTrait
     /**
      * Populate resource relationships.
      *
-     * @param ResourceMetadata $resourceMetadata
-     * @param array            $mapping
+     * @param ResourceMetadata      $resourceMetadata
+     * @param array<string, string> $mapping
      */
     protected function populateRelationships(ResourceMetadata $resourceMetadata, array $mapping): void
     {
@@ -189,8 +189,8 @@ trait MappingTrait
     /**
      * Populate resource attributes.
      *
-     * @param ResourceMetadata $resourceMetadata
-     * @param array            $mapping
+     * @param ResourceMetadata      $resourceMetadata
+     * @param array<string, string> $mapping
      */
     protected function populateAttributes(ResourceMetadata $resourceMetadata, array $mapping): void
     {
@@ -210,7 +210,7 @@ trait MappingTrait
     /**
      * Ger resource relationship metadata.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @throws DriverException
      *
@@ -237,8 +237,8 @@ trait MappingTrait
     /**
      * Populate relationship.
      *
-     * @param RelationshipMetadata $relationship
-     * @param array                $mapping
+     * @param RelationshipMetadata  $relationship
+     * @param array<string, string> $mapping
      */
     protected function populateRelationship(RelationshipMetadata $relationship, array $mapping): void
     {
@@ -254,8 +254,8 @@ trait MappingTrait
     /**
      * Get resource attribute metadata.
      *
-     * @param string $class
-     * @param array  $mapping
+     * @param string                $class
+     * @param array<string, string> $mapping
      *
      * @return AttributeMetadata
      */
@@ -271,8 +271,8 @@ trait MappingTrait
     /**
      * Populate attribute.
      *
-     * @param AttributeMetadata $attribute
-     * @param array             $mapping
+     * @param AttributeMetadata     $attribute
+     * @param array<string, string> $mapping
      */
     protected function populateAttribute(AttributeMetadata $attribute, array $mapping): void
     {
@@ -285,7 +285,7 @@ trait MappingTrait
     /**
      * Get attribute getter method.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return string
      */
@@ -297,7 +297,7 @@ trait MappingTrait
     /**
      * Get attribute setter method.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return string
      */
@@ -309,7 +309,7 @@ trait MappingTrait
     /**
      * Get attribute groups.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return array
      */
@@ -321,7 +321,7 @@ trait MappingTrait
     /**
      * Get attribute default inclusion.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return bool
      */
@@ -333,7 +333,7 @@ trait MappingTrait
     /**
      * Get relationship self link default inclusion.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return bool
      */
@@ -345,7 +345,7 @@ trait MappingTrait
     /**
      * Get relationship related link default inclusion.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return bool
      */
@@ -357,7 +357,7 @@ trait MappingTrait
     /**
      * Get relationship links.
      *
-     * @param array $mapping
+     * @param array<string, string> $mapping
      *
      * @return array
      */

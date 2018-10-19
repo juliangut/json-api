@@ -142,7 +142,7 @@ class Resource extends AbstractAnnotation
      *
      * @return self
      */
-    public function setAttributesInInclude(bool $attributesInInclude)
+    public function setAttributesInInclude(bool $attributesInInclude): self
     {
         $this->attributesInInclude = $attributesInInclude;
 

@@ -224,7 +224,7 @@ class MetadataSchemaTest extends TestCase
         $this->assertTrue(isset($relationships['relationshipA']));
         $this->assertFalse($relationships['relationshipA']['showData']);
         $this->assertTrue($relationships['relationshipA']['showSelf']);
-        $this->assertFalse($relationships['relationshipA']['related']);
+        $this->assertFalse($relationships['relationshipA']['showRelated']);
         $this->assertEquals('/custom', $relationships['relationshipA']['links']['custom']);
         $this->assertInstanceOf(Link::class, $relationships['relationshipA']['links']['external']);
     }

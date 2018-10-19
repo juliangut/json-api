@@ -1,11 +1,16 @@
 includes:
   - vendor/phpstan/phpstan-strict-rules/rules.neon
   - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
 
 parameters:
+  level: max
+  paths:
+    - src
   ignoreErrors:
-    - '/^Internal error: Could not find item at .+\/Mapping\/Driver\/.+Driver\.php/'
+    - '/^In method "Jgut\\JsonApi\\Mapping\\Driver\\(Php|Json|Yaml|Xml)Driver::.+", parameter \$mapping.* type is "array"/'
+    - '/^In method "Jgut\\JsonApi\\Mapping\\Driver\\(Php|Json|Yaml|Xml)Driver::.+", return type is "array"/'
     - '/^Parameter \#\d \$.+ of class Neomerx\\JsonApi\\Encoder\\Parameters\\EncodingParameters constructor expects array(<string>)?\|null, iterable given\.$/'
-    - '/^In method "Jgut\\JsonApi\\Schema\\MetadataSchema::checkResourceType", parameter \$resource can be type-hinted to "object"\.$/'
     - '/^Method Jgut\\JsonApi\\Manager::getResourceMetadata\(\) should return array<Jgut\\JsonApi\\Mapping\\Metadata\\ResourceMetadata> but returns array<Jgut\\Mapping\\Metadata\\MetadataInterface>\.$/'
-    - '/^In method "Jgut\\JsonApi\\Schema\\MetadataSchema::getRelationshipDescription", parameter \$resource can be type-hinted to "object"\.$/'
+    - '/^Binary operation "\+" between float\|int\|string and 0 results in an error\.$/'
+    - '/^Parameter #2 \$input1 of function array_map expects array, array<int, string>\|false given\.$/'
