@@ -36,13 +36,13 @@
     "friendsofphp/php-cs-fixer": "^2.0",
     "infection/infection": "^0.9",
     "phpmd/phpmd": "^2.0",
-    "phpmetrics/phpmetrics": "^2.0",
     "phpstan/phpstan": "^0.10",
     "phpstan/phpstan-deprecation-rules": "^0.10",
     "phpstan/phpstan-strict-rules": "^0.10",
     "phpunit/phpunit": "^7.0",
     "povils/phpmnd": "^2.0",
-    "sebastian/phpcpd": "^4.0",
+    "roave/security-advisories": "dev-master",
+    "sebastian/phpcpd": "^2.0|^4.0",
     "squizlabs/php_codesniffer": "^2.0",
     "thecodingmachine/phpstan-strict-rules": "^0.10.1"
   },
@@ -76,7 +76,6 @@
     "phpcpd": "phpcpd src",
     "phpmd": "phpmd src text unusedcode,naming,design,controversial,codesize",
     "phpmnd": "phpmnd ./ --exclude=tests",
-    "phpmetrics-report": "phpmetrics --report-html=build/metrics --report-violations=build/logs/violations.xml --offline .",
     "phpstan": "phpstan analyse --configuration=phpstan.neon --memory-limit=2G --no-progress",
     "phpunit": "phpunit",
     "phpunit-coverage": "phpunit --coverage-html build/coverage",
@@ -92,8 +91,8 @@
       "@phpstan"
     ],
     "reports": [
-      "@phpmetrics-report",
-      "@phpunit-coverage"
+      "@phpunit-coverage",
+      "@phpunit-clover"
     ],
     "fix": "php-cs-fixer fix --verbose",
     "security": "composer outdated",
