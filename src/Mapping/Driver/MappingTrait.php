@@ -152,7 +152,7 @@ trait MappingTrait
     /**
      * Get resource id attribute.
      *
-     * @param array<string, string> $mapping
+     * @param array<string, mixed> $mapping
      *
      * @throws \InvalidArgumentException
      *
@@ -170,8 +170,8 @@ trait MappingTrait
     /**
      * Populate resource relationships.
      *
-     * @param ResourceMetadata      $resourceMetadata
-     * @param array<string, string> $mapping
+     * @param ResourceMetadata     $resourceMetadata
+     * @param array<string, array> $mapping
      */
     protected function populateRelationships(ResourceMetadata $resourceMetadata, array $mapping): void
     {
@@ -189,8 +189,8 @@ trait MappingTrait
     /**
      * Populate resource attributes.
      *
-     * @param ResourceMetadata      $resourceMetadata
-     * @param array<string, string> $mapping
+     * @param ResourceMetadata     $resourceMetadata
+     * @param array<string, array> $mapping
      */
     protected function populateAttributes(ResourceMetadata $resourceMetadata, array $mapping): void
     {
@@ -309,7 +309,7 @@ trait MappingTrait
     /**
      * Get attribute groups.
      *
-     * @param array<string, string> $mapping
+     * @param array<string, array> $mapping
      *
      * @return array
      */
@@ -357,7 +357,7 @@ trait MappingTrait
     /**
      * Get relationship links.
      *
-     * @param array<string, string> $mapping
+     * @param array<string, array> $mapping
      *
      * @return array
      */

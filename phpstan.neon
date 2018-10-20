@@ -14,3 +14,4 @@ parameters:
     - '/^Method Jgut\\JsonApi\\Manager::getResourceMetadata\(\) should return array<Jgut\\JsonApi\\Mapping\\Metadata\\ResourceMetadata> but returns array<Jgut\\Mapping\\Metadata\\MetadataInterface>\.$/'
     - '/^Binary operation "\+" between float\|int\|string and 0 results in an error\.$/'
     - '/^Parameter #2 \$input1 of function array_map expects array, array<int, string>\|false given\.$/'
+    - '/^Parameter #1 \$str of function lcfirst expects string, string\|false given\.$/'
