@@ -31,7 +31,7 @@
     "zendframework/zend-diactoros": "^1.0"
   },
   "require-dev": {
-    "brainmaestro/composer-git-hooks": "^2.1",
+    "brainmaestro/composer-git-hooks": "^2.5",
     "doctrine/annotations": "^1.4",
     "friendsofphp/php-cs-fixer": "^2.0",
     "infection/infection": "^0.9",
@@ -42,7 +42,7 @@
     "phpunit/phpunit": "^7.0",
     "povils/phpmnd": "^2.0",
     "roave/security-advisories": "dev-master",
-    "sebastian/phpcpd": "^2.0|^4.0",
+    "sebastian/phpcpd": "^4.0",
     "squizlabs/php_codesniffer": "^2.0",
     "thecodingmachine/phpstan-strict-rules": "^0.10.1"
   },
@@ -70,41 +70,46 @@
     "cghooks": "cghooks",
     "post-install-cmd": "cghooks add --ignore-lock",
     "post-update-cmd": "cghooks update",
-    "php-lint": "php -l src && php -l tests",
-    "phpcs": "phpcs --standard=PSR2 src tests",
-    "phpcs-lint": "php-cs-fixer fix --dry-run --verbose",
-    "phpcpd": "phpcpd src",
-    "phpmd": "phpmd src text unusedcode,naming,design,controversial,codesize",
-    "phpmnd": "phpmnd ./ --exclude=tests",
-    "phpstan": "phpstan analyse --configuration=phpstan.neon --memory-limit=2G --no-progress",
-    "phpunit": "phpunit",
-    "phpunit-coverage": "phpunit --coverage-html build/coverage",
-    "phpunit-clover": "phpunit --coverage-clover build/logs/clover.xml",
-    "infection": "infection",
+    "lint-php": "php -l src && php -l tests",
+    "lint-phpcs": "phpcs --standard=PSR2 src tests",
+    "lint-phpcs-fixer": "php-cs-fixer fix --config=.php_cs --dry-run --verbose",
+    "fix-phpcs": "php-cs-fixer fix --config=.php_cs --verbose",
+    "qa-phpcpd": "phpcpd src",
+    "qa-phpmd": "phpmd src text unusedcode,naming,design,controversial,codesize",
+    "qa-phpmnd": "phpmnd ./ --exclude=tests",
+    "qa-phpstan": "phpstan analyse --configuration=phpstan.neon --memory-limit=2G --no-progress",
+    "test-phpunit": "phpunit",
+    "test-infection": "infection",
+    "report-phpmetrics": "phpmetrics --report-html=build/metrics --offline .",
+    "report-phpunit-coverage": "phpunit --coverage-html build/coverage",
+    "report-phpunit-clover": "phpunit --coverage-clover build/logs/clover.xml",
+    "lint": [
+      "@lint-php",
+      "@lint-phpcs",
+      "@lint-phpcs-fixer"
+    ],
+    "fix": [
+      "@fix-phpcs"
+    ],
     "qa": [
-      "@php-lint",
-      "@phpcs",
-      "@phpcs-lint",
-      "@phpcpd",
-      "@phpmd",
-      "@phpmnd",
-      "@phpstan"
+      "@qa-phpcpd",
+      "@qa-phpmd",
+      "@qa-phpmnd",
+      "@qa-phpstan"
     ],
-    "reports": [
-      "@phpunit-coverage",
-      "@phpunit-clover"
-    ],
-    "fix": "php-cs-fixer fix --verbose",
     "security": "composer outdated",
     "test": [
-      "@php-lint",
-      "@phpunit",
-      "@infection"
+      "@test-phpunit",
+      "@test-infection"
+    ],
+    "report": [
+      "@report-phpunit-coverage",
+      "@report-phpunit-clover"
     ]
   },
   "extra": {
     "hooks": {
-      "pre-commit": "composer qa && composer phpunit"
+      "pre-commit": "composer lint && composer qa && composer test-phpunit"
     }
   }
 }
