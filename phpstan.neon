@@ -8,7 +8,6 @@ parameters:
   paths:
     - src
   ignoreErrors:
-    - '/^In method "Jgut\\JsonApi\\Mapping\\Driver\\(Php|Json|Yaml|Xml)Driver::.+", parameter \$mapping.* type is "array"/'
     - '/^In method "Jgut\\JsonApi\\Mapping\\Driver\\(Php|Json|Yaml|Xml)Driver::.+", return type is "array"/'
     - '/^Parameter \#\d \$.+ of class Neomerx\\JsonApi\\Encoder\\Parameters\\EncodingParameters constructor expects array(<string>)?\|null, iterable given\.$/'
     - '/^Method Jgut\\JsonApi\\Manager::getResourceMetadata\(\) should return array<Jgut\\JsonApi\\Mapping\\Metadata\\ResourceMetadata> but returns array<Jgut\\Mapping\\Metadata\\MetadataInterface>\.$/'

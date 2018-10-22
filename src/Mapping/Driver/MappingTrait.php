@@ -107,8 +107,8 @@ trait MappingTrait
             $resource->setUrlPrefix($urlPrefix);
         }
 
-        $this->populateRelationships($resource, $mapping);
         $this->populateAttributes($resource, $mapping);
+        $this->populateRelationships($resource, $mapping);
 
         return $resource;
     }
