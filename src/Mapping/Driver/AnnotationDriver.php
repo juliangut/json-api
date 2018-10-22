@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Driver;
 
-use Doctrine\Common\Annotations\Annotation\Attribute;
 use Jgut\JsonApi\Mapping\Annotation\Attribute as AttributeAnnotation;
 use Jgut\JsonApi\Mapping\Annotation\Id as IdAnnotation;
 use Jgut\JsonApi\Mapping\Annotation\Relationship as RelationshipAnnotation;
@@ -128,6 +127,8 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             $resourceMetadata->setUrlPrefix($url);
         }
 
+        $resourceMetadata->setLinks($resourceAnnotation->getLinks());
+
         $resourceMetadata->setAttributesInInclude($resourceAnnotation->hasAttributesInInclude());
     }
 
@@ -152,7 +153,8 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
 
         return $relationship->setDefaultIncluded($annotation->isIncluded())
             ->setSelfLinkIncluded($annotation->isSelfLinkIncluded())
-            ->setRelatedLinkIncluded($annotation->isRelatedLinkIncluded());
+            ->setRelatedLinkIncluded($annotation->isRelatedLinkIncluded())
+            ->setLinks($annotation->getLinks());
     }
 
     /**

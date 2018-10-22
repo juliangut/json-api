@@ -68,6 +68,13 @@ class ResourceMetadata extends AbstractMetadata
     protected $group;
 
     /**
+     * Resource links.
+     *
+     * @var array<string, string>
+     */
+    protected $links = [];
+
+    /**
      * Get metadata resource schema class.
      *
      * @return string|null
@@ -231,6 +238,30 @@ class ResourceMetadata extends AbstractMetadata
     public function setGroup(string $group): self
     {
         $this->group = $group;
+
+        return $this;
+    }
+
+    /**
+     * Get resource links.
+     *
+     * @return array<string, string>
+     */
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+
+    /**
+     * Set resource links.
+     *
+     * @param array<string, string> $links
+     *
+     * @return self
+     */
+    public function setLinks(array $links): self
+    {
+        $this->links = $links;
 
         return $this;
     }

@@ -54,6 +54,13 @@ class Resource extends AbstractAnnotation
     protected $attributesInInclude = true;
 
     /**
+     * Resource links.
+     *
+     * @var array<string, string>
+     */
+    protected $links = [];
+
+    /**
      * Get resource name.
      *
      * @return string|null
@@ -145,6 +152,30 @@ class Resource extends AbstractAnnotation
     public function setAttributesInInclude(bool $attributesInInclude): self
     {
         $this->attributesInInclude = $attributesInInclude;
+
+        return $this;
+    }
+
+    /**
+     * Get relationship links.
+     *
+     * @return array<string, string>
+     */
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+
+    /**
+     * Set relationship links.
+     *
+     * @param array<string, string> $links
+     *
+     * @return self
+     */
+    public function setLinks(array $links): self
+    {
+        $this->links = $links;
 
         return $this;
     }

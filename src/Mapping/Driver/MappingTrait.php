@@ -83,7 +83,8 @@ trait MappingTrait
 
         $resource = (new ResourceMetadata($mapping['class'], $mapping['name']))
             ->setIdentifier($this->getIdAttribute($mapping))
-            ->setAttributesInInclude($this->hasAttributesInInclude($mapping));
+            ->setAttributesInInclude($this->hasAttributesInInclude($mapping))
+            ->setLinks($this->getLinks($mapping));
 
         $schemaClass = $this->getSchemaClass($mapping);
         if ($schemaClass !== null) {
@@ -252,7 +253,7 @@ trait MappingTrait
             ->setDefaultIncluded($this->isDefaultIncluded($mapping))
             ->setSelfLinkIncluded($this->isSelfLinkIncluded($mapping))
             ->setRelatedLinkIncluded($this->isRelatedLinkIncluded($mapping))
-            ->setLinks($this->getRelationshipLinks($mapping));
+            ->setLinks($this->getLinks($mapping));
     }
 
     /**
@@ -359,14 +360,22 @@ trait MappingTrait
     }
 
     /**
-     * Get relationship links.
+     * Get links.
      *
      * @param array<string, mixed> $mapping
      *
-     * @return array
+     * @return array<string, string>
      */
-    protected function getRelationshipLinks(array $mapping): array
+    protected function getLinks(array $mapping): array
     {
-        return $mapping['links'] ?? [];
+        if (!isset($mapping['links'])) {
+            return [];
+        }
+
+        if (!\is_array($mapping['links'])) {
+            throw new DriverException('Links must be an array');
+        }
+
+        return $mapping['links'];
     }
 }

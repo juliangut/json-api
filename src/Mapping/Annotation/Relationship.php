@@ -45,7 +45,7 @@ class Relationship extends Attribute
     /**
      * Relationship links.
      *
-     * @var string[]
+     * @var array<string, string>
      */
     protected $links = [];
 
@@ -124,7 +124,7 @@ class Relationship extends Attribute
     /**
      * Get relationship links.
      *
-     * @return string[]
+     * @return array<string, string>
      */
     public function getLinks(): array
     {
@@ -134,7 +134,7 @@ class Relationship extends Attribute
     /**
      * Set relationship links.
      *
-     * @param string[] $links
+     * @param array<string, string> $links
      *
      * @return self
      */

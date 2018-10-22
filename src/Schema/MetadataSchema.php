@@ -16,6 +16,7 @@ namespace Jgut\JsonApi\Schema;
 use Jgut\JsonApi\Exception\SchemaException;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
+use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
 use Neomerx\JsonApi\Document\Link;
 use Neomerx\JsonApi\Schema\BaseSchema;
@@ -213,6 +214,39 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
+     * Get links related to resource.
+     *
+     * @param object $resource
+     *
+     * @return (LinkInterface|string)[]
+     */
+    public function getResourceLinks($resource): array
+    {
+        $this->assertResourceType($resource);
+
+        return \array_merge(
+            [
+                LinkInterface::SELF => $this->getSelfSubLink($resource),
+            ],
+            $this->normalizeLinks($this->resourceMetadata->getLinks())
+        );
+    }
+
+    /**
+     * Get links related to resource when it is in 'included' section.
+     *
+     * @param object $resource
+     *
+     * @return (LinkInterface|string)[]
+     */
+    public function getIncludedResourceLinks($resource): array
+    {
+        $this->assertResourceType($resource);
+
+        return [];
+    }
+
+    /**
      * Normalize links format.
      *
      * @param string[] $links
@@ -221,16 +255,19 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      */
     private function normalizeLinks(array $links): array
     {
-        return \array_map(
-            function ($link) {
-                if (\is_string($link) && \preg_match('/^https?:\/\//', $link) === 1) {
-                    $link = new Link($link, null, true);
-                }
+        if ($links !== [] && \array_keys($links) === \range(0, count($links) - 1)) {
+            throw new SchemaException('Links array keys must be strings');
+        }
 
-                return $link;
-            },
-            $links
-        );
+        $linkList = [];
+
+        foreach ($links as $name => $link) {
+            $isExternal = \preg_match('!^https?://!', $link) === false;
+
+            $linkList[$name] = new Link($link, null, $isExternal);
+        }
+
+        return $linkList;
     }
 
     /**

@@ -42,7 +42,7 @@ class RelationshipMetadata extends AttributeMetadata
     /**
      * Relationship links.
      *
-     * @var string[]
+     * @var array<string, string>
      */
     protected $links = [];
 
@@ -121,7 +121,7 @@ class RelationshipMetadata extends AttributeMetadata
     /**
      * Get relationship links.
      *
-     * @return string[]
+     * @return array<string, string>
      */
     public function getLinks(): array
     {
@@ -131,7 +131,7 @@ class RelationshipMetadata extends AttributeMetadata
     /**
      * Set relationship links.
      *
-     * @param string[] $links
+     * @param array<string, string> $links
      *
      * @return self
      */
