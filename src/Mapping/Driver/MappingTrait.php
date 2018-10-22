@@ -161,7 +161,11 @@ trait MappingTrait
     protected function getIdAttribute(array $mapping): AttributeMetadata
     {
         if (!isset($mapping['id'])) {
-            $mapping['id'] = ['name' => 'id'];
+            $mapping['id'] = 'id';
+        }
+
+        if (\is_string($mapping['id'])) {
+            $mapping['id'] = ['name' => $mapping['id']];
         }
 
         return $this->getAttributeMetadata($mapping['class'], $mapping['id']);
