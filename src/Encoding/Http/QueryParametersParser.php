@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Encoding\Http;
 
-use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 /**
  * Request query parameters parser.
  */
-class QueryParametersParser implements BaseQueryParserInterface
+class QueryParametersParser implements QueryParametersParserInterface
 {
     /**
      * Known query parameters.

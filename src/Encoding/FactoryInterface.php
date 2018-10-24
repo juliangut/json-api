@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Encoding;
 
 use Jgut\JsonApi\Encoding\Http\HeadersCheckerInterface;
+use Jgut\JsonApi\Encoding\Http\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
-use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Psr\Http\Message\ServerRequestInterface;
@@ -41,9 +41,9 @@ interface FactoryInterface extends BaseFactoryInterface
      *
      * @param ServerRequestInterface $request
      *
-     * @return BaseQueryParserInterface
+     * @return QueryParametersParserInterface
      */
-    public function createQueryParametersParser(ServerRequestInterface $request): BaseQueryParserInterface;
+    public function createQueryParametersParser(ServerRequestInterface $request): QueryParametersParserInterface;
 
     /**
      * Create headers checker.

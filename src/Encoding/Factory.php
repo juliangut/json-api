@@ -16,8 +16,8 @@ namespace Jgut\JsonApi\Encoding;
 use Jgut\JsonApi\Encoding\Http\HeadersChecker;
 use Jgut\JsonApi\Encoding\Http\HeadersCheckerInterface;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
+use Jgut\JsonApi\Encoding\Http\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
-use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
@@ -46,7 +46,7 @@ class Factory extends BaseFactory implements FactoryInterface
      *
      * @throws \Neomerx\JsonApi\Exceptions\JsonApiException
      */
-    public function createQueryParametersParser(ServerRequestInterface $request): BaseQueryParserInterface
+    public function createQueryParametersParser(ServerRequestInterface $request): QueryParametersParserInterface
     {
         return new QueryParametersParser($request->getQueryParams());
     }
