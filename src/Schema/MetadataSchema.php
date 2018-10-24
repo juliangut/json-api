@@ -251,7 +251,9 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             };
         }
 
-        $description[self::LINKS] = $this->normalizeLinks($relationship->getLinks());
+        if ($primary) {
+            $description[self::LINKS] = $this->normalizeLinks($relationship->getLinks());
+        }
 
         // TODO This should be moved to self::getRelationshipsPrimaryMeta
         $meta = $relationship->getMeta();
