@@ -19,6 +19,7 @@ use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
 use Jgut\JsonApi\Manager;
 use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Document\Link;
 use Neomerx\JsonApi\Schema\Container;
 use PHPUnit\Framework\TestCase;
 use Zend\Diactoros\ServerRequest;
@@ -113,20 +114,22 @@ class ManagerTest extends TestCase
             ->setMethods(['getMetadata', 'getLinks', 'getSources'])
             ->getMock();
         $configuration->expects(self::once())
-            ->method('getMetadata')
-            ->will($this->returnValue([]));
-        $configuration->expects(self::once())
-            ->method('getLinks')
-            ->will($this->returnValue(['custom' => 'http://example.com']));
-        $configuration->expects(self::once())
             ->method('getSources')
             ->will($this->returnValue([__DIR__ . '/Files/Annotation/Valid']));
         /* @var Configuration $configuration */
 
         $manager = new Manager($configuration, $factory);
 
-        $request = $manager->setRequestQueryParameters($request, $queryParameters);
+        $encoded = $manager->encodeResources(
+            new \stdClass(),
+            $manager->setRequestQueryParameters($request, $queryParameters),
+            'test',
+            ['resourceB'],
+            null,
+            ['custom' => new Link('http://example.com', null, true)],
+            ['meta' => 'data']
+        );
 
-        self::assertEquals('ENCODED', $manager->encodeResources(new \stdClass(), $request, 'test', ['resourceB']));
+        self::assertEquals('ENCODED', $encoded);
     }
 }

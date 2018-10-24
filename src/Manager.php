@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace Jgut\JsonApi;
 
 use Jgut\JsonApi\Encoding\FactoryInterface;
+use Jgut\JsonApi\Exception\SchemaException;
 use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
+use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
-use Neomerx\JsonApi\Document\Link;
 use Neomerx\JsonApi\Encoder\EncoderOptions;
 use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
 use Neomerx\JsonApi\Exceptions\ErrorCollection;
@@ -101,6 +102,10 @@ class Manager
      * @param string|null                      $group
      * @param string[]                         $resourceTypes
      * @param EncodingParametersInterface|null $encodingParameters
+     * @param array<string, LinkInterface>     $links
+     * @param array<string, mixed>             $meta
+     *
+     * @throws SchemaException
      *
      * @return string
      */
@@ -109,7 +114,9 @@ class Manager
         ServerRequestInterface $request,
         ?string $group = null,
         array $resourceTypes = [],
-        ?EncodingParametersInterface $encodingParameters = null
+        ?EncodingParametersInterface $encodingParameters = null,
+        array $links = [],
+        array $meta = []
     ): string {
         if ($encodingParameters === null) {
             $queryParameters = $this->getRequestQueryParameters($request);
@@ -126,34 +133,31 @@ class Manager
             }
         }
 
-        $encoder = $this->getResourceEncoder($resourceTypes, $group);
-
-        $metadata = $this->configuration->getMetadata();
-        if ($metadata !== null) {
-            $encoder->withMeta($metadata);
-        }
-
-        $links = $this->getLinks();
-        if (\count($links) !== 0) {
-            $encoder->withLinks($links);
-        }
-
-        return $encoder->encodeData($resources, $encodingParameters);
+        return $this->getResourceEncoder($resourceTypes, $group, $links, $meta)
+            ->encodeData($resources, $encodingParameters);
     }
 
     /**
      * Get JSON API resource encoder.
      *
-     * @param string[]    $resourceTypes
-     * @param string|null $group
+     * @param string[]                     $resourceTypes
+     * @param string|null                  $group
+     * @param array<string, LinkInterface> $links
+     * @param array<string, mixed>         $meta
+     *
+     * @throws SchemaException
      *
      * @return EncoderInterface
      */
-    protected function getResourceEncoder(array $resourceTypes, ?string $group): EncoderInterface
-    {
+    protected function getResourceEncoder(
+        array $resourceTypes,
+        ?string $group,
+        array $links,
+        array $meta
+    ): EncoderInterface {
         $schemaFactories = $this->getSchemaFactories($resourceTypes, $group);
 
-        return $this->getEncoder($schemaFactories, $this->configuration->getEncoderOptions());
+        return $this->getEncoder($schemaFactories, $this->configuration->getEncoderOptions(), $links, $meta);
     }
 
     /**
@@ -198,24 +202,33 @@ class Manager
      * Encode errors to JSON API.
      *
      * @param ErrorInterface|ErrorCollection $errors
+     * @param array<string, LinkInterface>   $links
+     * @param array<string, mixed>           $meta
+     *
+     * @throws SchemaException
      *
      * @return string
      */
-    final public function encodeErrors($errors): string
+    final public function encodeErrors($errors, array $links = [], array $meta = []): string
     {
         if (!$errors instanceof ErrorCollection) {
             $errors = (new ErrorCollection())->add($errors);
         }
 
-        return $this->getErrorEncoder()->encodeErrors($errors);
+        return $this->getErrorEncoder($links, $meta)->encodeErrors($errors);
     }
 
     /**
      * Get JSON API error encoder.
      *
+     * @param array<string, LinkInterface> $links
+     * @param array<string, mixed>         $meta
+     *
+     * @throws SchemaException
+     *
      * @return EncoderInterface
      */
-    protected function getErrorEncoder(): EncoderInterface
+    protected function getErrorEncoder(array $links, array $meta): EncoderInterface
     {
         $encoderOptions = $this->configuration->getEncoderOptions();
         $encoderOptions = new EncoderOptions(
@@ -224,7 +237,7 @@ class Manager
             $encoderOptions->getDepth()
         );
 
-        return $this->getEncoder([], $encoderOptions);
+        return $this->getEncoder([], $encoderOptions, $links, $meta);
     }
 
     /**
@@ -232,40 +245,47 @@ class Manager
      *
      * @param SchemaInterface[]|\Closure[] $schemaFactories
      * @param EncoderOptions               $encoderOptions
+     * @param mixed[]                      $links
+     * @param mixed[]                      $meta
+     *
+     * @throws SchemaException
      *
      * @return EncoderInterface
      */
-    private function getEncoder(array $schemaFactories, EncoderOptions $encoderOptions): EncoderInterface
-    {
-        return $this->factory->createEncoder($this->factory->createContainer($schemaFactories), $encoderOptions);
-    }
+    protected function getEncoder(
+        array $schemaFactories,
+        EncoderOptions $encoderOptions,
+        array $links,
+        array $meta
+    ): EncoderInterface {
+        $encoder = $this->factory->createEncoder($this->factory->createContainer($schemaFactories), $encoderOptions);
 
-    /**
-     * Get general API links.
-     *
-     * @return string[]|Link[]
-     */
-    protected function getLinks(): array
-    {
-        $links = \array_merge(
-            $this->configuration->getUrlPrefix() !== null ? ['base' => $this->configuration->getUrlPrefix()] : [],
-            $this->configuration->getLinks() ?? []
-        );
-
-        return \array_map(
-            function ($link) {
-                if (\is_string($link)) {
-                    $isExternal = \preg_match('!^https?://!', $link) === false;
-                    if ($isExternal) {
-                        $link = '/' . \ltrim($link, '/');
-                    }
-
-                    $link = new Link($link, null, $isExternal);
+        if (\count($links) !== 0) {
+            foreach ($links as $name => $link) {
+                if (!\is_string($name)) {
+                    throw new SchemaException('Links keys must be all strings');
                 }
 
-                return $link;
-            },
-            $links
-        );
+                if (!$link instanceof LinkInterface) {
+                    throw new SchemaException(\sprintf(
+                        'Link must be an instance of %s, %s given',
+                        LinkInterface::class,
+                        \is_object($link) ? \get_class($link) : \gettype($link)
+                    ));
+                }
+            }
+
+            $encoder->withLinks($links);
+        }
+
+        if (\count($meta) !== 0) {
+            if (\array_keys($meta) === \range(0, \count($meta) - 1)) {
+                throw new SchemaException('Metadata keys must be all strings');
+            }
+
+            $encoder->withMeta($meta);
+        }
+
+        return $encoder;
     }
 }

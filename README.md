@@ -67,12 +67,10 @@ $jsonApiManager->encodeResources(new MyClass(), new RequestInstance());
     * `path` a string path or array of paths to where mapping files are located (files or directories) **REQUIRED if no driver**
     * `driver` an already created \Jgut\JsonApi\Mapping\Driver\DriverInterface object **REQUIRED if no type AND path**
 * `attributeName` name of the PSR-7 Request attribute that will hold query parameters for resource encoding
-* `encoderOptions` an instance of \Neomerx\JsonApi\Encoder\EncoderOptions
-* `urlPrefix` prefix for generated URLs
 * `schemaClass` class name implementing \Jgut\JsonApi\Schema\MetadataSchemaInterface (\Jgut\JsonApi\Schema\MetadataSchema by default)
-* `metadata` array of JSON-API global "meta" data
-* `MetadataResolver` an instance of \Jgut\Mapping\Metadata\MetadataResolver. It is highly recommended to provide a PSR-16 cache to metadata resolver on production
-* `links` array of JSON-API global "links", could be strings or instances of \Neomerx\JsonApi\Document\Link
+* `urlPrefix` prefix for generated URLs, defaults to 'JSON_API_query_parameters'
+* `metadataResolver` an instance of \Jgut\Mapping\Metadata\MetadataResolver. It is highly recommended to provide a PSR-16 cache to metadata resolver on production
+* `encoderOptions` an instance of \Neomerx\JsonApi\Encoder\EncoderOptions
 
 ### Resources
 

@@ -85,20 +85,6 @@ class Configuration
     protected $schemaClass = MetadataSchema::class;
 
     /**
-     * General API metadata.
-     *
-     * @var mixed[]
-     */
-    protected $metadata;
-
-    /**
-     * General API links.
-     *
-     * @var string[]|\Neomerx\JsonApi\Document\Link[]
-     */
-    protected $links;
-
-    /**
      * Configuration constructor.
      *
      * @param mixed[] $configurations
@@ -271,10 +257,11 @@ class Configuration
     public function getEncoderOptions(): EncoderOptions
     {
         if ($this->encoderOptions === null) {
-            $this->encoderOptions = new EncoderOptions(
-                static::JSON_ENCODE_OPTIONS,
-                $this->urlPrefix !== null ? \rtrim($this->urlPrefix, '/') : null
-            );
+            $urlPrefix = $this->urlPrefix !== null && \trim($this->urlPrefix, '/ ') !== ''
+                ? \rtrim($this->urlPrefix, '/ ')
+                : null;
+
+            $this->encoderOptions = new EncoderOptions(static::JSON_ENCODE_OPTIONS, $urlPrefix);
         }
 
         return $this->encoderOptions;
@@ -338,54 +325,6 @@ class Configuration
     public function setSchemaClass(string $schemaClass): self
     {
         $this->schemaClass = $schemaClass;
-
-        return $this;
-    }
-
-    /**
-     * Get general API metadata.
-     *
-     * @return mixed[]|null
-     */
-    public function getMetadata(): ?array
-    {
-        return $this->metadata;
-    }
-
-    /**
-     * Set general API metadata.
-     *
-     * @param mixed[] $metadata
-     *
-     * @return self
-     */
-    public function setMetadata(array $metadata): self
-    {
-        $this->metadata = $metadata;
-
-        return $this;
-    }
-
-    /**
-     * Get general API links.
-     *
-     * @return string[]|\Neomerx\JsonApi\Document\Link[]
-     */
-    public function getLinks(): ?array
-    {
-        return $this->links;
-    }
-
-    /**
-     * Set general API links.
-     *
-     * @param string[]|\Neomerx\JsonApi\Document\Link[] $links
-     *
-     * @return self
-     */
-    public function setLinks(array $links): self
-    {
-        $this->links = $links;
 
         return $this;
     }

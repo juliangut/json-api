@@ -37,8 +37,6 @@ class ConfigurationTest extends TestCase
         self::assertInstanceOf(EncoderOptions::class, $configuration->getEncoderOptions());
         self::assertNull($configuration->getUrlPrefix());
         self::assertEquals(MetadataSchema::class, $configuration->getSchemaClass());
-        self::assertNull($configuration->getMetadata());
-        self::assertNull($configuration->getLinks());
     }
 
     /**
@@ -121,19 +119,5 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(['schemaClass' => 'Class']);
 
         self::assertEquals('Class', $configuration->getSchemaClass());
-    }
-
-    public function testMetadata()
-    {
-        $configuration = new Configuration(['metadata' => ['meta' => 'data']]);
-
-        self::assertEquals(['meta' => 'data'], $configuration->getMetadata());
-    }
-
-    public function testLinks()
-    {
-        $configuration = new Configuration(['links' => ['link' => 'url']]);
-
-        self::assertEquals(['link' => 'url'], $configuration->getLinks());
     }
 }
