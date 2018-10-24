@@ -101,7 +101,6 @@ class Manager
      * @param string|null                      $group
      * @param string[]                         $resourceTypes
      * @param EncodingParametersInterface|null $encodingParameters
-     * @param EncoderOptions|null              $encoderOptions
      *
      * @return string
      */
@@ -110,8 +109,7 @@ class Manager
         ServerRequestInterface $request,
         ?string $group = null,
         array $resourceTypes = [],
-        ?EncodingParametersInterface $encodingParameters = null,
-        ?EncoderOptions $encoderOptions = null
+        ?EncodingParametersInterface $encodingParameters = null
     ): string {
         if ($encodingParameters === null) {
             $queryParameters = $this->getRequestQueryParameters($request);
@@ -128,45 +126,7 @@ class Manager
             }
         }
 
-        return $this->getResourceEncoder($resourceTypes, $group, $encoderOptions)
-            ->encodeData($resources, $encodingParameters);
-    }
-
-    /**
-     * Encode errors to JSON API.
-     *
-     * @param ErrorInterface|ErrorCollection $errors
-     * @param EncoderOptions|null            $encoderOptions
-     *
-     * @return string
-     */
-    final public function encodeErrors($errors, ?EncoderOptions $encoderOptions = null): string
-    {
-        if (!$errors instanceof ErrorCollection) {
-            $errors = (new ErrorCollection())->add($errors);
-        }
-
-        return $this->getErrorEncoder($encoderOptions)->encodeErrors($errors);
-    }
-
-    /**
-     * Get JSON API resource encoder.
-     *
-     * @param string[]            $resourceTypes
-     * @param string|null         $group
-     * @param EncoderOptions|null $encoderOptions
-     *
-     * @return EncoderInterface
-     */
-    protected function getResourceEncoder(
-        array $resourceTypes,
-        ?string $group,
-        ?EncoderOptions $encoderOptions
-    ): EncoderInterface {
-        $schemaFactories = $this->getSchemaFactories($resourceTypes, $group);
-        $encoderOptions = $encoderOptions ?? $this->configuration->getEncoderOptions();
-
-        $encoder = $this->getEncoder($schemaFactories, $encoderOptions);
+        $encoder = $this->getResourceEncoder($resourceTypes, $group);
 
         $metadata = $this->configuration->getMetadata();
         if ($metadata !== null) {
@@ -178,71 +138,22 @@ class Manager
             $encoder->withLinks($links);
         }
 
-        return $encoder;
+        return $encoder->encodeData($resources, $encodingParameters);
     }
 
     /**
-     * Get general API links.
+     * Get JSON API resource encoder.
      *
-     * @return string[]|Link[]
-     */
-    protected function getLinks(): array
-    {
-        $links = \array_merge(
-            $this->configuration->getUrlPrefix() !== null ? ['base' => $this->configuration->getUrlPrefix()] : [],
-            $this->configuration->getLinks() ?? []
-        );
-
-        return \array_map(
-            function ($link) {
-                if (\is_string($link)) {
-                    $isExternal = \preg_match('!^https?://!', $link) === false;
-                    if ($isExternal) {
-                        $link = '/' . \ltrim($link, '/');
-                    }
-
-                    $link = new Link($link, null, $isExternal);
-                }
-
-                return $link;
-            },
-            $links
-        );
-    }
-
-    /**
-     * Get JSON API error encoder.
-     *
-     * @param EncoderOptions|null $encoderOptions
+     * @param string[]    $resourceTypes
+     * @param string|null $group
      *
      * @return EncoderInterface
      */
-    protected function getErrorEncoder(?EncoderOptions $encoderOptions): EncoderInterface
+    protected function getResourceEncoder(array $resourceTypes, ?string $group): EncoderInterface
     {
-        $encoderOptions = $encoderOptions ?? $this->configuration->getEncoderOptions();
-        $encoderOptions = new EncoderOptions(
-            $encoderOptions->getOptions() | \JSON_PARTIAL_OUTPUT_ON_ERROR,
-            $encoderOptions->getUrlPrefix(),
-            $encoderOptions->getDepth()
-        );
+        $schemaFactories = $this->getSchemaFactories($resourceTypes, $group);
 
-        return $this->getEncoder([], $encoderOptions);
-    }
-
-    /**
-     * Get JSON API encoder.
-     *
-     * @param SchemaInterface[]|\Closure[] $schemaFactories
-     * @param EncoderOptions|null          $encoderOptions
-     *
-     * @return EncoderInterface
-     */
-    private function getEncoder(array $schemaFactories, ?EncoderOptions $encoderOptions): EncoderInterface
-    {
-        return $this->factory->createEncoder(
-            $this->factory->createContainer($schemaFactories),
-            $encoderOptions ?? $this->configuration->getEncoderOptions()
-        );
+        return $this->getEncoder($schemaFactories, $this->configuration->getEncoderOptions());
     }
 
     /**
@@ -281,5 +192,80 @@ class Manager
     {
         /* @var \Jgut\JsonApi\Mapping\Metadata\ResourceMetadata[] */
         return $this->configuration->getMetadataResolver()->getMetadata($this->configuration->getSources());
+    }
+
+    /**
+     * Encode errors to JSON API.
+     *
+     * @param ErrorInterface|ErrorCollection $errors
+     *
+     * @return string
+     */
+    final public function encodeErrors($errors): string
+    {
+        if (!$errors instanceof ErrorCollection) {
+            $errors = (new ErrorCollection())->add($errors);
+        }
+
+        return $this->getErrorEncoder()->encodeErrors($errors);
+    }
+
+    /**
+     * Get JSON API error encoder.
+     *
+     * @return EncoderInterface
+     */
+    protected function getErrorEncoder(): EncoderInterface
+    {
+        $encoderOptions = $this->configuration->getEncoderOptions();
+        $encoderOptions = new EncoderOptions(
+            $encoderOptions->getOptions() | \JSON_PARTIAL_OUTPUT_ON_ERROR,
+            $encoderOptions->getUrlPrefix(),
+            $encoderOptions->getDepth()
+        );
+
+        return $this->getEncoder([], $encoderOptions);
+    }
+
+    /**
+     * Get JSON API encoder.
+     *
+     * @param SchemaInterface[]|\Closure[] $schemaFactories
+     * @param EncoderOptions               $encoderOptions
+     *
+     * @return EncoderInterface
+     */
+    private function getEncoder(array $schemaFactories, EncoderOptions $encoderOptions): EncoderInterface
+    {
+        return $this->factory->createEncoder($this->factory->createContainer($schemaFactories), $encoderOptions);
+    }
+
+    /**
+     * Get general API links.
+     *
+     * @return string[]|Link[]
+     */
+    protected function getLinks(): array
+    {
+        $links = \array_merge(
+            $this->configuration->getUrlPrefix() !== null ? ['base' => $this->configuration->getUrlPrefix()] : [],
+            $this->configuration->getLinks() ?? []
+        );
+
+        return \array_map(
+            function ($link) {
+                if (\is_string($link)) {
+                    $isExternal = \preg_match('!^https?://!', $link) === false;
+                    if ($isExternal) {
+                        $link = '/' . \ltrim($link, '/');
+                    }
+
+                    $link = new Link($link, null, $isExternal);
+                }
+
+                return $link;
+            },
+            $links
+        );
     }
 }
