@@ -273,7 +273,7 @@ class Configuration
         if ($this->encoderOptions === null) {
             $this->encoderOptions = new EncoderOptions(
                 static::JSON_ENCODE_OPTIONS,
-                \is_string($this->urlPrefix) ? \rtrim($this->urlPrefix, '/') : null
+                $this->urlPrefix !== null ? \rtrim($this->urlPrefix, '/') : null
             );
         }
 

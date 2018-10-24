@@ -108,7 +108,7 @@ class Manager
     final public function encodeResources(
         $resources,
         ServerRequestInterface $request,
-        ?string $group,
+        ?string $group = null,
         array $resourceTypes = [],
         ?EncodingParametersInterface $encodingParameters = null,
         ?EncoderOptions $encoderOptions = null
@@ -164,6 +164,8 @@ class Manager
         ?EncoderOptions $encoderOptions
     ): EncoderInterface {
         $schemaFactories = $this->getSchemaFactories($resourceTypes, $group);
+        $encoderOptions = $encoderOptions ?? $this->configuration->getEncoderOptions();
+
         $encoder = $this->getEncoder($schemaFactories, $encoderOptions);
 
         $metadata = $this->configuration->getMetadata();

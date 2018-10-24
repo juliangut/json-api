@@ -46,9 +46,9 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
         $this->resourceType = $resourceMetadata->getName();
 
         $urlPrefix = $resourceMetadata->getUrlPrefix();
-        if ($urlPrefix !== null) {
-            $this->selfSubUrl = $urlPrefix;
-        }
+        $this->selfSubUrl = $urlPrefix !== null && \trim($urlPrefix, '/ ') !== ''
+            ? '/' . \trim($urlPrefix, '/ ')
+            : '/' . $this->resourceType;
 
         parent::__construct($factory);
 

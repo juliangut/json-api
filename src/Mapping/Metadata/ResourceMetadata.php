@@ -124,7 +124,7 @@ class ResourceMetadata extends AbstractMetadata
      */
     public function setUrlPrefix(string $urlPrefix): self
     {
-        $this->urlPrefix = '/' . \trim($urlPrefix, '/ ');
+        $this->urlPrefix = $urlPrefix;
 
         return $this;
     }

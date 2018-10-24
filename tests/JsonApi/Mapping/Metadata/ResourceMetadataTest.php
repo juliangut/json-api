@@ -76,7 +76,7 @@ class ResourceMetadataTest extends TestCase
     {
         $this->resource->setUrlPrefix('resource');
 
-        self::assertEquals('/resource', $this->resource->getUrlPrefix());
+        self::assertEquals('resource', $this->resource->getUrlPrefix());
     }
 
     public function testAttributes()
