@@ -42,9 +42,16 @@ class RelationshipMetadata extends AttributeMetadata
     /**
      * Relationship links.
      *
-     * @var array<string, string>
+     * @var array<string, LinkMetadata>
      */
     protected $links = [];
+
+    /**
+     * Relationship metadata.
+     *
+     * @var array<string, mixed>
+     */
+    protected $meta = [];
 
     /**
      * Is included by default.
@@ -121,7 +128,7 @@ class RelationshipMetadata extends AttributeMetadata
     /**
      * Get relationship links.
      *
-     * @return array<string, string>
+     * @return array<string, LinkMetadata>
      */
     public function getLinks(): array
     {
@@ -129,15 +136,39 @@ class RelationshipMetadata extends AttributeMetadata
     }
 
     /**
-     * Set relationship links.
+     * Add relationship link.
      *
-     * @param array<string, string> $links
+     * @param LinkMetadata $link
      *
      * @return self
      */
-    public function setLinks(array $links): self
+    public function addLink(LinkMetadata $link): self
     {
-        $this->links = $links;
+        $this->links[$link->getName()] = $link;
+
+        return $this;
+    }
+
+    /**
+     * Get relationship metadata.
+     *
+     * @return array<string, mixed>
+     */
+    public function getMeta(): array
+    {
+        return $this->meta;
+    }
+
+    /**
+     * Set relationship metadata.
+     *
+     * @param array<string, mixed> $meta
+     *
+     * @return self
+     */
+    public function setMeta(array $meta): self
+    {
+        $this->meta = $meta;
 
         return $this;
     }

@@ -14,3 +14,5 @@ parameters:
     - '/^Binary operation "\+" between float\|int\|string and 0 results in an error\.$/'
     - '/^Parameter #2 \$input1 of function array_map expects array, array<int, string>\|false given\.$/'
     - '/^Parameter #1 \$str of function lcfirst expects string, string\|false given\.$/'
+    - '/^Method Jgut\\JsonApi\\Schema\\MetadataSchema::.+\(\) has parameter \$(resource|meta) with no typehint specified\.$/'
+    - '/^Method Jgut\\JsonApi\\Schema\\MetadataSchema::get.+Meta\(\) has no return typehint specified\.$/'

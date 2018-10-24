@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Tests\Mapping\Metadata;
 
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
+use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use PHPUnit\Framework\TestCase;
@@ -54,10 +55,10 @@ class ResourceMetadataTest extends TestCase
 
     public function testIdentifier()
     {
-        $identifier = $this->getMockBuilder(AttributeMetadata::class)
+        $identifier = $this->getMockBuilder(IdentifierMetadata::class)
             ->disableOriginalConstructor()
             ->getMock();
-        /* @var AttributeMetadata $identifier */
+        /* @var IdentifierMetadata $identifier */
 
         $this->resource->setIdentifier($identifier);
 

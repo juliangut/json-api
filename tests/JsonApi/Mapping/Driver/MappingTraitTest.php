@@ -15,6 +15,8 @@ namespace Jgut\JsonApi\Tests\Mapping\Driver;
 
 use Jgut\JsonApi\Mapping\Driver\MappingTrait;
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
+use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
+use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Schema\MetadataSchema;
@@ -95,7 +97,6 @@ class MappingTraitTest extends TestCase
                     'urlPrefix' => 'resource',
                     'id' => [
                         'name' => 'uuid',
-                        'setter' => 'setUuid',
                         'getter' => 'getUuid',
                     ],
                     'attributes' => [
@@ -113,11 +114,15 @@ class MappingTraitTest extends TestCase
                             'name' => 'relationshipOne',
                             'selfLinkIncluded' => true,
                             'links' => [
-                                'custom' => '/custom',
+                                'custom' => [
+                                    'name' => 'custom',
+                                    'href' => '/custom',
+                                ],
                             ],
                         ],
                         [
                             'class' => 'My\Class\Relationship\Two',
+                            'name' => 'relationshipTwo',
                             'relatedLinkIncluded' => true,
                             'groups' => ['relationship', 'two'],
                         ],
@@ -135,12 +140,10 @@ class MappingTraitTest extends TestCase
         self::assertEquals('class', $resource->getName());
         self::assertEquals('/resource', $resource->getUrlPrefix());
         self::assertEquals(MetadataSchema::class, $resource->getSchemaClass());
-        self::assertInstanceOf(AttributeMetadata::class, $resource->getIdentifier());
+        self::assertInstanceOf(IdentifierMetadata::class, $resource->getIdentifier());
         self::assertEquals('My\Class', $resource->getIdentifier()->getClass());
         self::assertEquals('uuid', $resource->getIdentifier()->getName());
         self::assertEquals('getUuid', $resource->getIdentifier()->getGetter());
-        self::assertEquals('setUuid', $resource->getIdentifier()->getSetter());
-        self::assertEquals([], $resource->getIdentifier()->getGroups());
 
         $attributes = $resource->getAttributes();
 
@@ -172,14 +175,15 @@ class MappingTraitTest extends TestCase
         self::assertFalse($relationship->isDefaultIncluded());
         self::assertTrue($relationship->isSelfLinkIncluded());
         self::assertFalse($relationship->isRelatedLinkIncluded());
-        self::assertEquals(['custom' => '/custom'], $relationship->getLinks());
+        self::assertArrayHasKey('custom', $relationship->getLinks());
+        self::assertInstanceOf(LinkMetadata::class, $relationship->getLinks()['custom']);
 
-        $relationship = $relationships['two'];
+        $relationship = $relationships['relationshipTwo'];
         self::assertInstanceOf(RelationshipMetadata::class, $relationship);
         self::assertEquals('My\Class\Relationship\Two', $relationship->getClass());
-        self::assertEquals('two', $relationship->getName());
-        self::assertEquals('getTwo', $relationship->getGetter());
-        self::assertEquals('setTwo', $relationship->getSetter());
+        self::assertEquals('relationshipTwo', $relationship->getName());
+        self::assertEquals('getRelationshipTwo', $relationship->getGetter());
+        self::assertEquals('setRelationshipTwo', $relationship->getSetter());
         self::assertEquals(['relationship', 'two'], $relationship->getGroups());
         self::assertFalse($relationship->isDefaultIncluded());
         self::assertFalse($relationship->isSelfLinkIncluded());

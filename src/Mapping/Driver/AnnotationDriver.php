@@ -18,6 +18,8 @@ use Jgut\JsonApi\Mapping\Annotation\Id as IdAnnotation;
 use Jgut\JsonApi\Mapping\Annotation\Relationship as RelationshipAnnotation;
 use Jgut\JsonApi\Mapping\Annotation\Resource as ResourceAnnotation;
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
+use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
+use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\Mapping\Driver\AbstractAnnotationDriver;
@@ -25,6 +27,8 @@ use Jgut\Mapping\Exception\DriverException;
 
 /**
  * Annotation driver.
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterface
 {
@@ -87,7 +91,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
 
             foreach ($this->annotationReader->getPropertyAnnotations($property) as $attributeAnnotation) {
                 if ($attributeAnnotation instanceof IdAnnotation) {
-                    $resource->setIdentifier($this->getAttributeMetadata($property, $attributeAnnotation));
+                    $resource->setIdentifier($this->getIdentifierMetadata($property, $attributeAnnotation));
                 } elseif ($attributeAnnotation instanceof RelationshipAnnotation) {
                     $resource->addRelationship($this->getRelationshipMetadata($property, $attributeAnnotation));
                 } elseif ($attributeAnnotation instanceof AttributeAnnotation) {
@@ -127,7 +131,9 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             $resourceMetadata->setUrlPrefix($url);
         }
 
-        $resourceMetadata->setLinks($resourceAnnotation->getLinks());
+        foreach ($this->getLinks($resourceAnnotation->getLinks()) as $link) {
+            $resourceMetadata->addLink($link);
+        }
 
         $resourceMetadata->setAttributesInInclude($resourceAnnotation->hasAttributesInInclude());
     }
@@ -151,10 +157,39 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
 
         $this->populateAttributeMetadata($relationship, $property, $annotation);
 
+        foreach ($this->getLinks($annotation->getLinks()) as $link) {
+            $relationship->addLink($link);
+        }
+
         return $relationship->setDefaultIncluded($annotation->isIncluded())
             ->setSelfLinkIncluded($annotation->isSelfLinkIncluded())
-            ->setRelatedLinkIncluded($annotation->isRelatedLinkIncluded())
-            ->setLinks($annotation->getLinks());
+            ->setRelatedLinkIncluded($annotation->isRelatedLinkIncluded());
+    }
+
+    /**
+     * Get id attribute metadata.
+     *
+     * @param \ReflectionProperty $property
+     * @param AttributeAnnotation $annotation
+     *
+     * @return IdentifierMetadata
+     */
+    protected function getIdentifierMetadata(
+        \ReflectionProperty $property,
+        AttributeAnnotation $annotation
+    ): IdentifierMetadata {
+        $name = $annotation->getName() ?? $property->getName();
+
+        $identifier = new IdentifierMetadata($property->getDeclaringClass()->getName(), $name);
+
+        $getter = $annotation->getGetter();
+        if ($getter === null) {
+            $getter = 'get' . \ucfirst($name);
+        }
+
+        $identifier->setGetter($getter);
+
+        return $identifier;
     }
 
     /**
@@ -215,5 +250,28 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             ->setGetter($getter)
             ->setSetter($setter)
             ->setGroups($attributeAnnotation->getGroups());
+    }
+
+    /**
+     * Get links.
+     *
+     * @param array<mixed, string> $links
+     *
+     * @return array<mixed, LinkMetadata>
+     */
+    protected function getLinks(array $links): array
+    {
+        if ($links !== [] && \array_keys($links) === \range(0, \count($links) - 1)) {
+            throw new DriverException('Links keys must be all strings');
+        }
+
+        $linkList = [];
+
+        foreach ($links as $name => $link) {
+            $linkList[$name] = (new LinkMetadata($name))
+                ->setHref($link);
+        }
+
+        return $linkList;
     }
 }

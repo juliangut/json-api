@@ -26,9 +26,16 @@ class ResourceMetadata extends AbstractMetadata
     protected $schemaClass;
 
     /**
+     * Resource URL prefix.
+     *
+     * @var string
+     */
+    protected $urlPrefix;
+
+    /**
      * Identifier attribute.
      *
-     * @var AttributeMetadata
+     * @var IdentifierMetadata
      */
     protected $identifier;
 
@@ -47,11 +54,18 @@ class ResourceMetadata extends AbstractMetadata
     protected $relationships = [];
 
     /**
-     * Resource URL prefix.
+     * Resource links.
      *
-     * @var string
+     * @var array<string, LinkMetadata>
      */
-    protected $urlPrefix;
+    protected $links = [];
+
+    /**
+     * Resource metadata.
+     *
+     * @var array<string, mixed>
+     */
+    protected $meta = [];
 
     /**
      * Attributes visibility when included.
@@ -66,13 +80,6 @@ class ResourceMetadata extends AbstractMetadata
      * @var string
      */
     protected $group;
-
-    /**
-     * Resource links.
-     *
-     * @var array<string, string>
-     */
-    protected $links = [];
 
     /**
      * Get metadata resource schema class.
@@ -99,11 +106,35 @@ class ResourceMetadata extends AbstractMetadata
     }
 
     /**
+     * Get resource URL prefix.
+     *
+     * @return string|null
+     */
+    public function getUrlPrefix(): ?string
+    {
+        return $this->urlPrefix;
+    }
+
+    /**
+     * Set resource URL prefix.
+     *
+     * @param string $urlPrefix
+     *
+     * @return self
+     */
+    public function setUrlPrefix(string $urlPrefix): self
+    {
+        $this->urlPrefix = '/' . \trim($urlPrefix, '/ ');
+
+        return $this;
+    }
+
+    /**
      * Get identifier attribute.
      *
-     * @return AttributeMetadata|null
+     * @return IdentifierMetadata|null
      */
-    public function getIdentifier(): ?AttributeMetadata
+    public function getIdentifier(): ?IdentifierMetadata
     {
         return $this->identifier;
     }
@@ -111,11 +142,11 @@ class ResourceMetadata extends AbstractMetadata
     /**
      * Set identifier metadata.
      *
-     * @param AttributeMetadata $identifier
+     * @param IdentifierMetadata $identifier
      *
      * @return self
      */
-    public function setIdentifier(AttributeMetadata $identifier): self
+    public function setIdentifier(IdentifierMetadata $identifier): self
     {
         $this->identifier = $identifier;
 
@@ -171,25 +202,49 @@ class ResourceMetadata extends AbstractMetadata
     }
 
     /**
-     * Get resource URL prefix.
+     * Get resource links.
      *
-     * @return string|null
+     * @return array<string, LinkMetadata>
      */
-    public function getUrlPrefix(): ?string
+    public function getLinks(): array
     {
-        return $this->urlPrefix;
+        return $this->links;
     }
 
     /**
-     * Set resource URL prefix.
+     * Add resource link.
      *
-     * @param string $urlPrefix
+     * @param LinkMetadata $link
      *
      * @return self
      */
-    public function setUrlPrefix(string $urlPrefix): self
+    public function addLink(LinkMetadata $link): self
     {
-        $this->urlPrefix = '/' . \trim($urlPrefix, '/ ');
+        $this->links[$link->getName()] = $link;
+
+        return $this;
+    }
+
+    /**
+     * Get resource metadata.
+     *
+     * @return array<string, mixed>
+     */
+    public function getMeta(): array
+    {
+        return $this->meta;
+    }
+
+    /**
+     * Set resource metadata.
+     *
+     * @param array<string, mixed> $meta
+     *
+     * @return self
+     */
+    public function setMeta(array $meta): self
+    {
+        $this->meta = $meta;
 
         return $this;
     }
@@ -238,30 +293,6 @@ class ResourceMetadata extends AbstractMetadata
     public function setGroup(string $group): self
     {
         $this->group = $group;
-
-        return $this;
-    }
-
-    /**
-     * Get resource links.
-     *
-     * @return array<string, string>
-     */
-    public function getLinks(): array
-    {
-        return $this->links;
-    }
-
-    /**
-     * Set resource links.
-     *
-     * @param array<string, string> $links
-     *
-     * @return self
-     */
-    public function setLinks(array $links): self
-    {
-        $this->links = $links;
 
         return $this;
     }

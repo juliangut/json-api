@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Mapping\Driver;
 
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
+use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
+use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Schema\MetadataSchemaInterface;
@@ -76,15 +78,10 @@ trait MappingTrait
             throw new DriverException('Resource class missing');
         }
 
-        if (!isset($mapping['name'])) {
-            $nameParts = \explode('\\', $mapping['class']);
-            $mapping['name'] = \lcfirst(\end($nameParts));
-        }
-
-        $resource = (new ResourceMetadata($mapping['class'], $mapping['name']))
-            ->setIdentifier($this->getIdAttribute($mapping))
+        $resource = (new ResourceMetadata($mapping['class'], $this->getName($mapping)))
+            ->setIdentifier($this->getIdentifier($mapping))
             ->setAttributesInInclude($this->hasAttributesInInclude($mapping))
-            ->setLinks($this->getLinks($mapping));
+            ->setMeta($this->getMeta($mapping));
 
         $schemaClass = $this->getSchemaClass($mapping);
         if ($schemaClass !== null) {
@@ -111,7 +108,37 @@ trait MappingTrait
         $this->populateAttributes($resource, $mapping);
         $this->populateRelationships($resource, $mapping);
 
+        foreach ($this->getLinks($mapping) as $link) {
+            $resource->addLink($link);
+        }
+
         return $resource;
+    }
+
+    /**
+     * Get resource identifier.
+     *
+     * @param array<string, mixed> $mapping
+     *
+     * @return IdentifierMetadata
+     */
+    protected function getIdentifier(array $mapping): IdentifierMetadata
+    {
+        $identifier = 'id';
+        if (\array_key_exists('id', $mapping)) {
+            $identifier = \is_string($mapping['id']) && \trim($mapping['id']) !== ''
+                ? \trim($mapping['id'])
+                : $mapping['id'];
+        }
+
+        if (!\is_array($identifier)) {
+            $identifier = ['name' => $identifier];
+        }
+
+        $mapping['id'] = $identifier;
+
+        return (new IdentifierMetadata($mapping['class'], $mapping['id']['name']))
+            ->setGetter($this->getGetter($mapping['id']));
     }
 
     /**
@@ -123,7 +150,7 @@ trait MappingTrait
      */
     protected function hasAttributesInInclude(array $mapping): bool
     {
-        return isset($mapping['attributesInInclude']) ? (bool) $mapping['attributesInInclude'] : true;
+        return (bool) ($mapping['attributesInInclude'] ?? true);
     }
 
     /**
@@ -151,47 +178,6 @@ trait MappingTrait
     }
 
     /**
-     * Get resource id attribute.
-     *
-     * @param array<string, mixed> $mapping
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return AttributeMetadata
-     */
-    protected function getIdAttribute(array $mapping): AttributeMetadata
-    {
-        if (!isset($mapping['id'])) {
-            $mapping['id'] = 'id';
-        }
-
-        if (\is_string($mapping['id'])) {
-            $mapping['id'] = ['name' => $mapping['id']];
-        }
-
-        return $this->getAttributeMetadata($mapping['class'], $mapping['id']);
-    }
-
-    /**
-     * Populate resource relationships.
-     *
-     * @param ResourceMetadata     $resourceMetadata
-     * @param array<string, mixed> $mapping
-     */
-    protected function populateRelationships(ResourceMetadata $resourceMetadata, array $mapping): void
-    {
-        // @codeCoverageIgnoreStart
-        if (!isset($mapping['relationships'])) {
-            return;
-        }
-        // @codeCoverageIgnoreEnd
-
-        foreach ($mapping['relationships'] as $relationshipMapping) {
-            $resourceMetadata->addRelationship($this->getRelationshipMetadata($relationshipMapping));
-        }
-    }
-
-    /**
      * Populate resource attributes.
      *
      * @param ResourceMetadata     $resourceMetadata
@@ -200,7 +186,7 @@ trait MappingTrait
     protected function populateAttributes(ResourceMetadata $resourceMetadata, array $mapping): void
     {
         // @codeCoverageIgnoreStart
-        if (!isset($mapping['attributes'])) {
+        if (!\array_key_exists('attributes', $mapping)) {
             return;
         }
         // @codeCoverageIgnoreEnd
@@ -210,50 +196,6 @@ trait MappingTrait
                 $this->getAttributeMetadata($resourceMetadata->getClass(), $attributeMapping)
             );
         }
-    }
-
-    /**
-     * Ger resource relationship metadata.
-     *
-     * @param array<string, mixed> $mapping
-     *
-     * @throws DriverException
-     *
-     * @return RelationshipMetadata
-     */
-    protected function getRelationshipMetadata(array $mapping): RelationshipMetadata
-    {
-        if (!isset($mapping['class'])) {
-            throw new DriverException('Resource relationship class missing');
-        }
-
-        if (!isset($mapping['name'])) {
-            $nameParts = \explode('\\', $mapping['class']);
-            $mapping['name'] = \lcfirst(\end($nameParts));
-        }
-
-        $relationship = new RelationshipMetadata($mapping['class'], $mapping['name']);
-
-        $this->populateRelationship($relationship, $mapping);
-
-        return $relationship;
-    }
-
-    /**
-     * Populate relationship.
-     *
-     * @param RelationshipMetadata $relationship
-     * @param array<string, mixed> $mapping
-     */
-    protected function populateRelationship(RelationshipMetadata $relationship, array $mapping): void
-    {
-        $this->populateAttribute($relationship, $mapping);
-
-        $relationship
-            ->setDefaultIncluded($this->isDefaultIncluded($mapping))
-            ->setSelfLinkIncluded($this->isSelfLinkIncluded($mapping))
-            ->setRelatedLinkIncluded($this->isRelatedLinkIncluded($mapping))
-            ->setLinks($this->getLinks($mapping));
     }
 
     /**
@@ -320,7 +262,83 @@ trait MappingTrait
      */
     protected function getGroups(array $mapping): array
     {
-        return $mapping['groups'] ?? [];
+        if (!\array_key_exists('groups', $mapping)) {
+            return [];
+        }
+
+        $groups = $mapping['groups'];
+
+        foreach ($groups as $group) {
+            if (!\is_string($group)) {
+                throw new DriverException(
+                    \sprintf('Groups must be a string or string array. "%s" given', \gettype($group))
+                );
+            }
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Populate resource relationships.
+     *
+     * @param ResourceMetadata     $resourceMetadata
+     * @param array<string, mixed> $mapping
+     */
+    protected function populateRelationships(ResourceMetadata $resourceMetadata, array $mapping): void
+    {
+        // @codeCoverageIgnoreStart
+        if (!isset($mapping['relationships'])) {
+            return;
+        }
+        // @codeCoverageIgnoreEnd
+
+        foreach ($mapping['relationships'] as $relationshipMapping) {
+            $resourceMetadata->addRelationship($this->getRelationshipMetadata($relationshipMapping));
+        }
+    }
+
+    /**
+     * Ger resource relationship metadata.
+     *
+     * @param array<string, mixed> $mapping
+     *
+     * @throws DriverException
+     *
+     * @return RelationshipMetadata
+     */
+    protected function getRelationshipMetadata(array $mapping): RelationshipMetadata
+    {
+        if (!isset($mapping['class'])) {
+            throw new DriverException('Resource relationship class missing');
+        }
+
+        $relationship = new RelationshipMetadata($mapping['class'], $this->getName($mapping));
+
+        $this->populateRelationship($relationship, $mapping);
+
+        return $relationship;
+    }
+
+    /**
+     * Populate relationship.
+     *
+     * @param RelationshipMetadata $relationship
+     * @param array<string, mixed> $mapping
+     */
+    protected function populateRelationship(RelationshipMetadata $relationship, array $mapping): void
+    {
+        $this->populateAttribute($relationship, $mapping);
+
+        $relationship
+            ->setMeta($this->getMeta($mapping))
+            ->setDefaultIncluded($this->isDefaultIncluded($mapping))
+            ->setSelfLinkIncluded($this->isSelfLinkIncluded($mapping))
+            ->setRelatedLinkIncluded($this->isRelatedLinkIncluded($mapping));
+
+        foreach ($this->getLinks($mapping) as $link) {
+            $relationship->addLink($link);
+        }
     }
 
     /**
@@ -332,7 +350,7 @@ trait MappingTrait
      */
     protected function isDefaultIncluded(array $mapping): bool
     {
-        return isset($mapping['included']) ? (bool) $mapping['included'] : false;
+        return (bool) ($mapping['included'] ?? false);
     }
 
     /**
@@ -344,7 +362,7 @@ trait MappingTrait
      */
     protected function isSelfLinkIncluded(array $mapping): bool
     {
-        return isset($mapping['selfLinkIncluded']) ? (bool) $mapping['selfLinkIncluded'] : false;
+        return (bool) ($mapping['selfLinkIncluded'] ?? false);
     }
 
     /**
@@ -356,7 +374,28 @@ trait MappingTrait
      */
     protected function isRelatedLinkIncluded(array $mapping): bool
     {
-        return isset($mapping['relatedLinkIncluded']) ? (bool) $mapping['relatedLinkIncluded'] : false;
+        return (bool) ($mapping['relatedLinkIncluded'] ?? false);
+    }
+
+    /**
+     * Get name.
+     * Or construct from class.
+     *
+     * @param array<string, mixed> $mapping
+     *
+     * @return string
+     */
+    protected function getName(array $mapping): string
+    {
+        if (\array_key_exists('name', $mapping) && \trim($mapping['name']) !== '') {
+            return \trim($mapping['name']);
+        }
+
+        $nameParts = \explode('\\', $mapping['class']);
+        /** @var string $name */
+        $name = \end($nameParts);
+
+        return \lcfirst($name);
     }
 
     /**
@@ -364,18 +403,57 @@ trait MappingTrait
      *
      * @param array<string, mixed> $mapping
      *
-     * @return array<string, string>
+     * @return LinkMetadata[]
      */
     protected function getLinks(array $mapping): array
     {
-        if (!isset($mapping['links'])) {
+        if (!\array_key_exists('links', $mapping)) {
             return [];
         }
 
-        if (!\is_array($mapping['links'])) {
-            throw new DriverException('Links must be an array');
+        $links = $mapping['links'];
+
+        if ($links !== [] && \array_keys($links) === \range(0, \count($links) - 1)) {
+            throw new DriverException('Links keys must be all strings');
         }
 
-        return $mapping['links'];
+        return \array_map(
+            function (array $link): LinkMetadata {
+                if (!\array_key_exists('name', $link)) {
+                    throw new DriverException('Links must have a name');
+                }
+
+                if (!\array_key_exists('href', $link)) {
+                    throw new DriverException('Links must have an href');
+                }
+
+                return (new LinkMetadata($link['name']))
+                    ->setHref($link['href'])
+                    ->setMeta($link);
+            },
+            $links
+        );
+    }
+
+    /**
+     * Get metadata.
+     *
+     * @param array<string, mixed> $mapping
+     *
+     * @return array<string, mixed>
+     */
+    protected function getMeta(array $mapping): array
+    {
+        if (!\array_key_exists('meta', $mapping)) {
+            return [];
+        }
+
+        $meta = $mapping['meta'];
+
+        if ($meta !== [] && \array_keys($meta) === \range(0, \count($meta) - 1)) {
+            throw new DriverException('Metadata keys must be all strings');
+        }
+
+        return $meta;
     }
 }

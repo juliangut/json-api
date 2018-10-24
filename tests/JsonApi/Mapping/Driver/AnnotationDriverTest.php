@@ -15,7 +15,7 @@ namespace Jgut\Slim\Routing\Tests\Mapping\Driver;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Jgut\JsonApi\Mapping\Driver\AnnotationDriver;
-use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
+use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Tests\Files\Annotation\Valid\ResourceOne;
 use Jgut\JsonApi\Tests\Files\Annotation\Valid\ResourceTwo;
@@ -73,12 +73,10 @@ class AnnotationDriverTest extends TestCase
         self::assertNull($resource->getUrlPrefix());
         self::assertNull($resource->getSchemaClass());
         self::assertFalse($resource->hasAttributesInInclude());
-        self::assertInstanceOf(AttributeMetadata::class, $resource->getIdentifier());
+        self::assertInstanceOf(IdentifierMetadata::class, $resource->getIdentifier());
         self::assertEquals(ResourceOne::class, $resource->getIdentifier()->getClass());
         self::assertEquals('id', $resource->getIdentifier()->getName());
         self::assertEquals('getId', $resource->getIdentifier()->getGetter());
-        self::assertEquals('setId', $resource->getIdentifier()->getSetter());
-        self::assertEquals([], $resource->getIdentifier()->getGroups());
         self::assertEquals('isTheOne', $resource->getAttributes()['theOne']->getGetter());
         self::assertEquals('setTheOne', $resource->getAttributes()['theOne']->getSetter());
 
@@ -89,12 +87,10 @@ class AnnotationDriverTest extends TestCase
         self::assertEquals('/resource', $resource->getUrlPrefix());
         self::assertEquals('\Jgut\JsonApi\Test\Stubs\Schema', $resource->getSchemaClass());
         self::assertTrue($resource->hasAttributesInInclude());
-        self::assertInstanceOf(AttributeMetadata::class, $resource->getIdentifier());
+        self::assertInstanceOf(IdentifierMetadata::class, $resource->getIdentifier());
         self::assertEquals(ResourceTwo::class, $resource->getIdentifier()->getClass());
         self::assertEquals('uuid', $resource->getIdentifier()->getName());
         self::assertEquals('getUuid', $resource->getIdentifier()->getGetter());
-        self::assertEquals('setUuid', $resource->getIdentifier()->getSetter());
-        self::assertEquals([], $resource->getIdentifier()->getGroups());
         self::assertEquals('getTwo', $resource->getAttributes()['two']->getGetter());
         self::assertEquals('setTwo', $resource->getAttributes()['two']->getSetter());
     }

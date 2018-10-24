@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Tests\Mapping\Metadata;
 
+use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use PHPUnit\Framework\TestCase;
 
@@ -66,8 +67,10 @@ class RelationshipMetadataTest extends TestCase
 
     public function testLinks()
     {
-        $this->relationship->setLinks(['custom' => '/custom']);
+        $link = new LinkMetadata('custom');
 
-        self::assertEquals(['custom' => '/custom'], $this->relationship->getLinks());
+        $this->relationship->addLink($link);
+
+        self::assertEquals(['custom' => $link], $this->relationship->getLinks());
     }
 }

@@ -15,10 +15,11 @@ namespace Jgut\JsonApi\Tests\Schema;
 
 use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
+use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
+use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Schema\MetadataSchema;
-use Neomerx\JsonApi\Document\Link;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -75,7 +76,7 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $identifier = (new AttributeMetadata(\stdClass::class, 'Id'))
+        $identifier = (new IdentifierMetadata(\stdClass::class, 'Id'))
             ->setGetter('getId');
 
         $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
@@ -96,7 +97,7 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $identifier = (new AttributeMetadata(\stdClass::class, 'Id'))
+        $identifier = (new IdentifierMetadata(\stdClass::class, 'Id'))
             ->setGetter('getId');
 
         $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
@@ -205,14 +206,13 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
+        $link = (new LinkMetadata('custom'))->setHref('/custom');
+
         $relationshipA = (new RelationshipMetadata(\stdClass::class, 'relationshipA'))
             ->setGetter('getRelationshipA')
             ->setSelfLinkIncluded(true)
             ->setRelatedLinkIncluded(true)
-            ->setLinks([
-                'custom' => '/custom',
-                'external' => 'http://example.com',
-            ]);
+            ->addLink($link);
 
         $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
             ->addRelationship($relationshipA);
@@ -225,8 +225,7 @@ class MetadataSchemaTest extends TestCase
         $this->assertFalse($relationships['relationshipA']['showData']);
         $this->assertTrue($relationships['relationshipA']['showSelf']);
         $this->assertFalse($relationships['relationshipA']['showRelated']);
-        $this->assertInstanceOf(Link::class, $relationships['relationshipA']['links']['custom']);
-        $this->assertInstanceOf(Link::class, $relationships['relationshipA']['links']['external']);
+        $this->assertArrayHasKey('custom', $relationships['relationshipA']['links']);
     }
 
     public function testRelationshipsWithData()

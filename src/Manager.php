@@ -193,8 +193,13 @@ class Manager
 
         return \array_map(
             function ($link) {
-                if (\is_string($link) && \preg_match('/^https?:\/\//', $link) === 1) {
-                    $link = new Link($link, null, true);
+                if (\is_string($link)) {
+                    $isExternal = \preg_match('!^https?://!', $link) === false;
+                    if ($isExternal) {
+                        $link = '/' . \ltrim($link, '/');
+                    }
+
+                    $link = new Link($link, null, $isExternal);
                 }
 
                 return $link;

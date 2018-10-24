@@ -14,15 +14,19 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Schema;
 
 use Jgut\JsonApi\Exception\SchemaException;
+use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Neomerx\JsonApi\Contracts\Document\LinkInterface;
+use Neomerx\JsonApi\Contracts\Schema\ResourceObjectInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
-use Neomerx\JsonApi\Document\Link;
 use Neomerx\JsonApi\Schema\BaseSchema;
 
 /**
  * Resource metadata based schema.
+ *
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
 {
@@ -52,6 +56,20 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @throws SchemaException
+     */
+    public function getSelfSubUrl($resource = null): string
+    {
+        if ($resource !== null) {
+            $this->assertResourceType($resource);
+        }
+
+        return parent::getSelfSubUrl($resource);
+    }
+
+    /**
      * Get resource identity.
      *
      * @param object $resource
@@ -75,6 +93,48 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @throws SchemaException
+     */
+    public function getSelfSubLink($resource): LinkInterface
+    {
+        $this->assertResourceType($resource);
+
+        return parent::getSelfSubLink($resource);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws SchemaException
+     */
+    public function getRelationshipSelfLink(
+        $resource,
+        string $name,
+        $meta = null,
+        bool $treatAsHref = false
+    ): LinkInterface {
+        $this->assertResourceType($resource);
+
+        return parent::getRelationshipSelfLink($resource, $name, $meta, $treatAsHref);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRelationshipRelatedLink(
+        $resource,
+        string $name,
+        $meta = null,
+        bool $treatAsHref = false
+    ): LinkInterface {
+        $this->assertResourceType($resource);
+
+        return parent::getRelationshipRelatedLink($resource, $name, $meta, $treatAsHref);
+    }
+
+    /**
      * Get resource attributes.
      *
      * @param object        $resource
@@ -88,12 +148,16 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     {
         $this->assertResourceType($resource);
 
+        if (\is_array($fieldKeysFilter) && \count($fieldKeysFilter) === 0) {
+            return [];
+        }
+
         $group = $this->resourceMetadata->getGroup();
         $attributes = [];
 
         foreach ($this->resourceMetadata->getAttributes() as $attribute) {
-            $groups = $attribute->getGroups();
             $name = $attribute->getName();
+            $groups = $attribute->getGroups();
 
             if (($fieldKeysFilter === null || \in_array($name, $fieldKeysFilter, true))
                 && ($group === null || \in_array($group, $groups, true))
@@ -135,8 +199,8 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
         $relationships = [];
 
         foreach ($this->resourceMetadata->getRelationships() as $relationship) {
-            $groups = $relationship->getGroups();
             $name = $relationship->getName();
+            $groups = $relationship->getGroups();
 
             if (\array_key_exists($name, $includeRelationships)
                 && ($group === null || \in_array($group, $groups, true))
@@ -145,17 +209,15 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             }
         }
 
-        if (\count($includeRelationships) !== 0) {
-            $unknownRelationships = \array_diff_key($includeRelationships, $relationships);
-            if (\count($unknownRelationships) !== 0) {
-                throw new SchemaException(
-                    \sprintf(
-                        'Requested relationship%s "%s" does not exist',
-                        \count($unknownRelationships) > 1 ? 's' : '',
-                        \implode('", "', \array_keys($unknownRelationships))
-                    )
-                );
-            }
+        $unknownRelationships = \array_diff_key($includeRelationships, $relationships);
+        if (\count($unknownRelationships) !== 0) {
+            throw new SchemaException(
+                \sprintf(
+                    'Requested relationship%s "%s" does not exist',
+                    \count($unknownRelationships) > 1 ? 's' : '',
+                    \implode('", "', \array_keys($unknownRelationships))
+                )
+            );
         }
 
         return $relationships;
@@ -170,7 +232,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      *
      * @return mixed[]
      */
-    protected function getRelationshipDescription(
+    private function getRelationshipDescription(
         $resource,
         RelationshipMetadata $relationship,
         bool $primary
@@ -191,26 +253,28 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
 
         $description[self::LINKS] = $this->normalizeLinks($relationship->getLinks());
 
+        // TODO This should be moved to self::getRelationshipsPrimaryMeta
+        $meta = $relationship->getMeta();
+        if (\count($meta) !== 0) {
+            $description[self::META] = $meta;
+        }
+
         return $description;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws SchemaException
      */
-    public function getIncludePaths(): array
-    {
-        return \array_values(\array_filter(\array_map(
-            function (RelationshipMetadata $relationship) {
-                $group = $this->resourceMetadata->getGroup();
-                $name = $relationship->getName();
+    public function createResourceObject(
+        $resource,
+        bool $isOriginallyArrayed,
+        array $fieldKeysFilter = null
+    ): ResourceObjectInterface {
+        $this->assertResourceType($resource);
 
-                return $relationship->isDefaultIncluded()
-                    && ($group === null || \in_array($group, $relationship->getGroups(), true))
-                    ? $name
-                    : null;
-            },
-            $this->resourceMetadata->getRelationships()
-        )));
+        return parent::createResourceObject($resource, $isOriginallyArrayed, $fieldKeysFilter);
     }
 
     /**
@@ -218,7 +282,9 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      *
      * @param object $resource
      *
-     * @return (LinkInterface|string)[]
+     * @throws SchemaException
+     *
+     * @return array<string, LinkInterface>
      */
     public function getResourceLinks($resource): array
     {
@@ -237,7 +303,9 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      *
      * @param object $resource
      *
-     * @return (LinkInterface|string)[]
+     * @throws SchemaException
+     *
+     * @return array<string, LinkInterface>
      */
     public function getIncludedResourceLinks($resource): array
     {
@@ -247,27 +315,109 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getIncludePaths(): array
+    {
+        return \array_values(\array_filter(\array_map(
+            function (RelationshipMetadata $relationship) {
+                $name = $relationship->getName();
+                $group = $this->resourceMetadata->getGroup();
+
+                return $relationship->isDefaultIncluded()
+                && ($group === null || \in_array($group, $relationship->getGroups(), true))
+                    ? $name
+                    : null;
+            },
+            $this->resourceMetadata->getRelationships()
+        )));
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws SchemaException
+     */
+    public function getPrimaryMeta($resource)
+    {
+        $this->assertResourceType($resource);
+
+        $meta = $this->resourceMetadata->getMeta();
+        return \count($meta) !== 0 ? $meta : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws SchemaException
+     */
+    public function getLinkageMeta($resource)
+    {
+        $this->assertResourceType($resource);
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws SchemaException
+     */
+    public function getInclusionMeta($resource)
+    {
+        $this->assertResourceType($resource);
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws SchemaException
+     */
+    public function getRelationshipsPrimaryMeta($resource)
+    {
+        $this->assertResourceType($resource);
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws SchemaException
+     */
+    public function getRelationshipsInclusionMeta($resource)
+    {
+        $this->assertResourceType($resource);
+
+        return null;
+    }
+
+    /**
      * Normalize links format.
      *
-     * @param string[] $links
+     * @param array<string, LinkMetadata> $links
      *
-     * @return string[]|Link[]
+     * @return array<string, LinkInterface>
      */
     private function normalizeLinks(array $links): array
     {
-        if ($links !== [] && \array_keys($links) === \range(0, count($links) - 1)) {
-            throw new SchemaException('Links array keys must be strings');
-        }
+        return \array_map(
+            function (LinkMetadata $link): LinkInterface {
+                /** @var string $href */
+                $href = $link->getHref();
+                $isExternal = \preg_match('!^https?://!', $href) === false;
+                if ($isExternal) {
+                    $href = '/' . \ltrim($href, '/');
+                }
 
-        $linkList = [];
+                $meta = $link->getMeta();
 
-        foreach ($links as $name => $link) {
-            $isExternal = \preg_match('!^https?://!', $link) === false;
-
-            $linkList[$name] = new Link($link, null, $isExternal);
-        }
-
-        return $linkList;
+                return $this->createLink($href, \count($meta) !== 0 ? $meta : null, $isExternal);
+            },
+            $links
+        );
     }
 
     /**
