@@ -61,7 +61,7 @@ class JsonApiMiddlewareTest extends TestCase
         $handler = $this->getMockBuilder(RequestHandlerInterface::class)
             ->getMock();
 
-        $response = (new JsonApiMiddleware($manager, new ResponseFactory()))->process(new ServerRequest(), $handler);
+        $response = (new JsonApiMiddleware(new ResponseFactory(), $manager))->process(new ServerRequest(), $handler);
 
         self::assertEquals(400, $response->getStatusCode());
     }
@@ -104,7 +104,7 @@ class JsonApiMiddlewareTest extends TestCase
             ->will(self::returnValue(new Response()));
         /* @var RequestHandlerInterface $handler */
 
-        $response = (new JsonApiMiddleware($manager, new ResponseFactory()))->process(new ServerRequest(), $handler);
+        $response = (new JsonApiMiddleware(new ResponseFactory(), $manager))->process(new ServerRequest(), $handler);
 
         self::assertEquals(200, $response->getStatusCode());
         self::assertEquals('application/vnd.api+json; charset=utf-8', $response->getHeaderLine('Content-Type'));

@@ -28,6 +28,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 class JsonApiMiddleware implements MiddlewareInterface
 {
     /**
+     * @var ResponseFactoryInterface
+     */
+    protected $responseFactory;
+
+    /**
      * JSON API manager.
      *
      * @var Manager
@@ -35,20 +40,15 @@ class JsonApiMiddleware implements MiddlewareInterface
     protected $manager;
 
     /**
-     * @var ResponseFactoryInterface
-     */
-    protected $responseFactory;
-
-    /**
      * JsonApiMiddleware constructor.
      *
-     * @param Manager                  $manager
      * @param ResponseFactoryInterface $responseFactory
+     * @param Manager                  $manager
      */
-    public function __construct(Manager $manager, ResponseFactoryInterface $responseFactory)
+    public function __construct(ResponseFactoryInterface $responseFactory, Manager $manager)
     {
-        $this->manager = $manager;
         $this->responseFactory = $responseFactory;
+        $this->manager = $manager;
     }
 
     /**
