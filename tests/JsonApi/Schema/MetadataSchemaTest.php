@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Tests\Schema;
 
 use Jgut\JsonApi\Encoding\Factory;
+use Jgut\JsonApi\Exception\SchemaException;
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
 use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
@@ -35,18 +36,17 @@ class MetadataSchemaTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = $this->getMockBuilder(Factory::class)
             ->getMock();
     }
 
-    /**
-     * @expectedException \Jgut\JsonApi\Exception\SchemaException
-     * @expectedExceptionMessage Class "stdClass" is not a "Class"
-     */
     public function testInvalidResource()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('Class "stdClass" is not a "Class"');
+
         $metadata = new ResourceMetadata('Class', 'Resource');
 
         $schema = new MetadataSchema($this->factory, $metadata);
@@ -54,12 +54,11 @@ class MetadataSchemaTest extends TestCase
         $schema->getId(new \stdClass());
     }
 
-    /**
-     * @expectedException \Jgut\JsonApi\Exception\SchemaException
-     * @expectedExceptionMessage No id attribute defined for "stdClass" resource
-     */
     public function testNoId()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('No id attribute defined for "stdClass" resource');
+
         $metadata = new ResourceMetadata(\stdClass::class, 'Resource');
 
         $schema = new MetadataSchema($this->factory, $metadata);
@@ -85,7 +84,7 @@ class MetadataSchemaTest extends TestCase
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        $this->assertEquals('aaa', $schema->getId($resource));
+        self::assertEquals('aaa', $schema->getId($resource));
     }
 
     public function testGetUrl()
@@ -106,7 +105,7 @@ class MetadataSchemaTest extends TestCase
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        $this->assertEquals('/custom/resource/aaa', $schema->getSelfSubUrl($resource));
+        self::assertEquals('/custom/resource/aaa', $schema->getSelfSubUrl($resource));
     }
 
     public function testUnkownAttribute()
@@ -126,15 +125,14 @@ class MetadataSchemaTest extends TestCase
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        $this->assertEquals(['attribute' => 'aaa'], $schema->getAttributes($resource, ['attribute']));
+        self::assertEquals(['attribute' => 'aaa'], $schema->getAttributes($resource, ['attribute']));
     }
 
-    /**
-     * @expectedException \Jgut\JsonApi\Exception\SchemaException
-     * @expectedExceptionMessage Requested attribute "unknown" does not exist
-     */
     public function testGetAttributes()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('Requested attribute "unknown" does not exist');
+
         $resource = new class() {
             public function getAttributeA(): string
             {
@@ -161,24 +159,23 @@ class MetadataSchemaTest extends TestCase
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        $this->assertEquals(['attributeA' => 'aaa'], $schema->getAttributes($resource, ['unknown']));
+        self::assertEquals(['attributeA' => 'aaa'], $schema->getAttributes($resource, ['unknown']));
     }
 
     public function testNoRelationship()
     {
-        $metadata = (new ResourceMetadata(\stdClass::class, 'Resource'));
+        $metadata = new ResourceMetadata(\stdClass::class, 'Resource');
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        $this->assertEmpty($schema->getRelationships(new \stdClass(), true, []));
+        self::assertEmpty($schema->getRelationships(new \stdClass(), true, []));
     }
 
-    /**
-     * @expectedException \Jgut\JsonApi\Exception\SchemaException
-     * @expectedExceptionMessage Requested relationships "One", "Two" does not exist
-     */
     public function testUnknownRelationship()
     {
+        $this->expectException(SchemaException::class);
+        $this->expectExceptionMessage('Requested relationships "One", "Two" does not exist');
+
         $resource = new class() {
             public function getAttribute(): string
             {
@@ -221,11 +218,11 @@ class MetadataSchemaTest extends TestCase
 
         $relationships = $schema->getRelationships($resource, true, ['relationshipA' => null]);
 
-        $this->assertTrue(isset($relationships['relationshipA']));
-        $this->assertFalse($relationships['relationshipA']['showData']);
-        $this->assertTrue($relationships['relationshipA']['showSelf']);
-        $this->assertFalse($relationships['relationshipA']['showRelated']);
-        $this->assertArrayHasKey('custom', $relationships['relationshipA']['links']);
+        self::assertTrue(isset($relationships['relationshipA']));
+        self::assertFalse($relationships['relationshipA']['showData']);
+        self::assertTrue($relationships['relationshipA']['showSelf']);
+        self::assertFalse($relationships['relationshipA']['showRelated']);
+        self::assertArrayHasKey('custom', $relationships['relationshipA']['links']);
     }
 
     public function testRelationshipsWithData()
@@ -258,13 +255,13 @@ class MetadataSchemaTest extends TestCase
 
         $relationships = $schema->getRelationships($resource, true, ['relationshipA' => null]);
 
-        $this->assertTrue(isset($relationships['relationshipA']));
-        $this->assertInstanceOf(\Closure::class, $relationships['relationshipA']['data']);
-        $this->assertEquals('aaa', $relationships['relationshipA']['data']());
-        $this->assertFalse(isset($relationships['relationshipA']['showData']));
-        $this->assertFalse(isset($relationships['relationshipA']['showSelf']));
-        $this->assertFalse(isset($relationships['relationshipA']['related']));
-        $this->assertFalse(isset($relationships['relationshipB']));
+        self::assertTrue(isset($relationships['relationshipA']));
+        self::assertInstanceOf(\Closure::class, $relationships['relationshipA']['data']);
+        self::assertEquals('aaa', $relationships['relationshipA']['data']());
+        self::assertFalse(isset($relationships['relationshipA']['showData']));
+        self::assertFalse(isset($relationships['relationshipA']['showSelf']));
+        self::assertFalse(isset($relationships['relationshipA']['related']));
+        self::assertFalse(isset($relationships['relationshipB']));
     }
 
     public function testIncludePaths()
@@ -278,6 +275,6 @@ class MetadataSchemaTest extends TestCase
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        $this->assertEquals(['Relationship'], $schema->getIncludePaths());
+        self::assertEquals(['Relationship'], $schema->getIncludePaths());
     }
 }

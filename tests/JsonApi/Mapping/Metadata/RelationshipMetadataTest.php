@@ -30,7 +30,7 @@ class RelationshipMetadataTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->relationship = new RelationshipMetadata('Class', 'Name');
     }

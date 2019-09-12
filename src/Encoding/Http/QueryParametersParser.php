@@ -95,7 +95,10 @@ class QueryParametersParser implements QueryParametersParserInterface
                 try {
                     $method = 'parse' . \ucfirst($parameter) . 'Parameter';
 
-                    $this->$method($value);
+                    /** @var callable $callable */
+                    $callable = [$this, $method];
+
+                    \call_user_func($callable, $value);
                 } catch (\TypeError $error) {
                     throw new JsonApiException(
                         $this->getJsonApiError(

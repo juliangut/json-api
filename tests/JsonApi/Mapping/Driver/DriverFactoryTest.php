@@ -16,6 +16,7 @@ namespace Jgut\JsonApi\Tests\Mapping\Driver;
 use Jgut\JsonApi\Mapping\Driver\AnnotationDriver;
 use Jgut\JsonApi\Mapping\Driver\DriverFactory;
 use Jgut\Mapping\Driver\AbstractMappingDriver;
+use Jgut\Mapping\Exception\DriverException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,17 +32,16 @@ class DriverFactoryTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->factory = new DriverFactory();
     }
 
-    /**
-     * @expectedException \Jgut\Mapping\Exception\DriverException
-     * @expectedExceptionMessageRegExp /^Metadata mapping driver should be of the type .+, string given$/
-     */
     public function testInvalidDriver()
     {
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessageRegExp('/^Metadata mapping driver should be of the type .+, string given$/');
+
         $this->factory->getDriver(['driver' => 'invalid']);
     }
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Tests\Encoding;
 
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,12 +22,11 @@ use PHPUnit\Framework\TestCase;
  */
 class QueryParametersParserTest extends TestCase
 {
-    /**
-     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
-     * @expectedExceptionMessage JSON API error
-     */
     public function testInvalidFieldsType()
     {
+        $this->expectException(JsonApiException::class);
+        $this->expectExceptionMessage('JSON API error');
+
         $parameters = [
             'fields' => 'should_be_array',
         ];
@@ -34,12 +34,11 @@ class QueryParametersParserTest extends TestCase
         new QueryParametersParser($parameters);
     }
 
-    /**
-     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
-     * @expectedExceptionMessage JSON API error
-     */
     public function testInvalidFieldsKey()
     {
+        $this->expectException(JsonApiException::class);
+        $this->expectExceptionMessage('JSON API error');
+
         $parameters = [
             'fields' => ['key_should_be_string'],
         ];
@@ -61,12 +60,11 @@ class QueryParametersParserTest extends TestCase
         self::assertEquals(['another' => ['c', 'd']], $queryParser->getFields());
     }
 
-    /**
-     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
-     * @expectedExceptionMessage JSON API error
-     */
     public function testEmptyIncludes()
     {
+        $this->expectException(JsonApiException::class);
+        $this->expectExceptionMessage('JSON API error');
+
         $parameters = [
             'include' => ',,',
         ];
@@ -102,12 +100,11 @@ class QueryParametersParserTest extends TestCase
         self::assertEquals(['c' => true, 'd' => false], $queryParser->getSorts());
     }
 
-    /**
-     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
-     * @expectedExceptionMessage JSON API error
-     */
     public function testInvalidPage()
     {
+        $this->expectException(JsonApiException::class);
+        $this->expectExceptionMessage('JSON API error');
+
         $parameters = [
             'page' => ['page' => 1.0],
         ];

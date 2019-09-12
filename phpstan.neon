@@ -1,8 +1,3 @@
-includes:
-  - vendor/phpstan/phpstan-strict-rules/rules.neon
-  - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon
-  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
-
 parameters:
   level: max
   paths:
@@ -14,5 +9,5 @@ parameters:
     - '/^Binary operation "\+" between float\|int\|string and 0 results in an error\.$/'
     - '/^Parameter #2 \$input1 of function array_map expects array, array<int, string>\|false given\.$/'
     - '/^Parameter #1 \$str of function lcfirst expects string, string\|false given\.$/'
-    - '/^Method Jgut\\JsonApi\\Schema\\MetadataSchema::.+\(\) has parameter \$(resource|meta) with no typehint specified\.$/'
-    - '/^Method Jgut\\JsonApi\\Schema\\MetadataSchema::get.+Meta\(\) has no return typehint specified\.$/'
+    - '/^Parameter #1 \$meta of method Jgut\\JsonApi\\Mapping\\Metadata\\LinkMetadata::setMeta\(\) expects array<string, mixed>, array given\.$/'
+    - '/^Parameter #1 \$resource \(object\) of method Jgut\\JsonApi\\Schema\\MetadataSchema::getRelationships\(\) should be contravariant with parameter \$resource \(mixed\) of method Neomerx\\JsonApi\\Contracts\\Schema\\SchemaInterface::getRelationships\(\)$/'

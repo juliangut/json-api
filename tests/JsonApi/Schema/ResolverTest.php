@@ -33,17 +33,16 @@ class ResolverTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resolver = new Resolver(new Configuration());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Schema class .+ must implement .+/
-     */
     public function testInvalidSchemaClass()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('/Schema class .+ must implement .+/');
+
         $factory = $this->getMockBuilder(Factory::class)
             ->getMock();
         /** @var Factory $factory */
@@ -60,10 +59,10 @@ class ResolverTest extends TestCase
         $factory = $this->getMockBuilder(Factory::class)
             ->getMock();
         /** @var Factory $factory */
-        $resource = (new ResourceMetadata('Class', 'Name'));
+        $resource = new ResourceMetadata('Class', 'Name');
 
         $schemaFactory = $this->resolver->getSchemaFactory($resource);
 
-        $this->assertInstanceOf(MetadataSchemaInterface::class, $schemaFactory($factory));
+        self::assertInstanceOf(MetadataSchemaInterface::class, $schemaFactory($factory));
     }
 }

@@ -80,6 +80,14 @@ Resources can be defined in two basic ways: by setting them in definition files 
 
 #### Definition files
 
+###### PHP
+
+###### JSON
+
+###### XML
+
+###### YAML
+
 ## Contributing
 
 Found a bug or have a feature request? [Please open a new issue](https://github.com/juliangut/json-api/issues). Have a look at existing issues before.

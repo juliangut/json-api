@@ -29,7 +29,7 @@ class AttributeMetadataTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->attribute = new AttributeMetadata('Class', 'Name');
     }

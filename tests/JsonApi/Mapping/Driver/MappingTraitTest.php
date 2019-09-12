@@ -20,6 +20,7 @@ use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Schema\MetadataSchema;
+use Jgut\Mapping\Exception\DriverException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -27,16 +28,15 @@ use PHPUnit\Framework\TestCase;
  */
 class MappingTraitTest extends TestCase
 {
-    /**
-     * @expectedException \Jgut\Mapping\Exception\DriverException
-     * @expectedExceptionMessage Resource class missing
-     */
     public function testNoClass()
     {
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessage('Resource class missing');
+
         $driver = $this->getMockForTrait(MappingTrait::class);
-        $driver->expects($this->once())
+        $driver->expects(static::once())
             ->method('getMappingData')
-            ->will($this->returnValue([
+            ->will(self::returnValue([
                 [],
             ]));
         /* @var MappingTrait $driver */
@@ -44,16 +44,15 @@ class MappingTraitTest extends TestCase
         $driver->getMetadata();
     }
 
-    /**
-     * @expectedException \Jgut\Mapping\Exception\DriverException
-     * @expectedExceptionMessage Resource relationship class missing
-     */
     public function testNoRelationshipClass()
     {
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessage('Resource relationship class missing');
+
         $driver = $this->getMockForTrait(MappingTrait::class);
-        $driver->expects($this->once())
+        $driver->expects(static::once())
             ->method('getMappingData')
-            ->will($this->returnValue([
+            ->will(self::returnValue([
                 [
                     'class' => 'ClassName',
                     'relationships' => [[]],
@@ -64,16 +63,15 @@ class MappingTraitTest extends TestCase
         $driver->getMetadata();
     }
 
-    /**
-     * @expectedException \Jgut\Mapping\Exception\DriverException
-     * @expectedExceptionMessageRegExp /Schema class ".+" does not exist or does not implement ".+"/
-     */
     public function testInvalidSchemaClass()
     {
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessageRegExp('/Schema class ".+" does not exist or does not implement ".+"/');
+
         $driver = $this->getMockForTrait(MappingTrait::class);
-        $driver->expects($this->once())
+        $driver->expects(static::once())
             ->method('getMappingData')
-            ->will($this->returnValue([
+            ->will(self::returnValue([
                 [
                     'class' => 'ClassName',
                     'schemaClass' => self::class,
@@ -87,9 +85,9 @@ class MappingTraitTest extends TestCase
     public function testResources()
     {
         $driver = $this->getMockForTrait(MappingTrait::class);
-        $driver->expects($this->once())
+        $driver->expects(static::once())
             ->method('getMappingData')
-            ->will($this->returnValue([
+            ->will(self::returnValue([
                 [
                     'class' => 'My\Class',
                     'attributesInInclude' => false,

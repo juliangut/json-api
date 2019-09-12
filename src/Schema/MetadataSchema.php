@@ -89,7 +89,10 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             );
         }
 
-        return (string) $resource->{$idAttribute->getGetter()}();
+        /** @var callable $callable */
+        $callable = [$resource, $idAttribute->getGetter()];
+
+        return (string) \call_user_func($callable);
     }
 
     /**
@@ -135,14 +138,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
-     * Get resource attributes.
-     *
-     * @param object        $resource
-     * @param string[]|null $fieldKeysFilter
-     *
-     * @throws SchemaException
-     *
-     * @return array<string, string>
+     * {@inheritdoc}
      */
     public function getAttributes($resource, array $fieldKeysFilter = null): array
     {
@@ -162,7 +158,10 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             if (($fieldKeysFilter === null || \in_array($name, $fieldKeysFilter, true))
                 && ($group === null || \in_array($group, $groups, true))
             ) {
-                $attributes[$name] = $resource->{$attribute->getGetter()}();
+                /** @var callable $callable */
+                $callable = [$resource, $attribute->getGetter()];
+
+                $attributes[$name] = \call_user_func($callable);
             }
         }
 
@@ -247,7 +246,10 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             $description[self::SHOW_RELATED] = !$primary && $relationship->isRelatedLinkIncluded();
         } else {
             $description[self::DATA] = function () use ($resource, $relationship) {
-                return $resource->{$relationship->getGetter()}();
+                /** @var callable $callable */
+                $callable = [$resource, $relationship->getGetter()];
+
+                return \call_user_func($callable);
             };
         }
 
@@ -280,13 +282,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
-     * Get links related to resource.
-     *
-     * @param object $resource
-     *
-     * @throws SchemaException
-     *
-     * @return array<string, LinkInterface>
+     * {@inheritdoc}
      */
     public function getResourceLinks($resource): array
     {
@@ -301,13 +297,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
-     * Get links related to resource when it is in 'included' section.
-     *
-     * @param object $resource
-     *
-     * @throws SchemaException
-     *
-     * @return array<string, LinkInterface>
+     * {@inheritdoc}
      */
     public function getIncludedResourceLinks($resource): array
     {

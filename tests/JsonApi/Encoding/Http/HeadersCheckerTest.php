@@ -15,6 +15,7 @@ namespace Jgut\JsonApi\Tests\Encoding;
 
 use Jgut\JsonApi\Encoding\Http\HeadersChecker;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Http\Headers\HeaderParametersParser;
 use Neomerx\JsonApi\Http\Headers\MediaType;
 use PHPUnit\Framework\TestCase;
@@ -25,18 +26,17 @@ use Zend\Diactoros\ServerRequest;
  */
 class HeadersCheckerTest extends TestCase
 {
-    /**
-     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
-     * @expectedExceptionMessage JSON API error
-     */
     public function testInvalidContentType()
     {
+        $this->expectException(JsonApiException::class);
+        $this->expectExceptionMessage('JSON API error');
+
         $headerParser = $this->getMockBuilder(HeaderParametersParser::class)
             ->disableOriginalConstructor()
             ->getMock();
         $headerParser->expects(static::once())
             ->method('parseContentTypeHeader')
-            ->will($this->returnValue(new MediaType('not', 'valid')));
+            ->will(self::returnValue(new MediaType('not', 'valid')));
         /* @var HeaderParametersParser $headerParser */
 
         $request = (new ServerRequest())->withHeader('Content-Type', 'not/valid');
@@ -44,12 +44,11 @@ class HeadersCheckerTest extends TestCase
         (new HeadersChecker($headerParser))->checkHeaders($request);
     }
 
-    /**
-     * @expectedException \Neomerx\JsonApi\Exceptions\JsonApiException
-     * @expectedExceptionMessage JSON API error
-     */
     public function testInvalidAcceptHeader()
     {
+        $this->expectException(JsonApiException::class);
+        $this->expectExceptionMessage('JSON API error');
+
         $mediaType = new MediaType(MediaTypeInterface::JSON_API_TYPE, MediaTypeInterface::JSON_API_SUB_TYPE);
 
         $headerParser = $this->getMockBuilder(HeaderParametersParser::class)
@@ -57,10 +56,10 @@ class HeadersCheckerTest extends TestCase
             ->getMock();
         $headerParser->expects(static::once())
             ->method('parseContentTypeHeader')
-            ->will($this->returnValue($mediaType));
+            ->will(self::returnValue($mediaType));
         $headerParser->expects(static::once())
             ->method('parseAcceptHeader')
-            ->will($this->returnValue([new MediaType('not', 'valid')]));
+            ->will(self::returnValue([new MediaType('not', 'valid')]));
         /* @var HeaderParametersParser $headerParser */
 
         $request = (new ServerRequest())
@@ -79,10 +78,10 @@ class HeadersCheckerTest extends TestCase
             ->getMock();
         $headerParser->expects(static::once())
             ->method('parseContentTypeHeader')
-            ->will($this->returnValue($mediaType));
+            ->will(self::returnValue($mediaType));
         $headerParser->expects(static::once())
             ->method('parseAcceptHeader')
-            ->will($this->returnValue([$mediaType]));
+            ->will(self::returnValue([$mediaType]));
         /* @var HeaderParametersParser $headerParser */
 
         $request = (new ServerRequest())

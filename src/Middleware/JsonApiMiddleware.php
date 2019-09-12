@@ -16,11 +16,11 @@ namespace Jgut\JsonApi\Middleware;
 use Jgut\JsonApi\Manager;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response;
 
 /**
  * JSON API request handler middleware.
@@ -35,13 +35,20 @@ class JsonApiMiddleware implements MiddlewareInterface
     protected $manager;
 
     /**
+     * @var ResponseFactoryInterface
+     */
+    protected $responseFactory;
+
+    /**
      * JsonApiMiddleware constructor.
      *
-     * @param Manager $manager
+     * @param Manager                  $manager
+     * @param ResponseFactoryInterface $responseFactory
      */
-    public function __construct(Manager $manager)
+    public function __construct(Manager $manager, ResponseFactoryInterface $responseFactory)
     {
         $this->manager = $manager;
+        $this->responseFactory = $responseFactory;
     }
 
     /**
@@ -89,7 +96,7 @@ class JsonApiMiddleware implements MiddlewareInterface
      */
     protected function getResponseFromException(JsonApiException $exception): ResponseInterface
     {
-        $response = new Response('php://temp', $exception->getHttpCode());
+        $response = $this->responseFactory->createResponse($exception->getHttpCode());
         $response->getBody()->write($this->manager->encodeErrors($exception->getErrors()));
 
         return $response;

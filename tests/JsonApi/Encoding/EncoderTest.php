@@ -28,12 +28,13 @@ class EncoderTest extends TestCase
         self::assertInstanceOf(Factory::class, EncoderStub::doCreateFactory());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessageRegExp /Call to Encoder::instance is not allowed\. Use .+::getResourceEncoder instead/
-     */
     public function testRequireInstance()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessageRegExp(
+            '/Call to Encoder::instance is not allowed\. Use .+::getResourceEncoder instead/'
+        );
+
         Encoder::instance();
     }
 }

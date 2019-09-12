@@ -34,17 +34,16 @@ class AnnotationDriverTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->reader = new AnnotationReader();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessageRegExp /^Resource ".+" does not define an id attribute$/
-     */
     public function testNoIdResource()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageRegExp('/^Resource ".+" does not define an id attribute$/');
+
         $paths = [
             \dirname(__DIR__, 2) . '/Files/Annotation/Invalid/NoIdResource.php',
         ];

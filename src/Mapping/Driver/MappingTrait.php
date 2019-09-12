@@ -125,7 +125,7 @@ trait MappingTrait
     protected function getIdentifier(array $mapping): IdentifierMetadata
     {
         $identifier = 'id';
-        if (\array_key_exists('id', $mapping)) {
+        if (isset($mapping['id'])) {
             $identifier = \is_string($mapping['id']) && \trim($mapping['id']) !== ''
                 ? \trim($mapping['id'])
                 : $mapping['id'];
@@ -186,7 +186,7 @@ trait MappingTrait
     protected function populateAttributes(ResourceMetadata $resourceMetadata, array $mapping): void
     {
         // @codeCoverageIgnoreStart
-        if (!\array_key_exists('attributes', $mapping)) {
+        if (!isset($mapping['attributes'])) {
             return;
         }
         // @codeCoverageIgnoreEnd
@@ -262,7 +262,7 @@ trait MappingTrait
      */
     protected function getGroups(array $mapping): array
     {
-        if (!\array_key_exists('groups', $mapping)) {
+        if (!isset($mapping['groups'])) {
             return [];
         }
 
@@ -387,7 +387,7 @@ trait MappingTrait
      */
     protected function getName(array $mapping): string
     {
-        if (\array_key_exists('name', $mapping) && \trim($mapping['name']) !== '') {
+        if (isset($mapping['name']) && \trim($mapping['name']) !== '') {
             return \trim($mapping['name']);
         }
 
@@ -407,7 +407,7 @@ trait MappingTrait
      */
     protected function getLinks(array $mapping): array
     {
-        if (!\array_key_exists('links', $mapping)) {
+        if (!isset($mapping['links'])) {
             return [];
         }
 
@@ -419,11 +419,11 @@ trait MappingTrait
 
         return \array_map(
             function (array $link): LinkMetadata {
-                if (!\array_key_exists('name', $link)) {
+                if (!isset($link['name'])) {
                     throw new DriverException('Links must have a name');
                 }
 
-                if (!\array_key_exists('href', $link)) {
+                if (!isset($link['href'])) {
                     throw new DriverException('Links must have an href');
                 }
 
@@ -444,7 +444,7 @@ trait MappingTrait
      */
     protected function getMeta(array $mapping): array
     {
-        if (!\array_key_exists('meta', $mapping)) {
+        if (!isset($mapping['meta'])) {
             return [];
         }
 

@@ -39,12 +39,11 @@ class ConfigurationTest extends TestCase
         self::assertEquals(MetadataSchema::class, $configuration->getSchemaClass());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The following configuration parameters are not recognized: unknown
-     */
     public function testUnknownParameter()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The following configuration parameters are not recognized: unknown');
+
         new Configuration(['unknown' => 'unknown']);
     }
 
@@ -55,12 +54,13 @@ class ConfigurationTest extends TestCase
         self::assertEquals('Name', $configuration->getAttributeName());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Mapping source must be a string, array or .+\DriverInterface, integer given/
-     */
     public function testBadSource()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp(
+            '/Mapping source must be a string, array or .+\DriverInterface, integer given/'
+        );
+
         new Configuration(['sources' => [10]]);
     }
 

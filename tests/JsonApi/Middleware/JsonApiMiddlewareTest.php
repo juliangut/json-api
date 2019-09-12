@@ -23,6 +23,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\ResponseFactory;
 use Zend\Diactoros\ServerRequest;
 
 /**
@@ -45,7 +46,7 @@ class JsonApiMiddlewareTest extends TestCase
             ->getMock();
         $factory->expects(self::once())
             ->method('createHeadersChecker')
-            ->will($this->returnValue($headersChecker));
+            ->will(self::returnValue($headersChecker));
         /* @var Factory $factory */
 
         $manager = $this->getMockBuilder(Manager::class)
@@ -53,14 +54,14 @@ class JsonApiMiddlewareTest extends TestCase
             ->getMock();
         $manager->expects(self::once())
             ->method('getFactory')
-            ->will($this->returnValue($factory));
+            ->will(self::returnValue($factory));
         /* @var Manager $manager */
 
         /* @var RequestHandlerInterface $handler */
         $handler = $this->getMockBuilder(RequestHandlerInterface::class)
             ->getMock();
 
-        $response = (new JsonApiMiddleware($manager))->process(new ServerRequest(), $handler);
+        $response = (new JsonApiMiddleware($manager, new ResponseFactory()))->process(new ServerRequest(), $handler);
 
         self::assertEquals(400, $response->getStatusCode());
     }
@@ -79,10 +80,10 @@ class JsonApiMiddlewareTest extends TestCase
             ->getMock();
         $factory->expects(self::once())
             ->method('createHeadersChecker')
-            ->will($this->returnValue($headersChecker));
+            ->will(self::returnValue($headersChecker));
         $factory->expects(self::once())
             ->method('createQueryParametersParser')
-            ->will($this->returnValue(new QueryParametersParser()));
+            ->will(self::returnValue(new QueryParametersParser()));
         /* @var Factory $factory */
 
         $manager = $this->getMockBuilder(Manager::class)
@@ -90,20 +91,20 @@ class JsonApiMiddlewareTest extends TestCase
             ->getMock();
         $manager->expects(self::once())
             ->method('getFactory')
-            ->will($this->returnValue($factory));
+            ->will(self::returnValue($factory));
         $manager->expects(self::once())
             ->method('setRequestQueryParameters')
-            ->will($this->returnArgument(0));
+            ->will(self::returnArgument(0));
         /* @var Manager $manager */
 
         $handler = $this->getMockBuilder(RequestHandlerInterface::class)
             ->getMock();
         $handler->expects(self::once())
             ->method('handle')
-            ->will($this->returnValue(new Response()));
+            ->will(self::returnValue(new Response()));
         /* @var RequestHandlerInterface $handler */
 
-        $response = (new JsonApiMiddleware($manager))->process(new ServerRequest(), $handler);
+        $response = (new JsonApiMiddleware($manager, new ResponseFactory()))->process(new ServerRequest(), $handler);
 
         self::assertEquals(200, $response->getStatusCode());
         self::assertEquals('application/vnd.api+json; charset=utf-8', $response->getHeaderLine('Content-Type'));

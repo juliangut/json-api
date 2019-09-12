@@ -32,7 +32,7 @@ class ResourceMetadataTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resource = new ResourceMetadata('Class', 'Name');
     }
@@ -86,7 +86,7 @@ class ResourceMetadataTest extends TestCase
             ->getMock();
         $attribute->expects(self::once())
             ->method('getName')
-            ->will($this->returnValue('attribute'));
+            ->will(self::returnValue('attribute'));
         /* @var AttributeMetadata $attribute */
 
         $this->resource->addAttribute($attribute);
@@ -101,7 +101,7 @@ class ResourceMetadataTest extends TestCase
             ->getMock();
         $relationship->expects(self::once())
             ->method('getName')
-            ->will($this->returnValue('relationship'));
+            ->will(self::returnValue('relationship'));
         /* @var RelationshipMetadata $relationship */
 
         $this->resource->addRelationship($relationship);

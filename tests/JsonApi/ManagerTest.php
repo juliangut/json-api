@@ -51,7 +51,7 @@ class ManagerTest extends TestCase
             ->getMock();
         $encoder->expects(self::once())
             ->method('encodeErrors')
-            ->will($this->returnValue('ENCODED'));
+            ->will(self::returnValue('ENCODED'));
         /* @var Encoder $encoder */
 
         $container = $this->getMockBuilder(Container::class)
@@ -64,10 +64,10 @@ class ManagerTest extends TestCase
             ->getMock();
         $factory->expects(self::once())
             ->method('createEncoder')
-            ->will($this->returnValue($encoder));
+            ->will(self::returnValue($encoder));
         $factory->expects(self::once())
             ->method('createContainer')
-            ->will($this->returnValue($container));
+            ->will(self::returnValue($container));
         /* @var Factory $factory */
 
         self::assertEquals('ENCODED', (new Manager(new Configuration(), $factory))->encodeErrors(new Error()));
@@ -87,7 +87,7 @@ class ManagerTest extends TestCase
             ->method('withLinks');
         $encoder->expects(self::once())
             ->method('encodeData')
-            ->will($this->returnValue('ENCODED'));
+            ->will(self::returnValue('ENCODED'));
         /* @var Encoder $encoder */
 
         $container = $this->getMockBuilder(Container::class)
@@ -100,11 +100,11 @@ class ManagerTest extends TestCase
             ->getMock();
         $factory->expects(self::once())
             ->method('createEncoder')
-            ->will($this->returnValue($encoder));
+            ->will(self::returnValue($encoder));
         $factory->expects(self::once())
             ->method('createContainer')
-            ->will($this->returnCallback(function (array $metadata) use ($container) {
-                $this->assertCount(1, $metadata);
+            ->will(self::returnCallback(function (array $metadata) use ($container) {
+                self::assertCount(1, $metadata);
 
                 return $container;
             }));
@@ -115,7 +115,7 @@ class ManagerTest extends TestCase
             ->getMock();
         $configuration->expects(self::once())
             ->method('getSources')
-            ->will($this->returnValue([__DIR__ . '/Files/Annotation/Valid']));
+            ->will(self::returnValue([__DIR__ . '/Files/Annotation/Valid']));
         /* @var Configuration $configuration */
 
         $manager = new Manager($configuration, $factory);
