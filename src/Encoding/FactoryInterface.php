@@ -17,8 +17,7 @@ use Jgut\JsonApi\Encoding\Http\HeadersCheckerInterface;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -31,10 +30,7 @@ interface FactoryInterface extends BaseFactoryInterface
      *
      * @return Encoder
      */
-    public function createEncoder(
-        ContainerInterface $container,
-        EncoderOptions $encoderOptions = null
-    ): EncoderInterface;
+    public function createEncoder(SchemaContainerInterface $container): EncoderInterface;
 
     /**
      * Create request query parameters parser.

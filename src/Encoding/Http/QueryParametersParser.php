@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Encoding\Http;
 
-use Neomerx\JsonApi\Document\Error;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Neomerx\JsonApi\Schema\Error;
 
 /**
  * Request query parameters parser.
@@ -385,6 +385,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     protected function getJsonApiError(string $title, string $detail): Error
     {
         return new Error(
+            null,
             null,
             null,
             (string) JsonApiException::HTTP_CODE_BAD_REQUEST,

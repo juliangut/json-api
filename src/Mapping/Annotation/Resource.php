@@ -47,13 +47,6 @@ class Resource extends AbstractAnnotation
     protected $urlPrefix;
 
     /**
-     * Show attributes visibility when included.
-     *
-     * @var bool
-     */
-    protected $attributesInInclude = true;
-
-    /**
      * Resource links.
      *
      * @var array<string, string>
@@ -128,30 +121,6 @@ class Resource extends AbstractAnnotation
     public function setUrlPrefix(string $urlPrefix): self
     {
         $this->urlPrefix = $urlPrefix;
-
-        return $this;
-    }
-
-    /**
-     * Should attributes be shown when being included.
-     *
-     * @return bool
-     */
-    public function hasAttributesInInclude(): bool
-    {
-        return $this->attributesInInclude;
-    }
-
-    /**
-     * Set show attributes visibility when included.
-     *
-     * @param bool $attributesInInclude
-     *
-     * @return self
-     */
-    public function setAttributesInInclude(bool $attributesInInclude): self
-    {
-        $this->attributesInInclude = $attributesInInclude;
 
         return $this;
     }

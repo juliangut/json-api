@@ -34,28 +34,28 @@ class AttributeMetadataTest extends TestCase
         $this->attribute = new AttributeMetadata('Class', 'Name');
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
         self::assertNull($this->attribute->getGetter());
         self::assertNull($this->attribute->getSetter());
         self::assertEquals([], $this->attribute->getGroups());
     }
 
-    public function testGetter()
+    public function testGetter(): void
     {
         $this->attribute->setGetter('getAttr');
 
         self::assertEquals('getAttr', $this->attribute->getGetter());
     }
 
-    public function testSetter()
+    public function testSetter(): void
     {
         $this->attribute->setSetter('setAttr');
 
         self::assertEquals('setAttr', $this->attribute->getSetter());
     }
 
-    public function testGroups()
+    public function testGroups(): void
     {
         $this->attribute->setGroups(['one', 'two']);
 

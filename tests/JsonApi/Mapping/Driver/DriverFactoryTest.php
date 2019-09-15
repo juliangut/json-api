@@ -37,7 +37,7 @@ class DriverFactoryTest extends TestCase
         $this->factory = new DriverFactory();
     }
 
-    public function testInvalidDriver()
+    public function testInvalidDriver(): void
     {
         $this->expectException(DriverException::class);
         $this->expectExceptionMessageRegExp('/^Metadata mapping driver should be of the type .+, string given$/');
@@ -45,7 +45,7 @@ class DriverFactoryTest extends TestCase
         $this->factory->getDriver(['driver' => 'invalid']);
     }
 
-    public function testAnnotationDriver()
+    public function testAnnotationDriver(): void
     {
         self::assertInstanceOf(
             AnnotationDriver::class,
@@ -53,7 +53,7 @@ class DriverFactoryTest extends TestCase
         );
     }
 
-    public function testPhpDriver()
+    public function testPhpDriver(): void
     {
         self::assertInstanceOf(
             AbstractMappingDriver::class,
@@ -61,7 +61,7 @@ class DriverFactoryTest extends TestCase
         );
     }
 
-    public function testJsonDriver()
+    public function testJsonDriver(): void
     {
         self::assertInstanceOf(
             AbstractMappingDriver::class,
@@ -69,7 +69,7 @@ class DriverFactoryTest extends TestCase
         );
     }
 
-    public function testXmlDriver()
+    public function testXmlDriver(): void
     {
         self::assertInstanceOf(
             AbstractMappingDriver::class,
@@ -77,7 +77,7 @@ class DriverFactoryTest extends TestCase
         );
     }
 
-    public function testYamlDriver()
+    public function testYamlDriver(): void
     {
         self::assertInstanceOf(
             AbstractMappingDriver::class,

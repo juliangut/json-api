@@ -38,7 +38,7 @@ class ResolverTest extends TestCase
         $this->resolver = new Resolver(new Configuration());
     }
 
-    public function testInvalidSchemaClass()
+    public function testInvalidSchemaClass(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('/Schema class .+ must implement .+/');
@@ -54,7 +54,7 @@ class ResolverTest extends TestCase
         $schemaFactory($factory);
     }
 
-    public function testSchemaFactory()
+    public function testSchemaFactory(): void
     {
         $factory = $this->getMockBuilder(Factory::class)
             ->getMock();

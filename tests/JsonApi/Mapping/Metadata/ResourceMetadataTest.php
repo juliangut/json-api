@@ -37,23 +37,38 @@ class ResourceMetadataTest extends TestCase
         $this->resource = new ResourceMetadata('Class', 'Name');
     }
 
-    public function testDefaults()
+    public function testNoIdentifier(): void
     {
-        self::assertNull($this->resource->getSchemaClass());
-        self::assertNull($this->resource->getIdentifier());
-        self::assertTrue($this->resource->hasAttributesInInclude());
-        self::assertEquals([], $this->resource->getAttributes());
-        self::assertEquals([], $this->resource->getRelationships());
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Resource "Class" does not define an id attribute');
+
+        $this->resource->getIdentifier();
     }
 
-    public function testSchemaClass()
+    public function testDefaults(): void
+    {
+        self::assertNull($this->resource->getSchemaClass());
+        self::assertNull($this->resource->getUrlPrefix());
+        self::assertEquals([], $this->resource->getAttributes());
+        self::assertEquals([], $this->resource->getRelationships());
+        self::assertNull($this->resource->getGroup());
+    }
+
+    public function testSchemaClass(): void
     {
         $this->resource->setSchemaClass('class');
 
         self::assertEquals('class', $this->resource->getSchemaClass());
     }
 
-    public function testIdentifier()
+    public function testUrlPrefix(): void
+    {
+        $this->resource->setUrlPrefix('resource');
+
+        self::assertEquals('resource', $this->resource->getUrlPrefix());
+    }
+
+    public function testIdentifier(): void
     {
         $identifier = $this->getMockBuilder(IdentifierMetadata::class)
             ->disableOriginalConstructor()
@@ -65,21 +80,7 @@ class ResourceMetadataTest extends TestCase
         self::assertEquals($identifier, $this->resource->getIdentifier());
     }
 
-    public function testAttributesInInclude()
-    {
-        $this->resource->setAttributesInInclude(false);
-
-        self::assertFalse($this->resource->hasAttributesInInclude());
-    }
-
-    public function testUrl()
-    {
-        $this->resource->setUrlPrefix('resource');
-
-        self::assertEquals('resource', $this->resource->getUrlPrefix());
-    }
-
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $attribute = $this->getMockBuilder(AttributeMetadata::class)
             ->disableOriginalConstructor()
@@ -94,7 +95,7 @@ class ResourceMetadataTest extends TestCase
         self::assertEquals(['attribute' => $attribute], $this->resource->getAttributes());
     }
 
-    public function testRelationships()
+    public function testRelationships(): void
     {
         $relationship = $this->getMockBuilder(RelationshipMetadata::class)
             ->disableOriginalConstructor()
@@ -107,5 +108,12 @@ class ResourceMetadataTest extends TestCase
         $this->resource->addRelationship($relationship);
 
         self::assertEquals(['relationship' => $relationship], $this->resource->getRelationships());
+    }
+
+    public function testGroup(): void
+    {
+        $this->resource->setGroup('group');
+
+        self::assertEquals('group', $this->resource->getGroup());
     }
 }

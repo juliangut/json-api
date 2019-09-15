@@ -13,40 +13,35 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Metadata;
 
-/**
- * Identifier metadata.
- */
-class IdentifierMetadata extends AbstractMetadata
+trait MetasTrait
 {
-    use MetasTrait;
+    /**
+     * Metas.
+     *
+     * @var array<string, mixed>
+     */
+    protected $meta = [];
 
     /**
-     * Identifier getter.
+     * Get metas.
      *
-     * @var string
+     * @return array<string, mixed>
      */
-    protected $getter;
-
-    /**
-     * Get identifier getter.
-     *
-     * @return string|null
-     */
-    public function getGetter(): ?string
+    public function getMeta(): array
     {
-        return $this->getter;
+        return $this->meta;
     }
 
     /**
-     * Set identifier getter.
+     * Set metas.
      *
-     * @param string $getter
+     * @param array<string, mixed> $meta
      *
      * @return self
      */
-    public function setGetter(string $getter): self
+    public function setMeta(array $meta): self
     {
-        $this->getter = $getter;
+        $this->meta = $meta;
 
         return $this;
     }

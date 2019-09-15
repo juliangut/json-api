@@ -18,6 +18,8 @@ namespace Jgut\JsonApi\Mapping\Metadata;
  */
 class ResourceMetadata extends AbstractMetadata
 {
+    use LinksTrait, MetasTrait;
+
     /**
      * Metadata resource schema class.
      *
@@ -52,27 +54,6 @@ class ResourceMetadata extends AbstractMetadata
      * @var RelationshipMetadata[]
      */
     protected $relationships = [];
-
-    /**
-     * Resource links.
-     *
-     * @var array<string, LinkMetadata>
-     */
-    protected $links = [];
-
-    /**
-     * Resource metadata.
-     *
-     * @var array<string, mixed>
-     */
-    protected $meta = [];
-
-    /**
-     * Attributes visibility when included.
-     *
-     * @var bool
-     */
-    protected $attributesInInclude = true;
 
     /**
      * Encoding group.
@@ -132,10 +113,16 @@ class ResourceMetadata extends AbstractMetadata
     /**
      * Get identifier attribute.
      *
-     * @return IdentifierMetadata|null
+     * @return IdentifierMetadata
      */
-    public function getIdentifier(): ?IdentifierMetadata
+    public function getIdentifier(): IdentifierMetadata
     {
+        if ($this->identifier === null) {
+            throw new \RuntimeException(
+                \sprintf('Resource "%s" does not define an id attribute', $this->class)
+            );
+        }
+
         return $this->identifier;
     }
 
@@ -197,78 +184,6 @@ class ResourceMetadata extends AbstractMetadata
     public function addRelationship(RelationshipMetadata $relationship): self
     {
         $this->relationships[$relationship->getName()] = $relationship;
-
-        return $this;
-    }
-
-    /**
-     * Get resource links.
-     *
-     * @return array<string, LinkMetadata>
-     */
-    public function getLinks(): array
-    {
-        return $this->links;
-    }
-
-    /**
-     * Add resource link.
-     *
-     * @param LinkMetadata $link
-     *
-     * @return self
-     */
-    public function addLink(LinkMetadata $link): self
-    {
-        $this->links[$link->getName()] = $link;
-
-        return $this;
-    }
-
-    /**
-     * Get resource metadata.
-     *
-     * @return array<string, mixed>
-     */
-    public function getMeta(): array
-    {
-        return $this->meta;
-    }
-
-    /**
-     * Set resource metadata.
-     *
-     * @param array<string, mixed> $meta
-     *
-     * @return self
-     */
-    public function setMeta(array $meta): self
-    {
-        $this->meta = $meta;
-
-        return $this;
-    }
-
-    /**
-     * Get attributes visibility when included.
-     *
-     * @return bool
-     */
-    public function hasAttributesInInclude(): bool
-    {
-        return $this->attributesInInclude;
-    }
-
-    /**
-     * Set attributes visibility when included.
-     *
-     * @param bool $attributesInInclude
-     *
-     * @return self
-     */
-    public function setAttributesInInclude(bool $attributesInInclude): self
-    {
-        $this->attributesInInclude = $attributesInInclude;
 
         return $this;
     }

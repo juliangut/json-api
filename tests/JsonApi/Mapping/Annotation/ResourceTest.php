@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Jgut\Slim\Routing\Tests\Mapping\Annotation;
+namespace Jgut\JsonApi\Tests\Mapping\Annotation;
 
 use Jgut\JsonApi\Mapping\Annotation\Resource as AnnotationResource;
 use PHPUnit\Framework\TestCase;
@@ -34,35 +34,27 @@ class ResourceTest extends TestCase
         $this->annotation = new AnnotationResource([]);
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
         self::assertNull($this->annotation->getName());
         self::assertNull($this->annotation->getSchemaClass());
-        self::assertTrue($this->annotation->hasAttributesInInclude());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $this->annotation->setName('name');
 
         self::assertEquals('name', $this->annotation->getName());
     }
 
-    public function testSchemaClass()
+    public function testSchemaClass(): void
     {
         $this->annotation->setSchemaClass('Class');
 
         self::assertEquals('Class', $this->annotation->getSchemaClass());
     }
 
-    public function testAttributesInInclude()
-    {
-        $this->annotation->setAttributesInInclude(false);
-
-        self::assertFalse($this->annotation->hasAttributesInInclude());
-    }
-
-    public function testUrl()
+    public function testUrlPrefix(): void
     {
         $this->annotation->setUrlPrefix('/resource');
 

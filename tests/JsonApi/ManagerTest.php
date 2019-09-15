@@ -18,9 +18,8 @@ use Jgut\JsonApi\Encoding\Encoder;
 use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
 use Jgut\JsonApi\Manager;
-use Neomerx\JsonApi\Document\Error;
-use Neomerx\JsonApi\Document\Link;
-use Neomerx\JsonApi\Schema\Container;
+use Neomerx\JsonApi\Schema\Error;
+use Neomerx\JsonApi\Schema\SchemaContainer;
 use PHPUnit\Framework\TestCase;
 use Zend\Diactoros\ServerRequest;
 
@@ -29,7 +28,7 @@ use Zend\Diactoros\ServerRequest;
  */
 class ManagerTest extends TestCase
 {
-    public function testRequestManipulation()
+    public function testRequestManipulation(): void
     {
         $request = new ServerRequest();
         $queryParameters = new QueryParametersParser();
@@ -44,7 +43,7 @@ class ManagerTest extends TestCase
         self::assertSame($queryParameters, $manager->getRequestQueryParameters($request));
     }
 
-    public function testEncodeErrors()
+    public function testEncodeErrors(): void
     {
         $encoder = $this->getMockBuilder(Encoder::class)
             ->disableOriginalConstructor()
@@ -54,10 +53,10 @@ class ManagerTest extends TestCase
             ->will(self::returnValue('ENCODED'));
         /* @var Encoder $encoder */
 
-        $container = $this->getMockBuilder(Container::class)
+        $container = $this->getMockBuilder(SchemaContainer::class)
             ->disableOriginalConstructor()
             ->getMock();
-        /* @var Container $container */
+        /* @var SchemaContainer $container */
 
         $factory = $this->getMockBuilder(Factory::class)
             ->disableOriginalConstructor()
@@ -66,14 +65,14 @@ class ManagerTest extends TestCase
             ->method('createEncoder')
             ->will(self::returnValue($encoder));
         $factory->expects(self::once())
-            ->method('createContainer')
+            ->method('createSchemaContainer')
             ->will(self::returnValue($container));
         /* @var Factory $factory */
 
         self::assertEquals('ENCODED', (new Manager(new Configuration(), $factory))->encodeErrors(new Error()));
     }
 
-    public function testEncodeResources()
+    public function testEncodeResources(): void
     {
         $request = new ServerRequest();
         $queryParameters = new QueryParametersParser();
@@ -81,19 +80,19 @@ class ManagerTest extends TestCase
         $encoder = $this->getMockBuilder(Encoder::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $encoder->expects(self::once())
-            ->method('withMeta');
-        $encoder->expects(self::once())
-            ->method('withLinks');
+//        $encoder->expects(self::once())
+//            ->method('withMeta');
+//        $encoder->expects(self::once())
+//            ->method('withLinks');
         $encoder->expects(self::once())
             ->method('encodeData')
             ->will(self::returnValue('ENCODED'));
         /* @var Encoder $encoder */
 
-        $container = $this->getMockBuilder(Container::class)
+        $container = $this->getMockBuilder(SchemaContainer::class)
             ->disableOriginalConstructor()
             ->getMock();
-        /* @var Container $container */
+        /* @var SchemaContainer $container */
 
         $factory = $this->getMockBuilder(Factory::class)
             ->disableOriginalConstructor()
@@ -102,7 +101,7 @@ class ManagerTest extends TestCase
             ->method('createEncoder')
             ->will(self::returnValue($encoder));
         $factory->expects(self::once())
-            ->method('createContainer')
+            ->method('createSchemaContainer')
             ->will(self::returnCallback(function (array $metadata) use ($container) {
                 self::assertCount(1, $metadata);
 
@@ -123,11 +122,8 @@ class ManagerTest extends TestCase
         $encoded = $manager->encodeResources(
             new \stdClass(),
             $manager->setRequestQueryParameters($request, $queryParameters),
-            'test',
             ['resourceB'],
-            null,
-            ['custom' => new Link('http://example.com', null, true)],
-            ['meta' => 'data']
+            null
         );
 
         self::assertEquals('ENCODED', $encoded);

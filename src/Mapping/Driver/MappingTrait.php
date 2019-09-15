@@ -80,7 +80,6 @@ trait MappingTrait
 
         $resource = (new ResourceMetadata($mapping['class'], $this->getName($mapping)))
             ->setIdentifier($this->getIdentifier($mapping))
-            ->setAttributesInInclude($this->hasAttributesInInclude($mapping))
             ->setMeta($this->getMeta($mapping));
 
         $schemaClass = $this->getSchemaClass($mapping);
@@ -139,18 +138,6 @@ trait MappingTrait
 
         return (new IdentifierMetadata($mapping['class'], $mapping['id']['name']))
             ->setGetter($this->getGetter($mapping['id']));
-    }
-
-    /**
-     * Set attributes visibility when being included.
-     *
-     * @param array<string, mixed> $mapping
-     *
-     * @return bool
-     */
-    protected function hasAttributesInInclude(array $mapping): bool
-    {
-        return (bool) ($mapping['attributesInInclude'] ?? true);
     }
 
     /**
@@ -332,25 +319,12 @@ trait MappingTrait
 
         $relationship
             ->setMeta($this->getMeta($mapping))
-            ->setDefaultIncluded($this->isDefaultIncluded($mapping))
             ->setSelfLinkIncluded($this->isSelfLinkIncluded($mapping))
             ->setRelatedLinkIncluded($this->isRelatedLinkIncluded($mapping));
 
         foreach ($this->getLinks($mapping) as $link) {
             $relationship->addLink($link);
         }
-    }
-
-    /**
-     * Get attribute default inclusion.
-     *
-     * @param array<string, mixed> $mapping
-     *
-     * @return bool
-     */
-    protected function isDefaultIncluded(array $mapping): bool
-    {
-        return (bool) ($mapping['included'] ?? false);
     }
 
     /**

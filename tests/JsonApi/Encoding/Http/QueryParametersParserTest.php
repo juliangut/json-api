@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Jgut\JsonApi\Tests\Encoding;
+namespace Jgut\JsonApi\Tests\Encoding\Http;
 
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class QueryParametersParserTest extends TestCase
 {
-    public function testInvalidFieldsType()
+    public function testInvalidFieldsType(): void
     {
         $this->expectException(JsonApiException::class);
         $this->expectExceptionMessage('JSON API error');
@@ -34,7 +34,7 @@ class QueryParametersParserTest extends TestCase
         new QueryParametersParser($parameters);
     }
 
-    public function testInvalidFieldsKey()
+    public function testInvalidFieldsKey(): void
     {
         $this->expectException(JsonApiException::class);
         $this->expectExceptionMessage('JSON API error');
@@ -46,7 +46,7 @@ class QueryParametersParserTest extends TestCase
         new QueryParametersParser($parameters);
     }
 
-    public function testFieldsParsing()
+    public function testFieldsParsing(): void
     {
         $parameters = [
             'fields' => ['resource' => 'a,b'],
@@ -60,7 +60,7 @@ class QueryParametersParserTest extends TestCase
         self::assertEquals(['another' => ['c', 'd']], $queryParser->getFields());
     }
 
-    public function testEmptyIncludes()
+    public function testEmptyIncludes(): void
     {
         $this->expectException(JsonApiException::class);
         $this->expectExceptionMessage('JSON API error');
@@ -72,7 +72,7 @@ class QueryParametersParserTest extends TestCase
         new QueryParametersParser($parameters);
     }
 
-    public function testIncludesParsing()
+    public function testIncludesParsing(): void
     {
         $parameters = [
             'include' => 'a,b',
@@ -86,7 +86,7 @@ class QueryParametersParserTest extends TestCase
         self::assertEquals(['c', 'd'], $queryParser->getIncludes());
     }
 
-    public function testSortParsing()
+    public function testSortParsing(): void
     {
         $parameters = [
             'sort' => '-a,b',
@@ -100,7 +100,7 @@ class QueryParametersParserTest extends TestCase
         self::assertEquals(['c' => true, 'd' => false], $queryParser->getSorts());
     }
 
-    public function testInvalidPage()
+    public function testInvalidPage(): void
     {
         $this->expectException(JsonApiException::class);
         $this->expectExceptionMessage('JSON API error');
@@ -112,7 +112,7 @@ class QueryParametersParserTest extends TestCase
         new QueryParametersParser($parameters);
     }
 
-    public function testPagingParsing()
+    public function testPagingParsing(): void
     {
         $parameters = [
             'page' => ['offset' => 10, 'count' => 10],
@@ -126,7 +126,7 @@ class QueryParametersParserTest extends TestCase
         self::assertEquals(['page' => 5, 'size' => 10], $queryParser->getPaging());
     }
 
-    public function testFiltersParsing()
+    public function testFiltersParsing(): void
     {
         $parameters = [
             'filter' => 'anything',

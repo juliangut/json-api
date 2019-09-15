@@ -18,9 +18,10 @@ use Jgut\JsonApi\Encoding\Http\HeadersCheckerInterface;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
+use Neomerx\JsonApi\Contracts\Representation\FieldSetFilterInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use Neomerx\JsonApi\Factories\Factory as BaseFactory;
+use Neomerx\JsonApi\Http\Headers\HeaderParametersParser;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -31,14 +32,17 @@ class Factory extends BaseFactory implements FactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createEncoder(
-        ContainerInterface $container,
-        EncoderOptions $encoderOptions = null
-    ): EncoderInterface {
-        $encoder = new Encoder($this, $container, $encoderOptions);
-        $encoder->setLogger($this->logger);
+    public function createEncoder(SchemaContainerInterface $container): EncoderInterface
+    {
+        return new Encoder($this, $container);
+    }
 
-        return $encoder;
+    /**
+     * {@inheritdoc}
+     */
+    public function createFieldSetFilter(array $fieldSets): FieldSetFilterInterface
+    {
+        return new FieldSetFilter($fieldSets);
     }
 
     /**
@@ -56,6 +60,6 @@ class Factory extends BaseFactory implements FactoryInterface
      */
     public function createHeadersChecker(): HeadersCheckerInterface
     {
-        return new HeadersChecker($this->createHeaderParametersParser());
+        return new HeadersChecker(new HeaderParametersParser($this));
     }
 }

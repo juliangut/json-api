@@ -23,12 +23,12 @@ use PHPUnit\Framework\TestCase;
  */
 class EncoderTest extends TestCase
 {
-    public function testCreateFactory()
+    public function testCreateFactory(): void
     {
         self::assertInstanceOf(Factory::class, EncoderStub::doCreateFactory());
     }
 
-    public function testRequireInstance()
+    public function testRequireInstance(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessageRegExp(

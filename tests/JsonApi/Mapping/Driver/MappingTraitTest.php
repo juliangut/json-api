@@ -28,7 +28,7 @@ use PHPUnit\Framework\TestCase;
  */
 class MappingTraitTest extends TestCase
 {
-    public function testNoClass()
+    public function testNoClass(): void
     {
         $this->expectException(DriverException::class);
         $this->expectExceptionMessage('Resource class missing');
@@ -44,7 +44,7 @@ class MappingTraitTest extends TestCase
         $driver->getMetadata();
     }
 
-    public function testNoRelationshipClass()
+    public function testNoRelationshipClass(): void
     {
         $this->expectException(DriverException::class);
         $this->expectExceptionMessage('Resource relationship class missing');
@@ -63,7 +63,7 @@ class MappingTraitTest extends TestCase
         $driver->getMetadata();
     }
 
-    public function testInvalidSchemaClass()
+    public function testInvalidSchemaClass(): void
     {
         $this->expectException(DriverException::class);
         $this->expectExceptionMessageRegExp('/Schema class ".+" does not exist or does not implement ".+"/');
@@ -82,7 +82,7 @@ class MappingTraitTest extends TestCase
         $driver->getMetadata();
     }
 
-    public function testResources()
+    public function testResources(): void
     {
         $driver = $this->getMockForTrait(MappingTrait::class);
         $driver->expects(static::once())
@@ -90,7 +90,6 @@ class MappingTraitTest extends TestCase
             ->will(self::returnValue([
                 [
                     'class' => 'My\Class',
-                    'attributesInInclude' => false,
                     'schemaClass' => MetadataSchema::class,
                     'urlPrefix' => 'resource',
                     'id' => [
@@ -170,7 +169,6 @@ class MappingTraitTest extends TestCase
         self::assertEquals('getRelationshipOne', $relationship->getGetter());
         self::assertEquals('setRelationshipOne', $relationship->getSetter());
         self::assertEquals([], $relationship->getGroups());
-        self::assertFalse($relationship->isDefaultIncluded());
         self::assertTrue($relationship->isSelfLinkIncluded());
         self::assertFalse($relationship->isRelatedLinkIncluded());
         self::assertArrayHasKey('custom', $relationship->getLinks());
@@ -183,7 +181,6 @@ class MappingTraitTest extends TestCase
         self::assertEquals('getRelationshipTwo', $relationship->getGetter());
         self::assertEquals('setRelationshipTwo', $relationship->getSetter());
         self::assertEquals(['relationship', 'two'], $relationship->getGroups());
-        self::assertFalse($relationship->isDefaultIncluded());
         self::assertFalse($relationship->isSelfLinkIncluded());
         self::assertTrue($relationship->isRelatedLinkIncluded());
     }

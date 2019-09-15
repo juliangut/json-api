@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Schema;
 
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
-use Neomerx\JsonApi\Contracts\Schema\SchemaFactoryInterface;
+use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 
 /**
@@ -23,10 +23,7 @@ use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 interface MetadataSchemaInterface extends SchemaInterface
 {
     /**
-     * Metadata resource schema constructor.
-     *
-     * @param SchemaFactoryInterface $factory
-     * @param ResourceMetadata       $resourceMetadata
+     * {@inheritdoc}
      */
-    public function __construct(SchemaFactoryInterface $factory, ResourceMetadata $resourceMetadata);
+    public function __construct(FactoryInterface $factory, ResourceMetadata $resourceMetadata);
 }

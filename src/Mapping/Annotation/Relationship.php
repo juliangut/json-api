@@ -22,13 +22,6 @@ namespace Jgut\JsonApi\Mapping\Annotation;
 class Relationship extends Attribute
 {
     /**
-     * Included by default.
-     *
-     * @var bool
-     */
-    protected $included = false;
-
-    /**
      * Include self link.
      *
      * @var bool
@@ -48,30 +41,6 @@ class Relationship extends Attribute
      * @var array<string, string>
      */
     protected $links = [];
-
-    /**
-     * Is included by default.
-     *
-     * @return bool
-     */
-    public function isIncluded(): bool
-    {
-        return $this->included;
-    }
-
-    /**
-     * Set included by default.
-     *
-     * @param bool $included
-     *
-     * @return self
-     */
-    public function setIncluded(bool $included): self
-    {
-        $this->included = $included;
-
-        return $this;
-    }
 
     /**
      * Should self link be included.

@@ -14,16 +14,13 @@ declare(strict_types=1);
 namespace Jgut\JsonApi;
 
 use Jgut\JsonApi\Encoding\FactoryInterface;
+use Jgut\JsonApi\Encoding\OptionsInterface;
 use Jgut\JsonApi\Exception\SchemaException;
-use Neomerx\JsonApi\Contracts\Document\ErrorInterface;
-use Neomerx\JsonApi\Contracts\Document\LinkInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
-use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
+use Neomerx\JsonApi\Contracts\Schema\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
-use Neomerx\JsonApi\Encoder\Parameters\EncodingParameters;
-use Neomerx\JsonApi\Exceptions\ErrorCollection;
+use Neomerx\JsonApi\Schema\ErrorCollection;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -97,13 +94,10 @@ class Manager
     /**
      * Encode resources to JSON API.
      *
-     * @param object|object[]                  $resources
-     * @param ServerRequestInterface           $request
-     * @param string|null                      $group
-     * @param string[]                         $resourceTypes
-     * @param EncodingParametersInterface|null $encodingParameters
-     * @param array<string, LinkInterface>     $links
-     * @param array<string, mixed>             $meta
+     * @param object|object[]        $resources
+     * @param ServerRequestInterface $request
+     * @param string[]               $resourceTypes
+     * @param OptionsInterface|null  $encodingOptions
      *
      * @throws SchemaException
      *
@@ -112,52 +106,43 @@ class Manager
     final public function encodeResources(
         $resources,
         ServerRequestInterface $request,
-        ?string $group = null,
         array $resourceTypes = [],
-        ?EncodingParametersInterface $encodingParameters = null,
-        array $links = [],
-        array $meta = []
+        ?OptionsInterface $encodingOptions = null
     ): string {
-        if ($encodingParameters === null) {
-            $queryParameters = $this->getRequestQueryParameters($request);
+        $queryParameters = $this->getRequestQueryParameters($request);
 
-            if ($queryParameters !== null) {
-                $encodingParameters = new EncodingParameters(
-                    $queryParameters->getIncludes(),
-                    $queryParameters->getFields()
-                );
-            } else {
-                // @codeCoverageIgnoreStart
-                $encodingParameters = new EncodingParameters();
-                // @codeCoverageIgnoreEnd
-            }
-        }
+        $encodingOptions = $encodingOptions ?? $this->configuration->getEncodingOptions();
 
-        return $this->getResourceEncoder($resourceTypes, $group, $links, $meta)
-            ->encodeData($resources, $encodingParameters);
+        $encoder = $this->getEncoder(
+            $this->getSchemaFactories($resourceTypes, $encodingOptions->getGroup()),
+            $encodingOptions,
+            $queryParameters !== null ? $queryParameters->getIncludes() : null,
+            $queryParameters !== null ? $queryParameters->getFields() : null
+        );
+
+        return $encoder->encodeData($resources);
     }
 
     /**
-     * Get JSON API resource encoder.
+     * Encode errors to JSON API.
      *
-     * @param string[]                     $resourceTypes
-     * @param string|null                  $group
-     * @param array<string, LinkInterface> $links
-     * @param array<string, mixed>         $meta
+     * @param ErrorInterface|ErrorCollection $errors
+     * @param OptionsInterface               $encodingOptions
      *
      * @throws SchemaException
      *
-     * @return EncoderInterface
+     * @return string
      */
-    protected function getResourceEncoder(
-        array $resourceTypes,
-        ?string $group,
-        array $links,
-        array $meta
-    ): EncoderInterface {
-        $schemaFactories = $this->getSchemaFactories($resourceTypes, $group);
+    final public function encodeErrors($errors, ?OptionsInterface $encodingOptions = null): string
+    {
+        if (!$errors instanceof ErrorCollection) {
+            $errors = (new ErrorCollection())->add($errors);
+        }
 
-        return $this->getEncoder($schemaFactories, $this->configuration->getEncoderOptions(), $links, $meta);
+        $encodingOptions = clone ($encodingOptions ?? $this->configuration->getEncodingOptions());
+        $encodingOptions->setEncodeOptions($encodingOptions->getEncodeOptions() | \JSON_PARTIAL_OUTPUT_ON_ERROR);
+
+        return $this->getEncoder([], $encodingOptions)->encodeErrors($errors);
     }
 
     /**
@@ -199,91 +184,53 @@ class Manager
     }
 
     /**
-     * Encode errors to JSON API.
-     *
-     * @param ErrorInterface|ErrorCollection $errors
-     * @param array<string, LinkInterface>   $links
-     * @param array<string, mixed>           $meta
-     *
-     * @throws SchemaException
-     *
-     * @return string
-     */
-    final public function encodeErrors($errors, array $links = [], array $meta = []): string
-    {
-        if (!$errors instanceof ErrorCollection) {
-            $errors = (new ErrorCollection())->add($errors);
-        }
-
-        return $this->getErrorEncoder($links, $meta)->encodeErrors($errors);
-    }
-
-    /**
-     * Get JSON API error encoder.
-     *
-     * @param array<string, LinkInterface> $links
-     * @param array<string, mixed>         $meta
-     *
-     * @throws SchemaException
-     *
-     * @return EncoderInterface
-     */
-    protected function getErrorEncoder(array $links, array $meta): EncoderInterface
-    {
-        $encoderOptions = $this->configuration->getEncoderOptions();
-        $encoderOptions = new EncoderOptions(
-            $encoderOptions->getOptions() | \JSON_PARTIAL_OUTPUT_ON_ERROR,
-            $encoderOptions->getUrlPrefix(),
-            $encoderOptions->getDepth()
-        );
-
-        return $this->getEncoder([], $encoderOptions, $links, $meta);
-    }
-
-    /**
      * Get JSON API encoder.
      *
      * @param SchemaInterface[]|\Closure[] $schemaFactories
-     * @param EncoderOptions               $encoderOptions
-     * @param mixed[]                      $links
-     * @param mixed[]                      $meta
+     * @param OptionsInterface             $encodingOptions
+     * @param iterable|null                $includePaths
+     * @param array|null                   $fieldSets
      *
      * @throws SchemaException
      *
      * @return EncoderInterface
      */
-    protected function getEncoder(
+    private function getEncoder(
         array $schemaFactories,
-        EncoderOptions $encoderOptions,
-        array $links,
-        array $meta
+        OptionsInterface $encodingOptions,
+        ?iterable $includePaths = null,
+        ?array $fieldSets = null
     ): EncoderInterface {
-        $encoder = $this->factory->createEncoder($this->factory->createContainer($schemaFactories), $encoderOptions);
+        $encoder = $this->factory->createEncoder($this->factory->createSchemaContainer($schemaFactories));
 
-        if (\count($links) !== 0) {
-            foreach ($links as $name => $link) {
-                if (!\is_string($name)) {
-                    throw new SchemaException('Links keys must be all strings');
-                }
+        $urlPrefix = $this->configuration->getJsonApiVersion();
+        if ($urlPrefix !== null) {
+            $encoder->withUrlPrefix($urlPrefix);
+        }
+        $apiVersion = $this->configuration->getJsonApiVersion();
+        if ($apiVersion !== null) {
+            $encoder->withJsonApiVersion($apiVersion);
+        }
+        $encoder->withJsonApiMeta($this->configuration->getJsonApiMeta());
 
-                if (!$link instanceof LinkInterface) {
-                    throw new SchemaException(\sprintf(
-                        'Link must be an instance of %s, %s given',
-                        LinkInterface::class,
-                        \is_object($link) ? \get_class($link) : \gettype($link)
-                    ));
-                }
-            }
+        $encoder->withEncodeOptions($encodingOptions->getEncodeOptions());
+        $encoder->withEncodeDepth($encodingOptions->getEncodeDepth());
 
+        $links = $encodingOptions->getLinks();
+        if ($links !== null) {
             $encoder->withLinks($links);
         }
-
-        if (\count($meta) !== 0) {
-            if (\array_keys($meta) === \range(0, \count($meta) - 1)) {
-                throw new SchemaException('Metadata keys must be all strings');
-            }
-
+        // TODO add profile ($encoder->withProfile())
+        $meta = $encodingOptions->getMeta();
+        if ($meta !== null) {
             $encoder->withMeta($meta);
+        }
+
+        if ($includePaths !== null) {
+            $encoder->withIncludedPaths($includePaths);
+        }
+        if ($fieldSets !== null) {
+            $encoder->withFieldSets($fieldSets);
         }
 
         return $encoder;

@@ -18,19 +18,14 @@ namespace Jgut\JsonApi\Mapping\Metadata;
  */
 class LinkMetadata extends AbstractMetadata
 {
+    use MetasTrait;
+
     /**
      * Link href.
      *
      * @var string
      */
     protected $href;
-
-    /**
-     * Link metadata.
-     *
-     * @var array<string, mixed>
-     */
-    protected $meta = [];
 
     /**
      * LinkMetadata constructor.
@@ -62,30 +57,6 @@ class LinkMetadata extends AbstractMetadata
     public function setHref(string $href): self
     {
         $this->href = $href;
-
-        return $this;
-    }
-
-    /**
-     * Get link metadata.
-     *
-     * @return array<string, mixed>
-     */
-    public function getMeta(): array
-    {
-        return $this->meta;
-    }
-
-    /**
-     * Set link metadata.
-     *
-     * @param array<string, mixed> $meta
-     *
-     * @return self
-     */
-    public function setMeta(array $meta): self
-    {
-        $this->meta = $meta;
 
         return $this;
     }

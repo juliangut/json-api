@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class AbstractMetadataTest extends TestCase
 {
-    public function testCreation()
+    public function testCreation(): void
     {
         $metadata = new AbstractMetadataStub('Class', 'Name');
 

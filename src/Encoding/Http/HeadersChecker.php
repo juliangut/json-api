@@ -15,8 +15,9 @@ namespace Jgut\JsonApi\Encoding\Http;
 
 use Neomerx\JsonApi\Contracts\Http\Headers\HeaderParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
-use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Exceptions\InvalidArgumentException;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
+use Neomerx\JsonApi\Schema\Error;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -58,9 +59,25 @@ class HeadersChecker implements HeadersCheckerInterface
     protected function checkContentTypeHeader(ServerRequestInterface $request): void
     {
         if (\count($request->getHeader('Content-Type')) === 1) {
-            /** @var MediaTypeInterface $contentType */
-            $contentType = $this->headerParser
-                ->parseContentTypeHeader($request->getHeaderLine('Content-Type'));
+            try {
+                /** @var MediaTypeInterface $contentType */
+                $contentType = $this->headerParser
+                    ->parseContentTypeHeader($request->getHeaderLine('Content-Type'));
+            } catch (InvalidArgumentException $exception) {
+                throw new JsonApiException(
+                    new Error(
+                        null,
+                        null,
+                        null,
+                        (string) JsonApiException::HTTP_CODE_BAD_REQUEST,
+                        null,
+                        'Content-Type header parse error',
+                        $exception->getMessage()
+                    ),
+                    JsonApiException::HTTP_CODE_BAD_REQUEST,
+                    $exception
+                );
+            }
 
             if ($contentType->getType() === MediaTypeInterface::JSON_API_TYPE
                 && $contentType->getSubType() === MediaTypeInterface::JSON_API_SUB_TYPE
@@ -73,10 +90,11 @@ class HeadersChecker implements HeadersCheckerInterface
             new Error(
                 null,
                 null,
+                null,
                 (string) JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
                 null,
                 'Unsupported content type',
-                'Content-Type should be ' . MediaTypeInterface::JSON_API_MEDIA_TYPE
+                'Content-Type header should be ' . MediaTypeInterface::JSON_API_MEDIA_TYPE
             ),
             JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE
         );
@@ -91,15 +109,34 @@ class HeadersChecker implements HeadersCheckerInterface
      */
     protected function checkAcceptHeader(ServerRequestInterface $request): void
     {
-        /** @var MediaTypeInterface $mediaType */
-        foreach ($this->headerParser->parseAcceptHeader($request->getHeaderLine('Accept')) as $mediaType) {
-            if ($mediaType->getType() === 'application' && $mediaType->getSubType() === 'vnd.api+json') {
-                return;
+        try {
+            /** @var MediaTypeInterface $mediaType */
+            foreach ($this->headerParser->parseAcceptHeader($request->getHeaderLine('Accept')) as $mediaType) {
+                if ($mediaType->getType() === MediaTypeInterface::JSON_API_TYPE
+                    && $mediaType->getSubType() === MediaTypeInterface::JSON_API_SUB_TYPE
+                ) {
+                    return;
+                }
             }
+        } catch (InvalidArgumentException $exception) {
+            throw new JsonApiException(
+                new Error(
+                    null,
+                    null,
+                    null,
+                    (string) JsonApiException::HTTP_CODE_BAD_REQUEST,
+                    null,
+                    'Accept header parse error',
+                    $exception->getMessage()
+                ),
+                JsonApiException::HTTP_CODE_BAD_REQUEST,
+                $exception
+            );
         }
 
         throw new JsonApiException(
             new Error(
+                null,
                 null,
                 null,
                 (string) JsonApiException::HTTP_CODE_NOT_ACCEPTABLE,

@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Tests;
 
 use Jgut\JsonApi\Configuration;
+use Jgut\JsonApi\Encoding\Options;
+use Jgut\JsonApi\Encoding\OptionsInterface;
 use Jgut\JsonApi\Mapping\Driver\DriverFactory;
 use Jgut\JsonApi\Schema\MetadataSchema;
 use Jgut\JsonApi\Schema\Resolver;
 use Jgut\Mapping\Metadata\MetadataResolver;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -26,7 +27,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ConfigurationTest extends TestCase
 {
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $configuration = new Configuration();
 
@@ -34,12 +35,12 @@ class ConfigurationTest extends TestCase
         self::assertEmpty($configuration->getSources());
         self::assertInstanceOf(MetadataResolver::class, $configuration->getMetadataResolver());
         self::assertInstanceOf(Resolver::class, $configuration->getSchemaResolver());
-        self::assertInstanceOf(EncoderOptions::class, $configuration->getEncoderOptions());
+        self::assertInstanceOf(OptionsInterface::class, $configuration->getEncodingOptions());
         self::assertNull($configuration->getUrlPrefix());
         self::assertEquals(MetadataSchema::class, $configuration->getSchemaClass());
     }
 
-    public function testUnknownParameter()
+    public function testUnknownParameter(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The following configuration parameters are not recognized: unknown');
@@ -47,14 +48,14 @@ class ConfigurationTest extends TestCase
         new Configuration(['unknown' => 'unknown']);
     }
 
-    public function testAttributeName()
+    public function testAttributeName(): void
     {
         $configuration = new Configuration(['attributeName' => 'Name']);
 
         self::assertEquals('Name', $configuration->getAttributeName());
     }
 
-    public function testBadSource()
+    public function testBadSource(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp(
@@ -64,7 +65,7 @@ class ConfigurationTest extends TestCase
         new Configuration(['sources' => [10]]);
     }
 
-    public function testSourcePaths()
+    public function testSourcePaths(): void
     {
         $paths = [
             '/path/to/directory',
@@ -76,7 +77,7 @@ class ConfigurationTest extends TestCase
         self::assertEquals($paths, $configuration->getSources());
     }
 
-    public function testMetadataResolver()
+    public function testMetadataResolver(): void
     {
         $metadataResolver = new MetadataResolver(new DriverFactory());
 
@@ -85,7 +86,14 @@ class ConfigurationTest extends TestCase
         self::assertEquals($metadataResolver, $configuration->getMetadataResolver());
     }
 
-    public function testSchemaResolver()
+    public function testSchemaClass(): void
+    {
+        $configuration = new Configuration(['schemaClass' => 'Class']);
+
+        self::assertEquals('Class', $configuration->getSchemaClass());
+    }
+
+    public function testSchemaResolver(): void
     {
         $schemaResolver = $this->getMockBuilder(Resolver::class)
             ->disableOriginalConstructor()
@@ -96,28 +104,35 @@ class ConfigurationTest extends TestCase
         self::assertEquals($schemaResolver, $configuration->getSchemaResolver());
     }
 
-    public function testEncoderOptions()
+    public function testEncoderOptions(): void
     {
-        $encoderOptions = $this->getMockBuilder(EncoderOptions::class)
+        $encodingOptions = $this->getMockBuilder(Options::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configuration = new Configuration(['encoderOptions' => $encoderOptions]);
+        $configuration = new Configuration(['encodingOptions' => $encodingOptions]);
 
-        self::assertEquals($encoderOptions, $configuration->getEncoderOptions());
+        self::assertEquals($encodingOptions, $configuration->getEncodingOptions());
     }
 
-    public function testUrlPrefix()
+    public function testUrlPrefix(): void
     {
         $configuration = new Configuration(['urlPrefix' => 'http://example.com']);
 
         self::assertEquals('http://example.com', $configuration->getUrlPrefix());
     }
 
-    public function testSchemaClass()
+    public function testJsonApiVersion(): void
     {
-        $configuration = new Configuration(['schemaClass' => 'Class']);
+        $configuration = new Configuration(['jsonApiVersion' => '1.1']);
 
-        self::assertEquals('Class', $configuration->getSchemaClass());
+        self::assertEquals('1.1', $configuration->getJsonApiVersion());
+    }
+
+    public function testJsonApiMeta(): void
+    {
+        $configuration = new Configuration(['jsonApiMeta' => ['meta' => 'value']]);
+
+        self::assertEquals(['meta' => 'value'], $configuration->getJsonApiMeta());
     }
 }

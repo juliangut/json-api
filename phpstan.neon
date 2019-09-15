@@ -4,10 +4,10 @@ parameters:
     - src
   ignoreErrors:
     - '/^In method "Jgut\\JsonApi\\Mapping\\Driver\\(Php|Json|Yaml|Xml)Driver::.+", return type is "array"/'
-    - '/^Parameter \#\d \$.+ of class Neomerx\\JsonApi\\Encoder\\Parameters\\EncodingParameters constructor expects array(<string>)?\|null, iterable given\.$/'
     - '/^Method Jgut\\JsonApi\\Manager::getResourceMetadata\(\) should return array<Jgut\\JsonApi\\Mapping\\Metadata\\ResourceMetadata> but returns array<Jgut\\Mapping\\Metadata\\MetadataInterface>\.$/'
     - '/^Binary operation "\+" between float\|int\|string and 0 results in an error\.$/'
     - '/^Parameter #2 \$input1 of function array_map expects array, array<int, string>\|false given\.$/'
     - '/^Parameter #1 \$str of function lcfirst expects string, string\|false given\.$/'
     - '/^Parameter #1 \$meta of method Jgut\\JsonApi\\Mapping\\Metadata\\LinkMetadata::setMeta\(\) expects array<string, mixed>, array given\.$/'
-    - '/^Parameter #1 \$resource \(object\) of method Jgut\\JsonApi\\Schema\\MetadataSchema::getRelationships\(\) should be contravariant with parameter \$resource \(mixed\) of method Neomerx\\JsonApi\\Contracts\\Schema\\SchemaInterface::getRelationships\(\)$/'
+    - '/^Parameter #4 \$meta of method Neomerx\\JsonApi\\Contracts\\Factories\\FactoryInterface::createLink\(\) expects null, \(array<string, mixed>\)\|null given\.$/'
+    - '/^Parameter #4 \$fieldSets of method Jgut\\JsonApi\\Manager::getEncoder\(\) expects array\|null, iterable\|null given\.$/'

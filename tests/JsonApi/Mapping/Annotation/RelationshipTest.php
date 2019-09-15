@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Jgut\Slim\Routing\Tests\Mapping\Annotation;
+namespace Jgut\JsonApi\Tests\Mapping\Annotation;
 
 use Jgut\JsonApi\Mapping\Annotation\Relationship;
 use PHPUnit\Framework\TestCase;
@@ -34,36 +34,28 @@ class RelationshipTest extends TestCase
         $this->annotation = new Relationship([]);
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
-        self::assertFalse($this->annotation->isIncluded());
         self::assertFalse($this->annotation->isSelfLinkIncluded());
         self::assertFalse($this->annotation->isRelatedLinkIncluded());
         self::assertEmpty($this->annotation->getLinks());
     }
 
-    public function testDefaultIncluded()
-    {
-        $this->annotation->setIncluded(true);
-
-        self::assertTrue($this->annotation->isIncluded());
-    }
-
-    public function testSelfLinkIncluded()
+    public function testSelfLinkIncluded(): void
     {
         $this->annotation->setSelfLinkIncluded(true);
 
         self::assertTrue($this->annotation->isSelfLinkIncluded());
     }
 
-    public function testRelatedLinkIncluded()
+    public function testRelatedLinkIncluded(): void
     {
         $this->annotation->setRelatedLinkIncluded(true);
 
         self::assertTrue($this->annotation->isRelatedLinkIncluded());
     }
 
-    public function testLinks()
+    public function testLinks(): void
     {
         $this->annotation->setLinks(['custom' => '/custom']);
 

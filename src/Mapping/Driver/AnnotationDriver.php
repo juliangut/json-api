@@ -100,11 +100,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             }
         }
 
-        if ($resource->getIdentifier() === null) {
-            throw new DriverException(
-                \sprintf('Resource "%s" does not define an id attribute', $resourceName)
-            );
-        }
+        $resource->getIdentifier();
 
         $this->populateResourceMetadata($resource, $annotation);
 
@@ -134,8 +130,6 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         foreach ($this->getLinks($resourceAnnotation->getLinks()) as $link) {
             $resourceMetadata->addLink($link);
         }
-
-        $resourceMetadata->setAttributesInInclude($resourceAnnotation->hasAttributesInInclude());
     }
 
     /**
@@ -161,8 +155,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             $relationship->addLink($link);
         }
 
-        return $relationship->setDefaultIncluded($annotation->isIncluded())
-            ->setSelfLinkIncluded($annotation->isSelfLinkIncluded())
+        return $relationship->setSelfLinkIncluded($annotation->isSelfLinkIncluded())
             ->setRelatedLinkIncluded($annotation->isRelatedLinkIncluded());
     }
 

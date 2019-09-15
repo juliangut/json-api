@@ -39,7 +39,7 @@ class AnnotationDriverTest extends TestCase
         $this->reader = new AnnotationReader();
     }
 
-    public function testNoIdResource()
+    public function testNoIdResource(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessageRegExp('/^Resource ".+" does not define an id attribute$/');
@@ -53,7 +53,7 @@ class AnnotationDriverTest extends TestCase
         $driver->getMetadata();
     }
 
-    public function testResources()
+    public function testResources(): void
     {
         $paths = [
             \dirname(__DIR__, 2) . '/Files/Annotation/Valid/ResourceOne.php',
@@ -71,7 +71,6 @@ class AnnotationDriverTest extends TestCase
         self::assertEquals('resourceA', $resource->getName());
         self::assertNull($resource->getUrlPrefix());
         self::assertNull($resource->getSchemaClass());
-        self::assertFalse($resource->hasAttributesInInclude());
         self::assertInstanceOf(IdentifierMetadata::class, $resource->getIdentifier());
         self::assertEquals(ResourceOne::class, $resource->getIdentifier()->getClass());
         self::assertEquals('id', $resource->getIdentifier()->getName());
@@ -85,7 +84,6 @@ class AnnotationDriverTest extends TestCase
         self::assertEquals('resourceB', $resource->getName());
         self::assertEquals('resource', $resource->getUrlPrefix());
         self::assertEquals('\Jgut\JsonApi\Test\Stubs\Schema', $resource->getSchemaClass());
-        self::assertTrue($resource->hasAttributesInInclude());
         self::assertInstanceOf(IdentifierMetadata::class, $resource->getIdentifier());
         self::assertEquals(ResourceTwo::class, $resource->getIdentifier()->getClass());
         self::assertEquals('uuid', $resource->getIdentifier()->getName());

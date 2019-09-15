@@ -15,10 +15,11 @@ namespace Jgut\JsonApi\Tests\Encoding;
 
 use Jgut\JsonApi\Encoding\Encoder;
 use Jgut\JsonApi\Encoding\Factory;
+use Jgut\JsonApi\Encoding\FieldSetFilter;
 use Jgut\JsonApi\Encoding\Http\HeadersChecker;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
-use Neomerx\JsonApi\Contracts\Schema\ContainerInterface;
-use Neomerx\JsonApi\Schema\Container;
+use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
+use Neomerx\JsonApi\Schema\SchemaContainer;
 use PHPUnit\Framework\TestCase;
 use Zend\Diactoros\ServerRequest;
 
@@ -27,10 +28,10 @@ use Zend\Diactoros\ServerRequest;
  */
 class FactoryTest extends TestCase
 {
-    public function testCreateEncoder()
+    public function testCreateEncoder(): void
     {
-        /** @var ContainerInterface $container */
-        $container = $this->getMockBuilder(Container::class)
+        /** @var SchemaContainerInterface $container */
+        $container = $this->getMockBuilder(SchemaContainer::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -39,7 +40,14 @@ class FactoryTest extends TestCase
         self::assertInstanceOf(Encoder::class, $factory->createEncoder($container));
     }
 
-    public function testQueryParametersParser()
+    public function testCreateFieldSetFilter(): void
+    {
+        $factory = new Factory();
+
+        self::assertInstanceOf(FieldSetFilter::class, $factory->createFieldSetFilter([]));
+    }
+
+    public function testQueryParametersParser(): void
     {
         $parameters = [
             'fields' => ['resource' => 'a,b'],
@@ -57,7 +65,7 @@ class FactoryTest extends TestCase
         self::assertEquals(['a' => false, 'b' => true], $queryParametersParser->getSorts());
     }
 
-    public function testCreateHeadersChecker()
+    public function testCreateHeadersChecker(): void
     {
         $factory = new Factory();
 

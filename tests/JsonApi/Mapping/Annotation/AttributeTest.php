@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace Jgut\Slim\Routing\Tests\Mapping\Annotation;
+namespace Jgut\JsonApi\Tests\Mapping\Annotation;
 
 use Jgut\JsonApi\Mapping\Annotation\Attribute;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +34,7 @@ class AttributeTest extends TestCase
         $this->annotation = new Attribute([]);
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
         self::assertNull($this->annotation->getName());
         self::assertNull($this->annotation->getGetter());
@@ -42,28 +42,28 @@ class AttributeTest extends TestCase
         self::assertEquals([], $this->annotation->getGroups());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $this->annotation->setName('name');
 
         self::assertEquals('name', $this->annotation->getName());
     }
 
-    public function testGetter()
+    public function testGetter(): void
     {
         $this->annotation->setGetter('setGetter');
 
         self::assertEquals('setGetter', $this->annotation->getGetter());
     }
 
-    public function testSetter()
+    public function testSetter(): void
     {
         $this->annotation->setSetter('setSetter');
 
         self::assertEquals('setSetter', $this->annotation->getSetter());
     }
 
-    public function testGroups()
+    public function testGroups(): void
     {
         $this->annotation->setGroups(['one', 'two']);
 

@@ -31,7 +31,7 @@ use Zend\Diactoros\ServerRequest;
  */
 class JsonApiMiddlewareTest extends TestCase
 {
-    public function testIncorrectHeaders()
+    public function testIncorrectHeaders(): void
     {
         $headersChecker = $this->getMockBuilder(HeadersChecker::class)
             ->disableOriginalConstructor()
@@ -66,7 +66,7 @@ class JsonApiMiddlewareTest extends TestCase
         self::assertEquals(400, $response->getStatusCode());
     }
 
-    public function testCorrectHeaders()
+    public function testCorrectHeaders(): void
     {
         $headersChecker = $this->getMockBuilder(HeadersChecker::class)
             ->disableOriginalConstructor()

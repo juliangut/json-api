@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi;
 
+use Jgut\JsonApi\Encoding\Options;
+use Jgut\JsonApi\Encoding\OptionsInterface;
 use Jgut\JsonApi\Mapping\Driver\DriverFactory;
 use Jgut\JsonApi\Mapping\Driver\DriverInterface;
 use Jgut\JsonApi\Schema\MetadataSchema;
 use Jgut\JsonApi\Schema\Resolver;
 use Jgut\Mapping\Metadata\MetadataResolver;
-use Neomerx\JsonApi\Encoder\EncoderOptions;
 
 /**
  * JSON API configuration.
@@ -26,14 +27,6 @@ use Neomerx\JsonApi\Encoder\EncoderOptions;
 class Configuration
 {
     public const QUERY_PARAMETERS_REQUEST_KEY = 'JSON_API_query_parameters';
-
-    public const JSON_ENCODE_OPTIONS = \JSON_UNESCAPED_UNICODE
-        | \JSON_UNESCAPED_SLASHES
-        | \JSON_PRESERVE_ZERO_FRACTION
-        | \JSON_HEX_AMP
-        | \JSON_HEX_APOS
-        | \JSON_HEX_QUOT
-        | \JSON_HEX_TAG;
 
     /**
      * Request attribute name.
@@ -57,6 +50,13 @@ class Configuration
     protected $metadataResolver;
 
     /**
+     * Metadata resource schema class.
+     *
+     * @var string
+     */
+    protected $schemaClass = MetadataSchema::class;
+
+    /**
      * Schema resolver.
      *
      * @var Resolver
@@ -64,25 +64,32 @@ class Configuration
     protected $schemaResolver;
 
     /**
-     * JSON API encoder options.
+     * JSON encoding options.
      *
-     * @var EncoderOptions
+     * @var OptionsInterface
      */
-    protected $encoderOptions;
+    protected $encodingOptions;
 
     /**
      * URL prefix for links.
      *
      * @var string|null
      */
-    protected $urlPrefix;
+    private $urlPrefix;
 
     /**
-     * Metadata resource schema class.
+     * Global JSON API version.
      *
-     * @var string
+     * @var string|null
      */
-    protected $schemaClass = MetadataSchema::class;
+    private $jsonApiVersion;
+
+    /**
+     * Global meta.
+     *
+     * @var string[]|null
+     */
+    private $jsonApiMeta;
 
     /**
      * Configuration constructor.
@@ -112,6 +119,10 @@ class Configuration
 
                 \call_user_func($callback, $configurations[$config]);
             }
+        }
+
+        if ($this->encodingOptions === null) {
+            $this->encodingOptions = new Options();
         }
     }
 
@@ -222,6 +233,30 @@ class Configuration
     }
 
     /**
+     * Get metadata resource schema class.
+     *
+     * @return string
+     */
+    public function getSchemaClass(): string
+    {
+        return $this->schemaClass;
+    }
+
+    /**
+     * Set metadata resource schema class.
+     *
+     * @param string $schemaClass
+     *
+     * @return self
+     */
+    public function setSchemaClass(string $schemaClass): self
+    {
+        $this->schemaClass = $schemaClass;
+
+        return $this;
+    }
+
+    /**
      * Get schema resolver.
      *
      * @return Resolver
@@ -250,41 +285,33 @@ class Configuration
     }
 
     /**
-     * Get JSON API encoder options.
+     * Get JSON encoding options.
      *
-     * @return EncoderOptions
+     * @return OptionsInterface
      */
-    public function getEncoderOptions(): EncoderOptions
+    public function getEncodingOptions(): OptionsInterface
     {
-        if ($this->encoderOptions === null) {
-            $urlPrefix = $this->urlPrefix !== null && \trim($this->urlPrefix, '/ ') !== ''
-                ? \rtrim($this->urlPrefix, '/ ')
-                : null;
-
-            $this->encoderOptions = new EncoderOptions(static::JSON_ENCODE_OPTIONS, $urlPrefix);
-        }
-
-        return $this->encoderOptions;
+        return $this->encodingOptions;
     }
 
     /**
-     * Set JSON API encoder options.
+     * Set JSON encoding options.
      *
-     * @param EncoderOptions $encoderOptions
+     * @param OptionsInterface $encodingOptions
      *
      * @return self
      */
-    public function setEncoderOptions(EncoderOptions $encoderOptions): self
+    public function setEncodingOptions(OptionsInterface $encodingOptions): self
     {
-        $this->encoderOptions = $encoderOptions;
+        $this->encodingOptions = $encodingOptions;
 
         return $this;
     }
 
     /**
-     * Get URL prefix for links.
+     * Get URL prefix.
      *
-     * @return string
+     * @return string|null
      */
     public function getUrlPrefix(): ?string
     {
@@ -292,40 +319,52 @@ class Configuration
     }
 
     /**
-     * Set URL prefix for links.
+     * Set URL prefix.
      *
      * @param string $urlPrefix
-     *
-     * @return self
      */
-    public function setUrlPrefix(string $urlPrefix): self
+    public function setUrlPrefix(string $urlPrefix): void
     {
         $this->urlPrefix = $urlPrefix;
-
-        return $this;
     }
 
     /**
-     * Get metadata resource schema class.
+     * Get global JSON API version.
      *
-     * @return string
+     * @return string|null
      */
-    public function getSchemaClass(): string
+    public function getJsonApiVersion(): ?string
     {
-        return $this->schemaClass;
+        return $this->jsonApiVersion;
     }
 
     /**
-     * Set metadata resource schema class.
+     * Set global JSON API version.
      *
-     * @param string $schemaClass
-     *
-     * @return self
+     * @param string $jsonApiVersion
      */
-    public function setSchemaClass(string $schemaClass): self
+    public function setJsonApiVersion(string $jsonApiVersion): void
     {
-        $this->schemaClass = $schemaClass;
+        $this->jsonApiVersion = $jsonApiVersion;
+    }
 
-        return $this;
+    /**
+     * Get global meta.
+     *
+     * @return string[]|null
+     */
+    public function getJsonApiMeta(): ?array
+    {
+        return $this->jsonApiMeta;
+    }
+
+    /**
+     * Set global meta.
+     *
+     * @param string[] $jsonApiMeta
+     */
+    public function setJsonApiMeta(array $jsonApiMeta): void
+    {
+        $this->jsonApiMeta = $jsonApiMeta;
     }
 }

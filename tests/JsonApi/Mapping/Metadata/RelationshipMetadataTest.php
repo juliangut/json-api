@@ -35,42 +35,43 @@ class RelationshipMetadataTest extends TestCase
         $this->relationship = new RelationshipMetadata('Class', 'Name');
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
-        self::assertFalse($this->relationship->isDefaultIncluded());
-        self::assertFalse($this->relationship->isSelfLinkIncluded());
-        self::assertFalse($this->relationship->isRelatedLinkIncluded());
-        self::assertFalse($this->relationship->isRelatedLinkIncluded());
+        self::assertNull($this->relationship->isSelfLinkIncluded());
+        self::assertNull($this->relationship->isRelatedLinkIncluded());
         self::assertEmpty($this->relationship->getLinks());
+        self::assertEmpty($this->relationship->getMeta());
     }
 
-    public function testDefaultIncluded()
-    {
-        $this->relationship->setDefaultIncluded(true);
-
-        self::assertTrue($this->relationship->isDefaultIncluded());
-    }
-
-    public function testSelfLinkIncluded()
+    public function testSelfLinkIncluded(): void
     {
         $this->relationship->setSelfLinkIncluded(true);
 
         self::assertTrue($this->relationship->isSelfLinkIncluded());
     }
 
-    public function testRelatedLinkIncluded()
+    public function testRelatedLinkIncluded(): void
     {
         $this->relationship->setRelatedLinkIncluded(true);
 
         self::assertTrue($this->relationship->isRelatedLinkIncluded());
     }
 
-    public function testLinks()
+    public function testLinks(): void
     {
         $link = new LinkMetadata('custom');
 
         $this->relationship->addLink($link);
 
         self::assertEquals(['custom' => $link], $this->relationship->getLinks());
+    }
+
+    public function testMetas(): void
+    {
+        $link = new LinkMetadata('custom');
+
+        $this->relationship->setMeta(['meta' => 'value']);
+
+        self::assertEquals(['meta' => 'value'], $this->relationship->getMeta());
     }
 }
