@@ -17,9 +17,11 @@ use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Exception\SchemaException;
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
+use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Schema\MetadataSchema;
+use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -67,6 +69,15 @@ class MetadataSchemaTest extends TestCase
         $schema->getId(new \stdClass());
     }
 
+    public function testGetType(): void
+    {
+        $metadata = (new ResourceMetadata(\stdClass::class, 'Resource'));
+
+        $schema = new MetadataSchema($this->factory, $metadata);
+
+        self::assertEquals('Resource', $schema->getType());
+    }
+
     public function testGetId(): void
     {
         $resource = new class() {
@@ -108,7 +119,7 @@ class MetadataSchemaTest extends TestCase
         self::assertEquals('/custom/resource/aaa', $schema->getSelfLink($resource)->getStringRepresentation(''));
     }
 
-    public function testUnknownAttribute(): void
+    public function testGetAttributes(): void
     {
         $resource = new class() {
             public function getAttribute(): string
@@ -139,7 +150,7 @@ class MetadataSchemaTest extends TestCase
         self::assertEmpty($schema->getRelationships(new \stdClass()));
     }
 
-    public function testRelationshipsWithData(): void
+    public function testGetRelationships(): void
     {
         $resource = new class() {
             public function getRelationshipA(): string
@@ -155,7 +166,9 @@ class MetadataSchemaTest extends TestCase
 
         $relationshipA = (new RelationshipMetadata(\stdClass::class, 'relationshipA'))
             ->setGetter('getRelationshipA')
-            ->setGroups(['test']);
+            ->setGroups(['test'])
+            ->addLink((new LinkMetadata('me'))->setHref('/me'))
+            ->setMeta(['meta' => 'data']);
         $relationshipB = (new RelationshipMetadata(\stdClass::class, 'relationshipB'))
             ->setGetter('getRelationshipB')
             ->setGroups(['none']);
@@ -174,6 +187,59 @@ class MetadataSchemaTest extends TestCase
         self::assertEquals('aaa', $relationships['relationshipA'][SchemaInterface::RELATIONSHIP_DATA]());
         self::assertFalse(isset($relationships['relationshipA'][SchemaInterface::RELATIONSHIP_LINKS_SELF]));
         self::assertFalse(isset($relationships['relationshipA'][SchemaInterface::RELATIONSHIP_LINKS_RELATED]));
+        self::assertTrue(isset($relationships['relationshipA'][SchemaInterface::RELATIONSHIP_LINKS]));
+        self::assertTrue(isset($relationships['relationshipA'][SchemaInterface::RELATIONSHIP_META]));
         self::assertFalse(isset($relationships['relationshipB']));
+    }
+
+    public function testGetLinks(): void
+    {
+        $resource = new class() {
+            public function getId(): string
+            {
+                return 'aaa';
+            }
+        };
+
+        $identifier = (new IdentifierMetadata(\stdClass::class, 'Id'))
+            ->setGetter('getId');
+
+        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+            ->setIdentifier($identifier)
+            ->addLink((new LinkMetadata('me'))->setHref('https://example.com/me'))
+            ->setSelfLinkIncluded(false)
+            ->setRelatedLinkIncluded(false);
+
+        $schema = new MetadataSchema(new Factory(), $metadata);
+
+        self::assertArrayHasKey(LinkInterface::SELF, $schema->getLinks($resource));
+        self::assertArrayHasKey('me', $schema->getLinks($resource));
+        self::assertFalse($schema->isAddSelfLinkInRelationshipByDefault('relationship'));
+        self::assertFalse($schema->isAddRelatedLinkInRelationshipByDefault('relationship'));
+    }
+
+    public function testGetMeta(): void
+    {
+        $resource = new class() {
+            public function getId(): string
+            {
+                return 'aaa';
+            }
+        };
+
+        $identifier = (new IdentifierMetadata(\stdClass::class, 'Id'))
+            ->setGetter('getId')
+            ->setMeta(['meta' => 'data']);
+
+        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+            ->setIdentifier($identifier)
+            ->setMeta(['meta' => 'value']);
+
+        $schema = new MetadataSchema(new Factory(), $metadata);
+
+        self::assertTrue($schema->hasIdentifierMeta($resource));
+        self::assertEquals(['meta' => 'data'], $schema->getIdentifierMeta($resource));
+        self::assertTrue($schema->hasResourceMeta($resource));
+        self::assertEquals(['meta' => 'value'], $schema->getResourceMeta($resource));
     }
 }

@@ -174,7 +174,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             [
                 LinkInterface::SELF => $this->getSelfLink($resource),
             ],
-            $this->resourceMetadata->getLinks()
+            $this->normalizeLinks($this->resourceMetadata->getLinks())
         );
     }
 
@@ -267,7 +267,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             function (LinkMetadata $link): LinkInterface {
                 /** @var string $href */
                 $href = $link->getHref();
-                $isExternal = \preg_match('!^https?://!', $href) === false;
+                $isExternal = \preg_match('!^https?://!', $href) === 1;
                 if ($isExternal) {
                     $href = '/' . \ltrim($href, '/');
                 }
