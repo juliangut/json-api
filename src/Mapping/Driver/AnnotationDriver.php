@@ -102,18 +102,18 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
 
         $resource->getIdentifier();
 
-        $this->populateResourceMetadata($resource, $annotation);
+        $this->populateResource($resource, $annotation);
 
         return $resource;
     }
 
     /**
-     * Populate resource metadata.
+     * Populate resource.
      *
      * @param ResourceMetadata   $resourceMetadata
      * @param ResourceAnnotation $resourceAnnotation
      */
-    protected function populateResourceMetadata(
+    protected function populateResource(
         ResourceMetadata $resourceMetadata,
         ResourceAnnotation $resourceAnnotation
     ): void {
@@ -130,6 +130,8 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         foreach ($this->getLinks($resourceAnnotation->getLinks()) as $link) {
             $resourceMetadata->addLink($link);
         }
+
+        $resourceMetadata->setMeta($resourceAnnotation->getMeta());
     }
 
     /**
@@ -154,6 +156,8 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         foreach ($this->getLinks($annotation->getLinks()) as $link) {
             $relationship->addLink($link);
         }
+
+        $relationship->setMeta($annotation->getMeta());
 
         return $relationship->setSelfLinkIncluded($annotation->isSelfLinkIncluded())
             ->setRelatedLinkIncluded($annotation->isRelatedLinkIncluded());
@@ -259,10 +263,8 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         }
 
         $linkList = [];
-
-        foreach ($links as $name => $link) {
-            $linkList[$name] = (new LinkMetadata($name))
-                ->setHref($link);
+        foreach ($links as $name => $href) {
+            $linkList[$name] = new LinkMetadata($name, $href);
         }
 
         return $linkList;

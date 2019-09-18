@@ -21,7 +21,8 @@ use Jgut\JsonApi\Mapping\Annotation as JJA;
  * @JJA\Resource(
  *     name="resourceB",
  *     schemaClass="\Jgut\JsonApi\Test\Stubs\Schema",
- *     urlPrefix="resource"
+ *     urlPrefix="resource",
+ *     links={"me"="/me"}
  * )
  */
 class ResourceTwo

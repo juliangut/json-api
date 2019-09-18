@@ -59,19 +59,10 @@ class RelationshipMetadataTest extends TestCase
 
     public function testLinks(): void
     {
-        $link = new LinkMetadata('custom');
+        $link = new LinkMetadata('custom', '/custom');
 
         $this->relationship->addLink($link);
 
         self::assertEquals(['custom' => $link], $this->relationship->getLinks());
-    }
-
-    public function testMetas(): void
-    {
-        $link = new LinkMetadata('custom');
-
-        $this->relationship->setMeta(['meta' => 'value']);
-
-        self::assertEquals(['meta' => 'value'], $this->relationship->getMeta());
     }
 }

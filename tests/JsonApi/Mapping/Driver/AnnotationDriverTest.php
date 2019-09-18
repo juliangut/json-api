@@ -16,6 +16,8 @@ namespace Jgut\Slim\Routing\Tests\Mapping\Driver;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Jgut\JsonApi\Mapping\Driver\AnnotationDriver;
 use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
+use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
+use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Tests\Files\Annotation\Valid\ResourceOne;
 use Jgut\JsonApi\Tests\Files\Annotation\Valid\ResourceTwo;
@@ -77,6 +79,12 @@ class AnnotationDriverTest extends TestCase
         self::assertEquals('getId', $resource->getIdentifier()->getGetter());
         self::assertEquals('isTheOne', $resource->getAttributes()['theOne']->getGetter());
         self::assertEquals('setTheOne', $resource->getAttributes()['theOne']->getSetter());
+        self::assertArrayHasKey('relative', $resource->getRelationships());
+        self::assertInstanceOf(RelationshipMetadata::class, $resource->getRelationships()['relative']);
+        self::assertArrayHasKey('custom', $resource->getRelationships()['relative']->getLinks());
+        self::assertInstanceOf(LinkMetadata::class, $resource->getRelationships()['relative']->getLinks()['custom']);
+        self::assertArrayHasKey('data', $resource->getMeta());
+        self::assertEquals('value', $resource->getMeta()['data']);
 
         $resource = $resources['resourceB'];
         self::assertInstanceOf(ResourceMetadata::class, $resource);
@@ -90,5 +98,7 @@ class AnnotationDriverTest extends TestCase
         self::assertEquals('getUuid', $resource->getIdentifier()->getGetter());
         self::assertEquals('getTwo', $resource->getAttributes()['two']->getGetter());
         self::assertEquals('setTwo', $resource->getAttributes()['two']->getSetter());
+        self::assertArrayHasKey('me', $resource->getLinks());
+        self::assertInstanceOf(LinkMetadata::class, $resource->getLinks()['me']);
     }
 }

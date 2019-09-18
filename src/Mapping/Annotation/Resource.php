@@ -54,6 +54,13 @@ class Resource extends AbstractAnnotation
     protected $links = [];
 
     /**
+     * Resource meta.
+     *
+     * @var array<string, string>
+     */
+    protected $meta = [];
+
+    /**
      * Get resource name.
      *
      * @return string|null
@@ -126,7 +133,7 @@ class Resource extends AbstractAnnotation
     }
 
     /**
-     * Get relationship links.
+     * Get resource links.
      *
      * @return array<string, string>
      */
@@ -136,7 +143,7 @@ class Resource extends AbstractAnnotation
     }
 
     /**
-     * Set relationship links.
+     * Set resource links.
      *
      * @param array<string, string> $links
      *
@@ -145,6 +152,30 @@ class Resource extends AbstractAnnotation
     public function setLinks(array $links): self
     {
         $this->links = $links;
+
+        return $this;
+    }
+
+    /**
+     * Get resource meta.
+     *
+     * @return array<string, string>
+     */
+    public function getMeta(): array
+    {
+        return $this->meta;
+    }
+
+    /**
+     * Set resource meta.
+     *
+     * @param array<string, string> $meta
+     *
+     * @return self
+     */
+    public function setMeta(array $meta): self
+    {
+        $this->meta = $meta;
 
         return $this;
     }

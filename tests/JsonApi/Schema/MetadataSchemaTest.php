@@ -167,7 +167,7 @@ class MetadataSchemaTest extends TestCase
         $relationshipA = (new RelationshipMetadata(\stdClass::class, 'relationshipA'))
             ->setGetter('getRelationshipA')
             ->setGroups(['test'])
-            ->addLink((new LinkMetadata('me'))->setHref('/me'))
+            ->addLink(new LinkMetadata('me', '/me'))
             ->setMeta(['meta' => 'data']);
         $relationshipB = (new RelationshipMetadata(\stdClass::class, 'relationshipB'))
             ->setGetter('getRelationshipB')
@@ -206,7 +206,7 @@ class MetadataSchemaTest extends TestCase
 
         $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
             ->setIdentifier($identifier)
-            ->addLink((new LinkMetadata('me'))->setHref('https://example.com/me'))
+            ->addLink(new LinkMetadata('me', 'https://example.com/me'))
             ->setSelfLinkIncluded(false)
             ->setRelatedLinkIncluded(false);
 

@@ -31,10 +31,13 @@ class LinkMetadata extends AbstractMetadata
      * LinkMetadata constructor.
      *
      * @param string $name
+     * @param string $href
      */
-    public function __construct(string $name)
+    public function __construct(string $name, string $href)
     {
         parent::__construct('', $name);
+
+        $this->href = $href;
     }
 
     /**
@@ -45,19 +48,5 @@ class LinkMetadata extends AbstractMetadata
     public function getHref(): ?string
     {
         return $this->href;
-    }
-
-    /**
-     * Set href setter.
-     *
-     * @param string $href
-     *
-     * @return self
-     */
-    public function setHref(string $href): self
-    {
-        $this->href = $href;
-
-        return $this;
     }
 }

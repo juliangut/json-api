@@ -43,6 +43,13 @@ class Relationship extends Attribute
     protected $links = [];
 
     /**
+     * Relationship meta.
+     *
+     * @var array<string, string>
+     */
+    protected $meta = [];
+
+    /**
      * Should self link be included.
      *
      * @return bool
@@ -110,6 +117,30 @@ class Relationship extends Attribute
     public function setLinks(array $links): self
     {
         $this->links = $links;
+
+        return $this;
+    }
+
+    /**
+     * Get relationship meta.
+     *
+     * @return array<string, string>
+     */
+    public function getMeta(): array
+    {
+        return $this->meta;
+    }
+
+    /**
+     * Set relationship meta.
+     *
+     * @param array<string, string> $meta
+     *
+     * @return self
+     */
+    public function setMeta(array $meta): self
+    {
+        $this->meta = $meta;
 
         return $this;
     }

@@ -78,57 +78,31 @@ trait MappingTrait
             throw new DriverException('Resource class missing');
         }
 
-        $resource = (new ResourceMetadata($mapping['class'], $this->getName($mapping)))
-            ->setIdentifier($this->getIdentifier($mapping))
-            ->setMeta($this->getMeta($mapping));
+        $resource = (new ResourceMetadata($mapping['class'], $this->getName($mapping)));
 
-        $schemaClass = $this->getSchemaClass($mapping);
-        if ($schemaClass !== null) {
-            if (!\class_exists($schemaClass)
-                || !\in_array(MetadataSchemaInterface::class, \class_implements($schemaClass), true)
-            ) {
-                throw new DriverException(
-                    \sprintf(
-                        'Schema class "%s" does not exist or does not implement "%s"',
-                        $schemaClass,
-                        MetadataSchemaInterface::class
-                    )
-                );
-            }
-
-            $resource->setSchemaClass($schemaClass);
-        }
-
-        $urlPrefix = $this->getUrlPrefix($mapping);
-        if ($urlPrefix !== null) {
-            $resource->setUrlPrefix($urlPrefix);
-        }
-
+        $this->populateIdentifier($resource, $mapping);
         $this->populateAttributes($resource, $mapping);
         $this->populateRelationships($resource, $mapping);
-
-        foreach ($this->getLinks($mapping) as $link) {
-            $resource->addLink($link);
-        }
+        $this->populateResource($resource, $mapping);
 
         return $resource;
     }
 
     /**
-     * Get resource identifier.
+     * Populate identifier.
      *
+     * @param ResourceMetadata     $resourceMetadata
      * @param array<string, mixed> $mapping
-     *
-     * @return IdentifierMetadata
      */
-    protected function getIdentifier(array $mapping): IdentifierMetadata
+    protected function populateIdentifier(ResourceMetadata $resourceMetadata, array $mapping): void
     {
-        $identifier = 'id';
-        if (isset($mapping['id'])) {
-            $identifier = \is_string($mapping['id']) && \trim($mapping['id']) !== ''
-                ? \trim($mapping['id'])
-                : $mapping['id'];
+        if (!isset($mapping['id'])) {
+            throw new DriverException('Resource does not define an id attribute');
         }
+
+        $identifier = \is_string($mapping['id']) && \trim($mapping['id']) !== ''
+            ? \trim($mapping['id'])
+            : $mapping['id'];
 
         if (!\is_array($identifier)) {
             $identifier = ['name' => $identifier];
@@ -136,32 +110,10 @@ trait MappingTrait
 
         $mapping['id'] = $identifier;
 
-        return (new IdentifierMetadata($mapping['class'], $mapping['id']['name']))
+        $identifier = (new IdentifierMetadata($mapping['class'], $mapping['id']['name']))
             ->setGetter($this->getGetter($mapping['id']));
-    }
 
-    /**
-     * Get schema class.
-     *
-     * @param array<string, mixed> $mapping
-     *
-     * @return string|null
-     */
-    protected function getSchemaClass(array $mapping): ?string
-    {
-        return $mapping['schemaClass'] ?? null;
-    }
-
-    /**
-     * Get resource URL prefix.
-     *
-     * @param array<string, mixed> $mapping
-     *
-     * @return string|null
-     */
-    protected function getUrlPrefix(array $mapping): ?string
-    {
-        return $mapping['urlPrefix'] ?? null;
+        $resourceMetadata->setIdentifier($identifier);
     }
 
     /**
@@ -352,6 +304,67 @@ trait MappingTrait
     }
 
     /**
+     * Populate resource.
+     *
+     * @param ResourceMetadata     $resourceMetadata
+     * @param array<string, mixed> $mapping
+     */
+    protected function populateResource(ResourceMetadata $resourceMetadata, array $mapping): void
+    {
+        $schemaClass = $this->getSchemaClass($mapping);
+        if ($schemaClass !== null) {
+            if (!\class_exists($schemaClass)
+                || !\in_array(MetadataSchemaInterface::class, \class_implements($schemaClass), true)
+            ) {
+                throw new DriverException(
+                    \sprintf(
+                        'Schema class "%s" does not exist or does not implement "%s"',
+                        $schemaClass,
+                        MetadataSchemaInterface::class
+                    )
+                );
+            }
+
+            $resourceMetadata->setSchemaClass($schemaClass);
+        }
+
+        $urlPrefix = $this->getUrlPrefix($mapping);
+        if ($urlPrefix !== null) {
+            $resourceMetadata->setUrlPrefix($urlPrefix);
+        }
+
+        foreach ($this->getLinks($mapping) as $link) {
+            $resourceMetadata->addLink($link);
+        }
+
+        $resourceMetadata->setMeta($this->getMeta($mapping));
+    }
+
+    /**
+     * Get schema class.
+     *
+     * @param array<string, mixed> $mapping
+     *
+     * @return string|null
+     */
+    protected function getSchemaClass(array $mapping): ?string
+    {
+        return $mapping['schemaClass'] ?? null;
+    }
+
+    /**
+     * Get resource URL prefix.
+     *
+     * @param array<string, mixed> $mapping
+     *
+     * @return string|null
+     */
+    protected function getUrlPrefix(array $mapping): ?string
+    {
+        return $mapping['urlPrefix'] ?? null;
+    }
+
+    /**
      * Get name.
      * Or construct from class.
      *
@@ -391,22 +404,12 @@ trait MappingTrait
             throw new DriverException('Links keys must be all strings');
         }
 
-        return \array_map(
-            function (array $link): LinkMetadata {
-                if (!isset($link['name'])) {
-                    throw new DriverException('Links must have a name');
-                }
+        $linkList = [];
+        foreach ($links as $name => $href) {
+            $linkList[$name] = new LinkMetadata($name, $href);
+        }
 
-                if (!isset($link['href'])) {
-                    throw new DriverException('Links must have an href');
-                }
-
-                return (new LinkMetadata($link['name']))
-                    ->setHref($link['href'])
-                    ->setMeta($link);
-            },
-            $links
-        );
+        return $linkList;
     }
 
     /**

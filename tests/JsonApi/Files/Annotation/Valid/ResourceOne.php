@@ -19,7 +19,8 @@ use Jgut\JsonApi\Mapping\Annotation as JJA;
  * Example resource.
  *
  * @JJA\Resource(
- *     name="resourceA"
+ *     name="resourceA",
+ *     meta={"data"="value"}
  * )
  */
 class ResourceOne

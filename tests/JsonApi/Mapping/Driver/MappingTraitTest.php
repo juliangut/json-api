@@ -44,6 +44,25 @@ class MappingTraitTest extends TestCase
         $driver->getMetadata();
     }
 
+    public function testNoIdResource(): void
+    {
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessage('Resource does not define an id attribute');
+
+        $driver = $this->getMockForTrait(MappingTrait::class);
+        $driver->expects(static::once())
+            ->method('getMappingData')
+            ->will(self::returnValue([
+                [
+                    'class' => 'ClassName',
+                    'schemaClass' => MetadataSchema::class,
+                ],
+            ]));
+        /* @var MappingTrait $driver */
+
+        $driver->getMetadata();
+    }
+
     public function testNoRelationshipClass(): void
     {
         $this->expectException(DriverException::class);
@@ -55,6 +74,7 @@ class MappingTraitTest extends TestCase
             ->will(self::returnValue([
                 [
                     'class' => 'ClassName',
+                    'id' => 'uuid',
                     'relationships' => [[]],
                 ],
             ]));
@@ -74,6 +94,7 @@ class MappingTraitTest extends TestCase
             ->will(self::returnValue([
                 [
                     'class' => 'ClassName',
+                    'id' => 'uuid',
                     'schemaClass' => self::class,
                 ],
             ]));
@@ -111,10 +132,7 @@ class MappingTraitTest extends TestCase
                             'name' => 'relationshipOne',
                             'selfLinkIncluded' => true,
                             'links' => [
-                                'custom' => [
-                                    'name' => 'custom',
-                                    'href' => '/custom',
-                                ],
+                                'custom' => '/custom',
                             ],
                         ],
                         [
@@ -122,7 +140,14 @@ class MappingTraitTest extends TestCase
                             'name' => 'relationshipTwo',
                             'relatedLinkIncluded' => true,
                             'groups' => ['relationship', 'two'],
+                            'meta' => ['data' => 'value'],
                         ],
+                    ],
+                    'links' => [
+                        'me' => '/me',
+                    ],
+                    'meta' => [
+                        'data' => 'value',
                     ],
                 ],
             ]));
@@ -141,6 +166,9 @@ class MappingTraitTest extends TestCase
         self::assertEquals('My\Class', $resource->getIdentifier()->getClass());
         self::assertEquals('uuid', $resource->getIdentifier()->getName());
         self::assertEquals('getUuid', $resource->getIdentifier()->getGetter());
+        self::assertArrayHasKey('me', $resource->getLinks());
+        self::assertInstanceOf(LinkMetadata::class, $resource->getLinks()['me']);
+        self::assertEquals(['data' => 'value'], $resource->getMeta());
 
         $attributes = $resource->getAttributes();
 
@@ -183,5 +211,6 @@ class MappingTraitTest extends TestCase
         self::assertEquals(['relationship', 'two'], $relationship->getGroups());
         self::assertFalse($relationship->isSelfLinkIncluded());
         self::assertTrue($relationship->isRelatedLinkIncluded());
+        self::assertEquals(['data' => 'value'], $relationship->getMeta());
     }
 }
