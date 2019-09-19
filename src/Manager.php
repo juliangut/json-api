@@ -211,7 +211,10 @@ class Manager
         if ($apiVersion !== null) {
             $encoder->withJsonApiVersion($apiVersion);
         }
-        $encoder->withJsonApiMeta($this->configuration->getJsonApiMeta());
+        $apiMeta = $this->configuration->getJsonApiMeta();
+        if ($apiMeta !== null) {
+            $encoder->withJsonApiMeta($apiMeta);
+        }
 
         $encoder->withEncodeOptions($encodingOptions->getEncodeOptions());
         $encoder->withEncodeDepth($encodingOptions->getEncodeDepth());
