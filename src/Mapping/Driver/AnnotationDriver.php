@@ -269,7 +269,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
     /**
      * Get links.
      *
-     * @param array<mixed, string> $links
+     * @param mixed[] $links
      *
      * @return array<mixed, LinkMetadata>
      */
@@ -280,8 +280,20 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         }
 
         $linkList = [];
-        foreach ($links as $name => $href) {
-            $linkList[$name] = new LinkMetadata($name, $href);
+        foreach ($links as $name => $definition) {
+            if (\is_string($definition)) {
+                $link = new LinkMetadata($name, $definition);
+            } elseif (\is_array($definition)) {
+                $link = new LinkMetadata($name, $definition['href']);
+                $link->setMeta($definition['meta']);
+            } else {
+                throw new DriverException(\sprintf(
+                    'Link definition must be either a string or array, %s given',
+                    \is_object($definition) ? \get_class($definition) : \gettype($definition)
+                ));
+            }
+
+            $linkList[$name] = $link;
         }
 
         return $linkList;
@@ -290,7 +302,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
     /**
      * Get meta data.
      *
-     * @param array<mixed, string> $meta
+     * @param mixed[] $meta
      *
      * @return array<string, mixed>
      */

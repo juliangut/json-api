@@ -83,7 +83,9 @@ class OptionsTest extends TestCase
     public function testInvalidLinkType(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage('Link must be an instance of ' . LinkInterface::class . ', string given');
+        $this->expectExceptionMessage(
+            'Link must be an instance of ' . LinkInterface::class . ' or array, string given'
+        );
 
         $this->options->setLinks(['first' => 'invalid']);
     }

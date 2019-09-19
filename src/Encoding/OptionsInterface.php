@@ -72,7 +72,7 @@ interface OptionsInterface
     public function getMeta(): ?array;
 
     /**
-     * @param string[] $meta
+     * @param mixed[] $meta
      */
     public function setMeta(array $meta): void;
 }

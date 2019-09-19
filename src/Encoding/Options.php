@@ -122,21 +122,41 @@ class Options implements OptionsInterface
      */
     public function setLinks(array $links): void
     {
-        foreach ($links as $name => $link) {
-            if (!\is_string($name)) {
-                throw new SchemaException('Links keys must be all strings');
-            }
-
-            if (!$link instanceof LinkInterface) {
-                throw new SchemaException(\sprintf(
-                    'Link must be an instance of %s, %s given',
-                    LinkInterface::class,
-                    \is_object($link) ? \get_class($link) : \gettype($link)
-                ));
-            }
+        if ($links !== [] && \array_keys($links) === \range(0, \count($links) - 1)) {
+            throw new SchemaException('Links keys must be all strings');
         }
 
-        $this->links = $links;
+        $linkList = [];
+        foreach ($links as $name => $definition) {
+            if ($definition instanceof LinkInterface) {
+                $link = $definition;
+            } elseif (\is_array($definition)) {
+                $href = $definition['href'];
+                if (!$href instanceof LinkInterface) {
+                    throw new SchemaException(\sprintf(
+                        'Link href must be an instance of %s or array, %s given',
+                        LinkInterface::class,
+                        \is_object($href) ? \get_class($href) : \gettype($href)
+                    ));
+                }
+                $this->assertMeta($definition['meta']);
+
+                $link = [
+                    'href' => $definition['href'],
+                    'meta' => $definition['meta'],
+                ];
+            } else {
+                throw new SchemaException(\sprintf(
+                    'Link must be an instance of %s or array, %s given',
+                    LinkInterface::class,
+                    \is_object($definition) ? \get_class($definition) : \gettype($definition)
+                ));
+            }
+
+            $linkList[$name] = $link;
+        }
+
+        $this->links = $linkList;
     }
 
     /**
@@ -154,6 +174,20 @@ class Options implements OptionsInterface
      */
     public function setMeta(array $meta): void
     {
+        $this->assertMeta($meta);
+
+        $this->meta = $meta;
+    }
+
+    /**
+     * Assert meta data is correct.
+     *
+     * @param mixed[] $meta
+     *
+     * @throws SchemaException
+     */
+    private function assertMeta(array $meta): void
+    {
         $keys = \array_keys($meta);
         \array_walk(
             $keys,
@@ -163,7 +197,5 @@ class Options implements OptionsInterface
                 }
             }
         );
-
-        $this->meta = $meta;
     }
 }
