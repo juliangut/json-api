@@ -212,7 +212,7 @@ class MetadataSchemaTest extends TestCase
 
         $schema = new MetadataSchema(new Factory(), $metadata);
 
-        self::assertArrayHasKey(LinkInterface::SELF, $schema->getLinks($resource));
+        self::assertArrayNotHasKey(LinkInterface::SELF, $schema->getLinks($resource));
         self::assertArrayHasKey('me', $schema->getLinks($resource));
         self::assertFalse($schema->isAddSelfLinkInRelationshipByDefault('relationship'));
         self::assertFalse($schema->isAddRelatedLinkInRelationshipByDefault('relationship'));

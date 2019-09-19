@@ -113,6 +113,7 @@ class MappingTraitTest extends TestCase
                     'class' => 'My\Class',
                     'schemaClass' => MetadataSchema::class,
                     'urlPrefix' => 'resource',
+                    'selfLinkIncluded' => false,
                     'id' => [
                         'name' => 'uuid',
                         'getter' => 'getUuid',
@@ -161,6 +162,8 @@ class MappingTraitTest extends TestCase
         self::assertEquals('My\Class', $resource->getClass());
         self::assertEquals('class', $resource->getName());
         self::assertEquals('resource', $resource->getUrlPrefix());
+        self::assertFalse($resource->isSelfLinkIncluded());
+        self::assertNull($resource->isRelatedLinkIncluded());
         self::assertEquals(MetadataSchema::class, $resource->getSchemaClass());
         self::assertInstanceOf(IdentifierMetadata::class, $resource->getIdentifier());
         self::assertEquals('My\Class', $resource->getIdentifier()->getClass());
@@ -198,7 +201,7 @@ class MappingTraitTest extends TestCase
         self::assertEquals('setRelationshipOne', $relationship->getSetter());
         self::assertEquals([], $relationship->getGroups());
         self::assertTrue($relationship->isSelfLinkIncluded());
-        self::assertFalse($relationship->isRelatedLinkIncluded());
+        self::assertNull($relationship->isRelatedLinkIncluded());
         self::assertArrayHasKey('custom', $relationship->getLinks());
         self::assertInstanceOf(LinkMetadata::class, $relationship->getLinks()['custom']);
 
@@ -209,7 +212,7 @@ class MappingTraitTest extends TestCase
         self::assertEquals('getRelationshipTwo', $relationship->getGetter());
         self::assertEquals('setRelationshipTwo', $relationship->getSetter());
         self::assertEquals(['relationship', 'two'], $relationship->getGroups());
-        self::assertFalse($relationship->isSelfLinkIncluded());
+        self::assertNull($relationship->isSelfLinkIncluded());
         self::assertTrue($relationship->isRelatedLinkIncluded());
         self::assertEquals(['data' => 'value'], $relationship->getMeta());
     }

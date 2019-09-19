@@ -121,12 +121,12 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
         $group = $this->resourceMetadata->getGroup();
         $relationships = [];
 
-        foreach ($this->resourceMetadata->getRelationships() as $relationship) {
-            $name = $relationship->getName();
-            $groups = $relationship->getGroups();
+        foreach ($this->resourceMetadata->getRelationships() as $relationshipMetadata) {
+            $name = $relationshipMetadata->getName();
+            $groups = $relationshipMetadata->getGroups();
 
             if ($group === null || \in_array($group, $groups, true)) {
-                $relationships[$name] = $this->getRelationshipDescription($resource, $relationship);
+                $relationships[$name] = $this->getRelationshipDescription($resource, $relationshipMetadata);
             }
         }
 
@@ -137,27 +137,27 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      * Get relationship description.
      *
      * @param object               $resource
-     * @param RelationshipMetadata $relationship
+     * @param RelationshipMetadata $relationshipMetadata
      *
      * @return mixed[]
      */
-    private function getRelationshipDescription($resource, RelationshipMetadata $relationship): array
+    private function getRelationshipDescription($resource, RelationshipMetadata $relationshipMetadata): array
     {
         /** @var callable $callable */
-        $callable = [$resource, $relationship->getGetter()];
+        $callable = [$resource, $relationshipMetadata->getGetter()];
 
         $description = [
             SchemaInterface::RELATIONSHIP_DATA => \Closure::fromCallable($callable),
-            SchemaInterface::RELATIONSHIP_LINKS_SELF => $relationship->isSelfLinkIncluded(),
-            SchemaInterface::RELATIONSHIP_LINKS_RELATED => $relationship->isRelatedLinkIncluded(),
+            SchemaInterface::RELATIONSHIP_LINKS_SELF => $relationshipMetadata->isSelfLinkIncluded(),
+            SchemaInterface::RELATIONSHIP_LINKS_RELATED => $relationshipMetadata->isRelatedLinkIncluded(),
         ];
 
-        $links = $relationship->getLinks();
+        $links = $relationshipMetadata->getLinks();
         if (\count($links) !== 0) {
             $description[SchemaInterface::RELATIONSHIP_LINKS] = $this->normalizeLinks($links);
         }
 
-        $meta = $relationship->getMeta();
+        $meta = $relationshipMetadata->getMeta();
         if (\count($meta) !== 0) {
             $description[SchemaInterface::RELATIONSHIP_META] = $meta;
         }
@@ -170,12 +170,12 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      */
     public function getLinks($resource): iterable
     {
-        return \array_merge(
-            [
-                LinkInterface::SELF => $this->getSelfLink($resource),
-            ],
-            $this->normalizeLinks($this->resourceMetadata->getLinks())
-        );
+        $defaultLinks = [];
+        if ($this->resourceMetadata->isSelfLinkIncluded() !== false) {
+            $defaultLinks[LinkInterface::SELF] = $this->getSelfLink($resource);
+        }
+
+        return \array_merge($defaultLinks, $this->normalizeLinks($this->resourceMetadata->getLinks()));
     }
 
     /**

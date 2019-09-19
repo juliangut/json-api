@@ -60,4 +60,13 @@ class ResourceTest extends TestCase
 
         self::assertEquals('/resource', $this->annotation->getUrlPrefix());
     }
+
+    public function testLinksIncluded(): void
+    {
+        $this->annotation->setSelfLinkIncluded(true);
+        $this->annotation->setRelatedLinkIncluded(false);
+
+        self::assertTrue($this->annotation->isSelfLinkIncluded());
+        self::assertFalse($this->annotation->isRelatedLinkIncluded());
+    }
 }

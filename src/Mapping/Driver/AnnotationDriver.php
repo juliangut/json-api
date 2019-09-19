@@ -69,7 +69,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
      *
      * @param string             $resourceName
      * @param \ReflectionClass   $class
-     * @param ResourceAnnotation $annotation
+     * @param ResourceAnnotation $annotationAnnotation
      *
      * @throws DriverException
      *
@@ -78,9 +78,9 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
     protected function getResourceMetadata(
         string $resourceName,
         \ReflectionClass $class,
-        ResourceAnnotation $annotation
+        ResourceAnnotation $annotationAnnotation
     ): ResourceMetadata {
-        $resource = new ResourceMetadata($class->getName(), $resourceName);
+        $resourceMetadata = new ResourceMetadata($class->getName(), $resourceName);
 
         foreach ($class->getProperties() as $property) {
             // @codeCoverageIgnoreStart
@@ -91,20 +91,20 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
 
             foreach ($this->annotationReader->getPropertyAnnotations($property) as $attributeAnnotation) {
                 if ($attributeAnnotation instanceof IdAnnotation) {
-                    $resource->setIdentifier($this->getIdentifierMetadata($property, $attributeAnnotation));
+                    $resourceMetadata->setIdentifier($this->getIdentifierMetadata($property, $attributeAnnotation));
                 } elseif ($attributeAnnotation instanceof RelationshipAnnotation) {
-                    $resource->addRelationship($this->getRelationshipMetadata($property, $attributeAnnotation));
+                    $resourceMetadata->addRelationship($this->getRelationshipMetadata($property, $attributeAnnotation));
                 } elseif ($attributeAnnotation instanceof AttributeAnnotation) {
-                    $resource->addAttribute($this->getAttributeMetadata($property, $attributeAnnotation));
+                    $resourceMetadata->addAttribute($this->getAttributeMetadata($property, $attributeAnnotation));
                 }
             }
         }
 
-        $resource->getIdentifier();
+        $resourceMetadata->getIdentifier();
 
-        $this->populateResource($resource, $annotation);
+        $this->populateResource($resourceMetadata, $annotationAnnotation);
 
-        return $resource;
+        return $resourceMetadata;
     }
 
     /**
@@ -127,11 +127,20 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             $resourceMetadata->setUrlPrefix($url);
         }
 
+        $selfLinkIncluded = $resourceAnnotation->isSelfLinkIncluded();
+        if ($selfLinkIncluded !== null) {
+            $resourceMetadata->setSelfLinkIncluded($selfLinkIncluded);
+        }
+        $relatedLinkIncluded = $resourceAnnotation->isRelatedLinkIncluded();
+        if ($relatedLinkIncluded !== null) {
+            $resourceMetadata->setRelatedLinkIncluded($relatedLinkIncluded);
+        }
+
         foreach ($this->getLinks($resourceAnnotation->getLinks()) as $link) {
             $resourceMetadata->addLink($link);
         }
 
-        $resourceMetadata->setMeta($resourceAnnotation->getMeta());
+        $resourceMetadata->setMeta($this->getMeta($resourceAnnotation->getMeta()));
     }
 
     /**
@@ -146,21 +155,29 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         \ReflectionProperty $property,
         RelationshipAnnotation $annotation
     ): RelationshipMetadata {
-        $relationship = new RelationshipMetadata(
+        $relationshipMetadata = new RelationshipMetadata(
             $property->getDeclaringClass()->getName(),
             $annotation->getName() ?? $property->getName()
         );
 
-        $this->populateAttributeMetadata($relationship, $property, $annotation);
+        $this->populateAttributeMetadata($relationshipMetadata, $property, $annotation);
 
-        foreach ($this->getLinks($annotation->getLinks()) as $link) {
-            $relationship->addLink($link);
+        $selfLinkIncluded = $annotation->isSelfLinkIncluded();
+        if ($selfLinkIncluded !== null) {
+            $relationshipMetadata->setSelfLinkIncluded($selfLinkIncluded);
+        }
+        $relatedLinkIncluded = $annotation->isRelatedLinkIncluded();
+        if ($relatedLinkIncluded !== null) {
+            $relationshipMetadata->setRelatedLinkIncluded($relatedLinkIncluded);
         }
 
-        $relationship->setMeta($annotation->getMeta());
+        foreach ($this->getLinks($annotation->getLinks()) as $link) {
+            $relationshipMetadata->addLink($link);
+        }
 
-        return $relationship->setSelfLinkIncluded($annotation->isSelfLinkIncluded())
-            ->setRelatedLinkIncluded($annotation->isRelatedLinkIncluded());
+        $relationshipMetadata->setMeta($this->getMeta($annotation->getMeta()));
+
+        return $relationshipMetadata;
     }
 
     /**
@@ -268,5 +285,21 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         }
 
         return $linkList;
+    }
+
+    /**
+     * Get meta data.
+     *
+     * @param array<mixed, string> $meta
+     *
+     * @return array<string, mixed>
+     */
+    protected function getMeta(array $meta): array
+    {
+        if ($meta !== [] && \array_keys($meta) === \range(0, \count($meta) - 1)) {
+            throw new DriverException('Metadata keys must be all strings');
+        }
+
+        return $meta;
     }
 }

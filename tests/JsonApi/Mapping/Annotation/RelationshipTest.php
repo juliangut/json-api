@@ -36,8 +36,8 @@ class RelationshipTest extends TestCase
 
     public function testDefaults(): void
     {
-        self::assertFalse($this->annotation->isSelfLinkIncluded());
-        self::assertFalse($this->annotation->isRelatedLinkIncluded());
+        self::assertNull($this->annotation->isSelfLinkIncluded());
+        self::assertNull($this->annotation->isRelatedLinkIncluded());
         self::assertEmpty($this->annotation->getLinks());
     }
 

@@ -23,6 +23,8 @@ use Jgut\Mapping\Annotation\AbstractAnnotation;
  */
 class Resource extends AbstractAnnotation
 {
+    use LinksTrait, MetasTrait;
+
     /**
      * Resource name.
      *
@@ -45,20 +47,6 @@ class Resource extends AbstractAnnotation
      * @var string
      */
     protected $urlPrefix;
-
-    /**
-     * Resource links.
-     *
-     * @var array<string, string>
-     */
-    protected $links = [];
-
-    /**
-     * Resource meta.
-     *
-     * @var array<string, string>
-     */
-    protected $meta = [];
 
     /**
      * Get resource name.
@@ -128,54 +116,6 @@ class Resource extends AbstractAnnotation
     public function setUrlPrefix(string $urlPrefix): self
     {
         $this->urlPrefix = $urlPrefix;
-
-        return $this;
-    }
-
-    /**
-     * Get resource links.
-     *
-     * @return array<string, string>
-     */
-    public function getLinks(): array
-    {
-        return $this->links;
-    }
-
-    /**
-     * Set resource links.
-     *
-     * @param array<string, string> $links
-     *
-     * @return self
-     */
-    public function setLinks(array $links): self
-    {
-        $this->links = $links;
-
-        return $this;
-    }
-
-    /**
-     * Get resource meta.
-     *
-     * @return array<string, string>
-     */
-    public function getMeta(): array
-    {
-        return $this->meta;
-    }
-
-    /**
-     * Set resource meta.
-     *
-     * @param array<string, string> $meta
-     *
-     * @return self
-     */
-    public function setMeta(array $meta): self
-    {
-        $this->meta = $meta;
 
         return $this;
     }

@@ -78,14 +78,14 @@ trait MappingTrait
             throw new DriverException('Resource class missing');
         }
 
-        $resource = (new ResourceMetadata($mapping['class'], $this->getName($mapping)));
+        $resourceMetadata = (new ResourceMetadata($mapping['class'], $this->getName($mapping)));
 
-        $this->populateIdentifier($resource, $mapping);
-        $this->populateAttributes($resource, $mapping);
-        $this->populateRelationships($resource, $mapping);
-        $this->populateResource($resource, $mapping);
+        $this->populateIdentifier($resourceMetadata, $mapping);
+        $this->populateAttributes($resourceMetadata, $mapping);
+        $this->populateRelationships($resourceMetadata, $mapping);
+        $this->populateResource($resourceMetadata, $mapping);
 
-        return $resource;
+        return $resourceMetadata;
     }
 
     /**
@@ -262,45 +262,27 @@ trait MappingTrait
     /**
      * Populate relationship.
      *
-     * @param RelationshipMetadata $relationship
+     * @param RelationshipMetadata $relationshipMetadata
      * @param array<string, mixed> $mapping
      */
-    protected function populateRelationship(RelationshipMetadata $relationship, array $mapping): void
+    protected function populateRelationship(RelationshipMetadata $relationshipMetadata, array $mapping): void
     {
-        $this->populateAttribute($relationship, $mapping);
+        $this->populateAttribute($relationshipMetadata, $mapping);
 
-        $relationship
-            ->setMeta($this->getMeta($mapping))
-            ->setSelfLinkIncluded($this->isSelfLinkIncluded($mapping))
-            ->setRelatedLinkIncluded($this->isRelatedLinkIncluded($mapping));
+        $relationshipMetadata->setMeta($this->getMeta($mapping));
+
+        $selfLinkIncluded = $this->isSelfLinkIncluded($mapping);
+        if ($selfLinkIncluded !== null) {
+            $relationshipMetadata->setSelfLinkIncluded($selfLinkIncluded);
+        }
+        $relatedLinkIncluded = $this->isRelatedLinkIncluded($mapping);
+        if ($relatedLinkIncluded !== null) {
+            $relationshipMetadata->setRelatedLinkIncluded($relatedLinkIncluded);
+        }
 
         foreach ($this->getLinks($mapping) as $link) {
-            $relationship->addLink($link);
+            $relationshipMetadata->addLink($link);
         }
-    }
-
-    /**
-     * Get relationship self link default inclusion.
-     *
-     * @param array<string, mixed> $mapping
-     *
-     * @return bool
-     */
-    protected function isSelfLinkIncluded(array $mapping): bool
-    {
-        return (bool) ($mapping['selfLinkIncluded'] ?? false);
-    }
-
-    /**
-     * Get relationship related link default inclusion.
-     *
-     * @param array<string, mixed> $mapping
-     *
-     * @return bool
-     */
-    protected function isRelatedLinkIncluded(array $mapping): bool
-    {
-        return (bool) ($mapping['relatedLinkIncluded'] ?? false);
     }
 
     /**
@@ -333,11 +315,44 @@ trait MappingTrait
             $resourceMetadata->setUrlPrefix($urlPrefix);
         }
 
+        $selfLinkIncluded = $this->isSelfLinkIncluded($mapping);
+        if ($selfLinkIncluded !== null) {
+            $resourceMetadata->setSelfLinkIncluded($selfLinkIncluded);
+        }
+        $relatedLinkIncluded = $this->isRelatedLinkIncluded($mapping);
+        if ($relatedLinkIncluded !== null) {
+            $resourceMetadata->setRelatedLinkIncluded($relatedLinkIncluded);
+        }
+
         foreach ($this->getLinks($mapping) as $link) {
             $resourceMetadata->addLink($link);
         }
 
         $resourceMetadata->setMeta($this->getMeta($mapping));
+    }
+
+    /**
+     * Get relationship self link default inclusion.
+     *
+     * @param array<string, mixed> $mapping
+     *
+     * @return bool|null
+     */
+    protected function isSelfLinkIncluded(array $mapping): ?bool
+    {
+        return isset($mapping['selfLinkIncluded']) ? (bool) $mapping['selfLinkIncluded'] : null;
+    }
+
+    /**
+     * Get relationship related link default inclusion.
+     *
+     * @param array<string, mixed> $mapping
+     *
+     * @return bool|null
+     */
+    protected function isRelatedLinkIncluded(array $mapping): ?bool
+    {
+        return isset($mapping['relatedLinkIncluded']) ? (bool) $mapping['relatedLinkIncluded'] : null;
     }
 
     /**
@@ -413,7 +428,7 @@ trait MappingTrait
     }
 
     /**
-     * Get metadata.
+     * Get meta data.
      *
      * @param array<string, mixed> $mapping
      *
