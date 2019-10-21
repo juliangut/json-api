@@ -19,7 +19,6 @@ use Jgut\JsonApi\Mapping\Annotation\Relationship as RelationshipAnnotation;
 use Jgut\JsonApi\Mapping\Annotation\Resource as ResourceAnnotation;
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
-use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\Mapping\Driver\AbstractAnnotationDriver;
@@ -32,6 +31,8 @@ use Jgut\Mapping\Exception\DriverException;
  */
 class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterface
 {
+    use LinksTrait;
+
     /**
      * {@inheritdoc}
      *
@@ -54,7 +55,10 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
                 $resourceName = $resource->getName();
                 if ($resourceName === null) {
                     $nameParts = \explode('\\', $class->name);
-                    $resourceName = \lcfirst(\end($nameParts));
+                    /** @var string $name */
+                    $name = \end($nameParts);
+
+                    $resourceName = \lcfirst($name);
                 }
 
                 $resources[$resourceName] = $this->getResourceMetadata($resourceName, $class, $resource);
@@ -136,7 +140,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             $resourceMetadata->setRelatedLinkIncluded($relatedLinkIncluded);
         }
 
-        foreach ($this->getLinks($resourceAnnotation->getLinks()) as $link) {
+        foreach ($this->getLinksMetadata($resourceAnnotation->getLinks()) as $link) {
             $resourceMetadata->addLink($link);
         }
 
@@ -171,7 +175,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             $relationshipMetadata->setRelatedLinkIncluded($relatedLinkIncluded);
         }
 
-        foreach ($this->getLinks($annotation->getLinks()) as $link) {
+        foreach ($this->getLinksMetadata($annotation->getLinks()) as $link) {
             $relationshipMetadata->addLink($link);
         }
 
@@ -264,39 +268,6 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             ->setGetter($getter)
             ->setSetter($setter)
             ->setGroups($attributeAnnotation->getGroups());
-    }
-
-    /**
-     * Get links.
-     *
-     * @param mixed[] $links
-     *
-     * @return array<mixed, LinkMetadata>
-     */
-    protected function getLinks(array $links): array
-    {
-        if ($links !== [] && \array_keys($links) === \range(0, \count($links) - 1)) {
-            throw new DriverException('Links keys must be all strings');
-        }
-
-        $linkList = [];
-        foreach ($links as $name => $definition) {
-            if (\is_string($definition)) {
-                $link = new LinkMetadata($name, $definition);
-            } elseif (\is_array($definition)) {
-                $link = new LinkMetadata($name, $definition['href']);
-                $link->setMeta($definition['meta']);
-            } else {
-                throw new DriverException(\sprintf(
-                    'Link definition must be either a string or array, %s given',
-                    \is_object($definition) ? \get_class($definition) : \gettype($definition)
-                ));
-            }
-
-            $linkList[$name] = $link;
-        }
-
-        return $linkList;
     }
 
     /**

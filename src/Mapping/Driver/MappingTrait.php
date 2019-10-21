@@ -26,6 +26,8 @@ use Jgut\Mapping\Exception\DriverException;
  */
 trait MappingTrait
 {
+    use LinksTrait;
+
     /**
      * Get mapped metadata.
      *
@@ -197,7 +199,7 @@ trait MappingTrait
      *
      * @param array<string, mixed> $mapping
      *
-     * @return array
+     * @return string[]
      */
     protected function getGroups(array $mapping): array
     {
@@ -413,30 +415,7 @@ trait MappingTrait
             return [];
         }
 
-        $links = $mapping['links'];
-
-        if ($links !== [] && \array_keys($links) === \range(0, \count($links) - 1)) {
-            throw new DriverException('Links keys must be all strings');
-        }
-
-        $linkList = [];
-        foreach ($links as $name => $definition) {
-            if (\is_string($definition)) {
-                $link = new LinkMetadata($name, $definition);
-            } elseif (\is_array($definition)) {
-                $link = new LinkMetadata($name, $definition['href']);
-                $link->setMeta($definition['meta']);
-            } else {
-                throw new DriverException(\sprintf(
-                    'Link definition must be either a string or array, %s given',
-                    \is_object($definition) ? \get_class($definition) : \gettype($definition)
-                ));
-            }
-
-            $linkList[$name] = $link;
-        }
-
-        return $linkList;
+        return $this->getLinksMetadata($mapping['links']);
     }
 
     /**

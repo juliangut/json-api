@@ -357,6 +357,9 @@ class QueryParametersParser implements QueryParametersParserInterface
      */
     protected function splitString(string $parameter, string $string, string $separator): array
     {
+        /** @var string[] $strings */
+        $strings = \explode($separator, $string);
+
         return \array_filter(\array_map(
             function (string $value) use ($parameter): string {
                 $value = \trim($value);
@@ -370,7 +373,7 @@ class QueryParametersParser implements QueryParametersParserInterface
 
                 return $value;
             },
-            \explode($separator, $string)
+            $strings
         ));
     }
 

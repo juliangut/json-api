@@ -16,6 +16,7 @@ namespace Jgut\JsonApi\Schema;
 use Jgut\JsonApi\Configuration;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
+use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 
 /**
  * JSON API schema resolver.
@@ -52,22 +53,20 @@ class Resolver
 
         return function (FactoryInterface $factory) use ($resource, $defaultSchemaClass
         ): MetadataSchemaInterface {
-            $schemaClass = $defaultSchemaClass;
+            $schemaClass = $resource->getSchemaClass() ?? $defaultSchemaClass;
 
-            if ($resource->getSchemaClass() !== null) {
-                $schemaClass = $resource->getSchemaClass();
-
-                $reflection = new \ReflectionClass($schemaClass);
-                if (!$reflection->implementsInterface(MetadataSchemaInterface::class)) {
-                    throw new \InvalidArgumentException(\sprintf(
-                        'Schema class %s must implement %s',
-                        $schemaClass,
-                        MetadataSchemaInterface::class
-                    ));
-                }
+            $reflection = new \ReflectionClass($schemaClass);
+            if (!$reflection->implementsInterface(SchemaInterface::class)) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Schema class %s must implement %s',
+                    $schemaClass,
+                    SchemaInterface::class
+                ));
             }
 
-            return new $schemaClass($factory, $resource);
+            return $reflection->implementsInterface(MetadataSchemaInterface::class)
+                ? new $schemaClass($factory, $resource)
+                : new $schemaClass($factory);
         };
     }
 }

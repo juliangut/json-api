@@ -179,8 +179,10 @@ class Manager
      */
     private function getResourceMetadata(): array
     {
-        /* @var \Jgut\JsonApi\Mapping\Metadata\ResourceMetadata[] */
-        return $this->configuration->getMetadataResolver()->getMetadata($this->configuration->getSources());
+        /** @var \Jgut\JsonApi\Mapping\Metadata\ResourceMetadata[] $resources */
+        $resources = $this->configuration->getMetadataResolver()->getMetadata($this->configuration->getSources());
+
+        return $resources;
     }
 
     /**
@@ -189,7 +191,7 @@ class Manager
      * @param SchemaInterface[]|\Closure[] $schemaFactories
      * @param OptionsInterface             $encodingOptions
      * @param iterable|null                $includePaths
-     * @param array|null                   $fieldSets
+     * @param iterable|null                $fieldSets
      *
      * @throws SchemaException
      *
@@ -199,7 +201,7 @@ class Manager
         array $schemaFactories,
         OptionsInterface $encodingOptions,
         ?iterable $includePaths = null,
-        ?array $fieldSets = null
+        ?iterable $fieldSets = null
     ): EncoderInterface {
         $encoder = $this->factory->createEncoder($this->factory->createSchemaContainer($schemaFactories));
 
@@ -233,6 +235,10 @@ class Manager
             $encoder->withIncludedPaths($includePaths);
         }
         if ($fieldSets !== null) {
+            if ($fieldSets instanceof \Traversable) {
+                $fieldSets = \iterator_to_array($fieldSets);
+            }
+
             $encoder->withFieldSets($fieldSets);
         }
 

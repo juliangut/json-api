@@ -18,6 +18,7 @@ use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
+use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 use Neomerx\JsonApi\Schema\BaseSchema;
@@ -87,7 +88,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttributes($resource): iterable
+    public function getAttributes($resource, ContextInterface $context): iterable
     {
         $this->assertResourceType($resource);
 
@@ -114,7 +115,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
      *
      * @throws SchemaException
      */
-    public function getRelationships($resource): iterable
+    public function getRelationships($resource, ContextInterface $context): iterable
     {
         $this->assertResourceType($resource);
 
@@ -267,8 +268,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
             function (LinkMetadata $link): LinkInterface {
                 /** @var string $href */
                 $href = $link->getHref();
-                $isExternal = \preg_match('!^https?://!', $href) === 1;
-                if ($isExternal) {
+                if (\preg_match('!^https?://!', $href) === 1) {
                     $href = '/' . \ltrim($href, '/');
                 }
 

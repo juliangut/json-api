@@ -24,7 +24,7 @@ composer require juliangut/json-api
 
 doctrine/annotations to parse annotations
 
-```php
+```
 composer require doctrine/annotations
 ```
 
@@ -45,7 +45,7 @@ require './vendor/autoload.php';
 ```php
 use Jgut\JsonApi\Manager;
 use Jgut\JsonApi\Configuration;
-use Neomerx\JsonApi\Document\Error;
+use Neomerx\JsonApi\Schema\Error;
 
 $configuration = new Configuration([
     'sources' => ['/path/to/resource/files'],
@@ -54,10 +54,10 @@ $configuration = new Configuration([
 $jsonApiManager = new Manager($configuration);
 
 // Get encoded errors
-$jsonApiManager->encodeErrors([new Error()]);
+$jsonApiManager->encodeErrors(new Error());
 
 // Get encoded resources
-$jsonApiManager->encodeResources(new MyClass(), new RequestInstance());
+$jsonApiManager->encodeResources(new MyClass(), new ServerRequestInstance());
 ```
 
 ### Configuration
@@ -66,17 +66,138 @@ $jsonApiManager->encodeResources(new MyClass(), new RequestInstance());
     * `type` one of \Jgut\JsonApi\Mapping\Driver\DriverFactory constants: `DRIVER_ANNOTATION`, `DRIVER_PHP`, `DRIVER_JSON`, `DRIVER_XML` or `DRIVER_YAML` **defaults to DRIVER_ANNOTATION if no driver**
     * `path` a string path or array of paths to where mapping files are located (files or directories) **REQUIRED if no driver**
     * `driver` an already created \Jgut\JsonApi\Mapping\Driver\DriverInterface object **REQUIRED if no type AND path**
-* `attributeName` name of the PSR-7 Request attribute that will hold query parameters for resource encoding
+* `attributeName` name of the PSR-7 Request attribute that will hold query parameters for resource encoding, defaults to 'JSON_API_query_parameters'
 * `schemaClass` class name implementing \Jgut\JsonApi\Schema\MetadataSchemaInterface (\Jgut\JsonApi\Schema\MetadataSchema by default)
-* `urlPrefix` prefix for generated URLs, defaults to 'JSON_API_query_parameters'
+* `urlPrefix` prefix for generated URLs
 * `metadataResolver` an instance of \Jgut\Mapping\Metadata\MetadataResolver. It is highly recommended to provide a PSR-16 cache to metadata resolver on production
-* `encoderOptions` an instance of \Neomerx\JsonApi\Encoder\EncoderOptions
+* `encodingOptions` global encoding options, an instance of \Jgut\JsonApi\Encoding\OptionsInterface
+* `jsonApiVersion` none by default
+* `jsonApiMeta` optional global metadata
 
 ### Resources
 
 Resources can be defined in two basic ways: by setting them in definition files of various types or directly defined in annotations on classes
 
 #### Annotations
+
+##### Resource (Class level)
+
+Identifies each resource. Its presence is mandatory on each resource class
+
+```php
+use Jgut\JsonApi\Mapping\Annotation as JJM;
+
+/**
+ * @JJM\Resource(
+ *     name="company",
+ *     schemaClass="customSchemaClass",
+ *     urlPrefix="resourcePrefix",
+ *     selfLinkIncluded=true,
+ *     relatedLinkIncluded=false,
+ *     links={"link1": "http://...", "link2": "http://..."],
+ *     meta=["meta1", "meta2"]
+ * )
+ */
+class Company
+{
+}
+```
+
+* `name`, optional, resource name, class name by default
+* `schemaClass`, optional, schema class, must implement `Neomerx\JsonApi\Contracts\Schema\SchemaInterface`, `Jgut\JsonApi\Schema\MetadataSchema` by default
+* `utlPrefix`, optional, none by default
+* `selfLinkIncluded`, optional bool, display self link, null by default
+* `relatedLinkIncluded`, optional bool, display self link when included, null by default
+* `links`, optional, list of optional resource links
+* `meta`, optional, list of optional resource metadata
+
+##### Attribute (Property level)
+
+Defines each and every attribute accessible on the resource
+
+```php
+use Jgut\JsonApi\Mapping\Annotation as JJM;
+
+/**
+ * @JJM\Resource
+ */
+class Company
+{
+    /**
+     * @var string
+     *
+     * @JJM\Attribute(
+     *     name="email",
+     *     getter="getEmail",
+     *     setter="setEmail",
+     *     groups=["view"]
+     * )
+     */
+    protected $email;
+}
+```
+
+* `name`, optional, attribute name, property name by default
+* `getter`, optional, getter method name
+* `setter`, optional, setter method name
+* `groups`, optional, list of encoding groups
+
+##### Id (Property level)
+
+The resource identifier 
+
+```php
+use Jgut\JsonApi\Mapping\Annotation as JJM;
+
+/**
+ * @JJM\Resource
+ */
+class Company
+{
+    /**
+     * @var string
+     *
+     * @JJM\Id(
+     *     name="id",
+     *     getter="getId",
+     *     setter="setId",
+     *     groups=["view"]
+     * )
+     */
+    protected $id;
+}
+```
+
+##### Relationship (Property level)
+
+Identifies this resource relationships
+
+```php
+use Jgut\JsonApi\Mapping\Annotation as JJM;
+
+/**
+ * @JJM\Resource
+ */
+class Company
+{
+    /**
+     * @var Owner
+     *
+     * @JJM\Relationship(
+     *     selfLinkIncluded=true,
+     *     relatedLinkIncluded=false,
+     *     links={"link1": "http://...", "link2": "http://..."],
+     *     meta=["meta1", "meta2"]
+     * )
+     */
+    protected $company;
+}
+```
+
+* `selfLinkIncluded`, optional bool, display self link, null by default
+* `relatedLinkIncluded`, optional bool, display self link when included, null by default
+* `links`, optional, list of optional relationship links
+* `meta`, optional, list of optional relationship metadata
 
 #### Definition files
 

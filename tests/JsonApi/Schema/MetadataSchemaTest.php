@@ -21,6 +21,7 @@ use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
 use Jgut\JsonApi\Schema\MetadataSchema;
+use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 use PHPUnit\Framework\TestCase;
@@ -134,20 +135,24 @@ class MetadataSchemaTest extends TestCase
         $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
             ->addAttribute($attribute);
 
+        /** @var ContextInterface $context */
+        $context = $this->getMockBuilder(ContextInterface::class)->disableOriginalConstructor()->getMock();
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        self::assertArrayHasKey('attribute', $schema->getAttributes($resource));
-        self::assertInstanceOf(\Closure::class, $schema->getAttributes($resource)['attribute']);
-        self::assertEquals('aaa', $schema->getAttributes($resource)['attribute']());
+        self::assertArrayHasKey('attribute', $schema->getAttributes($resource, $context));
+        self::assertInstanceOf(\Closure::class, $schema->getAttributes($resource, $context)['attribute']);
+        self::assertEquals('aaa', $schema->getAttributes($resource, $context)['attribute']());
     }
 
     public function testNoRelationship(): void
     {
         $metadata = new ResourceMetadata(\stdClass::class, 'Resource');
 
+        /** @var ContextInterface $context */
+        $context = $this->getMockBuilder(ContextInterface::class)->disableOriginalConstructor()->getMock();
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        self::assertEmpty($schema->getRelationships(new \stdClass()));
+        self::assertEmpty($schema->getRelationships(new \stdClass(), $context));
     }
 
     public function testGetRelationships(): void
@@ -178,9 +183,11 @@ class MetadataSchemaTest extends TestCase
             ->addRelationship($relationshipB)
             ->setGroup('test');
 
+        /** @var ContextInterface $context */
+        $context = $this->getMockBuilder(ContextInterface::class)->disableOriginalConstructor()->getMock();
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        $relationships = $schema->getRelationships($resource);
+        $relationships = $schema->getRelationships($resource, $context);
 
         self::assertTrue(isset($relationships['relationshipA']));
         self::assertInstanceOf(\Closure::class, $relationships['relationshipA'][SchemaInterface::RELATIONSHIP_DATA]);
@@ -210,6 +217,8 @@ class MetadataSchemaTest extends TestCase
             ->setSelfLinkIncluded(false)
             ->setRelatedLinkIncluded(false);
 
+        /** @var ContextInterface $context */
+        $context = $this->getMockBuilder(ContextInterface::class)->disableOriginalConstructor()->getMock();
         $schema = new MetadataSchema(new Factory(), $metadata);
 
         self::assertArrayNotHasKey(LinkInterface::SELF, $schema->getLinks($resource));
