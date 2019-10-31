@@ -191,7 +191,7 @@ class Options implements OptionsInterface
         $keys = \array_keys($meta);
         \array_walk(
             $keys,
-            function ($key) {
+            function ($key): void {
                 if (!\is_string($key)) {
                     throw new SchemaException('Metadata keys must be all strings');
                 }

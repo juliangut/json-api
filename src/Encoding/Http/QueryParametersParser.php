@@ -148,7 +148,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     {
         \array_walk(
             $fields,
-            function (&$fieldList, $resourceName) {
+            function (&$fieldList, $resourceName): void {
                 if (\is_numeric($resourceName)) {
                     throw new JsonApiException($this->getJsonApiError(
                         'Invalid parameter',
@@ -289,7 +289,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     {
         \array_walk(
             $paging,
-            function (&$value, $key) {
+            function (&$value, $key): void {
                 if (\is_numeric($key) || !\is_numeric($value) || ($value + 0) !== (int) $value) {
                     throw new JsonApiException($this->getJsonApiError(
                         'Invalid parameter',
