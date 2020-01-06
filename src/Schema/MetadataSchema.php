@@ -87,6 +87,8 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return iterable<\Closure>
      */
     public function getAttributes($resource, ContextInterface $context): iterable
     {

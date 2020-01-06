@@ -39,6 +39,8 @@ class Encoder extends BaseEncoder
      * Prevent usage. Use an instance of Manager instead
      *
      * @throws \BadMethodCallException
+     *
+     * @return EncoderInterface
      */
     public static function instance(array $schemas = []): EncoderInterface
     {
