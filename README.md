@@ -12,7 +12,7 @@
 
 # json-api
 
-PSR-7 aware json-api integration.
+Easy JSON:API integration.
 
 ## Installation
 
@@ -208,6 +208,21 @@ class Company
 ###### XML
 
 ###### YAML
+
+### Middleware
+
+Use PSR-15 middleware `Jgut\JsonApi\Middleware\JsonApiMiddleware` in order to validate request being a valid JSON:API specification request
+
+```php
+use Jgut\JsonApi\Middleware\JsonApiMiddleware;
+
+/** @var \Psr\Http\Message\ResponseFactoryInterface $responseFactory */
+/** @var \Jgut\JsonApi\Manager $jsonApiManager */
+
+$middleware = new JsonApiMiddleware($responseFactory, $jsonApiManager);
+
+// Add the middleware to PSR-15 compatible library/framework, such as Slim, Mezzio, etc 
+```
 
 ## Contributing
 

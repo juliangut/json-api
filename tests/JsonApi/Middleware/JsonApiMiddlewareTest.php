@@ -19,12 +19,12 @@ use Jgut\JsonApi\Encoding\Http\HeadersChecker;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
 use Jgut\JsonApi\Manager;
 use Jgut\JsonApi\Middleware\JsonApiMiddleware;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\ResponseFactory;
+use Laminas\Diactoros\ServerRequest;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\ResponseFactory;
-use Zend\Diactoros\ServerRequest;
 
 /**
  * JSON API request handler middleware tests.
@@ -107,6 +107,5 @@ class JsonApiMiddlewareTest extends TestCase
         $response = (new JsonApiMiddleware(new ResponseFactory(), $manager))->process(new ServerRequest(), $handler);
 
         self::assertEquals(200, $response->getStatusCode());
-        self::assertEquals('application/vnd.api+json; charset=utf-8', $response->getHeaderLine('Content-Type'));
     }
 }

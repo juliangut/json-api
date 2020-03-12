@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Middleware;
 
 use Jgut\JsonApi\Manager;
-use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -62,9 +61,7 @@ class JsonApiMiddleware implements MiddlewareInterface
             return $this->getResponseFromException($exception);
         }
 
-        $response = $handler->handle($request);
-
-        return $response->withHeader('Content-Type', MediaTypeInterface::JSON_API_MEDIA_TYPE . '; charset=utf-8');
+        return $handler->handle($request);
     }
 
     /**

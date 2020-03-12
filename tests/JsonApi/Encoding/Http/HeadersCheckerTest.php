@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Tests\Encoding\Http;
 
 use Jgut\JsonApi\Encoding\Http\HeadersChecker;
+use Laminas\Diactoros\ServerRequest;
 use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 use Neomerx\JsonApi\Exceptions\InvalidArgumentException;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Http\Headers\HeaderParametersParser;
 use Neomerx\JsonApi\Http\Headers\MediaType;
 use PHPUnit\Framework\TestCase;
-use Zend\Diactoros\ServerRequest;
 
 /**
  * Request headers validity checker tests.

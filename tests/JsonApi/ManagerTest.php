@@ -18,10 +18,10 @@ use Jgut\JsonApi\Encoding\Encoder;
 use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
 use Jgut\JsonApi\Manager;
+use Laminas\Diactoros\ServerRequest;
 use Neomerx\JsonApi\Schema\Error;
 use Neomerx\JsonApi\Schema\SchemaContainer;
 use PHPUnit\Framework\TestCase;
-use Zend\Diactoros\ServerRequest;
 
 /**
  * JSON-API manager tests.

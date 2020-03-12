@@ -18,10 +18,10 @@ use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Encoding\FieldSetFilter;
 use Jgut\JsonApi\Encoding\Http\HeadersChecker;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
+use Laminas\Diactoros\ServerRequest;
 use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use Neomerx\JsonApi\Schema\SchemaContainer;
 use PHPUnit\Framework\TestCase;
-use Zend\Diactoros\ServerRequest;
 
 /**
  * Custom factory tests.
