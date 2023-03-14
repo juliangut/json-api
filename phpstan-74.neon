@@ -1,0 +1,9 @@
+includes:
+  - phpstan.neon.dist
+
+parameters:
+  excludePaths:
+    - src/Mapping/Driver/AttributeDriver.php
+  ignoreErrors:
+    - message: '/^Parameter #1 \$callback of function array_map expects \(callable\(ReflectionType\): mixed\)\|null, Closure\(ReflectionNamedType\): string given\.$/'
+      path: src/Mapping/Driver/PropertyTrait.php

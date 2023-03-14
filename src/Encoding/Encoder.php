@@ -13,39 +13,32 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Encoding;
 
+use BadMethodCallException;
 use Jgut\JsonApi\Manager;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Encoder\Encoder as BaseEncoder;
 
-/**
- * Custom encoder.
- */
 class Encoder extends BaseEncoder
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @return FactoryInterface
-     */
     protected static function createFactory(): FactoryInterface
     {
         return new Factory();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * Prevent usage. Use an instance of Manager instead
      *
-     * @throws \BadMethodCallException
+     * @param array<mixed> $schemas
      *
-     * @return EncoderInterface
+     * @throws BadMethodCallException
      */
     public static function instance(array $schemas = []): EncoderInterface
     {
-        throw new \BadMethodCallException(
-            \sprintf('Call to Encoder::instance is not allowed. Use %s::getResourceEncoder instead', Manager::class)
+        throw new BadMethodCallException(
+            sprintf('Call to Encoder::instance is not allowed. Use %s::getResourceEncoder instead.', Manager::class),
         );
     }
 }

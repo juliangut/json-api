@@ -1,0 +1,28 @@
+includes:
+  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
+services:
+  - class: Jgut\JsonApi\PhpStan\AssertResourceType
+    tags:
+      - phpstan.typeSpecifier.methodTypeSpecifyingExtension
+
+parameters:
+  level: max
+  checkMissingCallableSignature: true
+  tipsOfTheDay: false
+  errorFormat: compact
+  parallel:
+    maximumNumberOfProcesses: 7
+  paths:
+    - src
+  typeAliases:
+    LinkMapping: 'array<string, string|array{href: string, meta?: array<string, mixed>}|mixed>'
+    IdentifierMapping: 'array{property: string, name?: string, getter?: string, setter?: string}'
+    AttributeMapping: 'array{property?: string, name?: string, getter?: string, setter?: string, groups?: array<string|mixed>}'
+    RelationshipMapping: 'array{class?: class-string, property?: string, name?: string, meta?: mixed, linkSelf?: mixed, linkRelated?: mixed, links?: LinkMapping}'
+    ResourceMapping: 'array{class?: class-string, name?: string, schema?: class-string, prefix?: string, meta?: mixed, linkSelf?: mixed, linkRelated?: mixed, links?: LinkMapping, identifier?: string|IdentifierMapping, attributes?: array<AttributeMapping>, relationships?: array<RelationshipMapping>}'
+  ignoreErrors:
+    - message: '/^Parameter #4 \$meta of method Neomerx\\JsonApi\\Contracts\\Factories\\FactoryInterface::createLink\(\) expects null, array<string, mixed>\|null given\.$/'
+      path: src/Schema/MetadataSchema.php
+    - message: '/^Parameter #2 \$fields \(iterable<string, mixed>\) of method Jgut\\JsonApi\\Encoding\\FieldSetFilter::filterFields\(\) should be contravariant with parameter \$fields \(iterable\) of method Neomerx\\JsonApi\\Representation\\FieldSetFilter::filterFields\(\)$/'
+      path: src/Encoding/FieldSetFilter.php

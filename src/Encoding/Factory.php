@@ -24,40 +24,26 @@ use Neomerx\JsonApi\Factories\Factory as BaseFactory;
 use Neomerx\JsonApi\Http\Headers\HeaderParametersParser;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Custom factory.
- */
 class Factory extends BaseFactory implements FactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function createEncoder(SchemaContainerInterface $container): EncoderInterface
     {
         return new Encoder($this, $container);
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<mixed> $fieldSets
      */
     public function createFieldSetFilter(array $fieldSets): FieldSetFilterInterface
     {
         return new FieldSetFilter($fieldSets);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Neomerx\JsonApi\Exceptions\JsonApiException
-     */
     public function createQueryParametersParser(ServerRequestInterface $request): QueryParametersParserInterface
     {
         return new QueryParametersParser($request->getQueryParams());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createHeadersChecker(): HeadersCheckerInterface
     {
         return new HeadersChecker(new HeaderParametersParser($this));

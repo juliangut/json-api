@@ -18,7 +18,7 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Request query parameters parser tests.
+ * @internal
  */
 class QueryParametersParserTest extends TestCase
 {
@@ -54,10 +54,10 @@ class QueryParametersParserTest extends TestCase
 
         $queryParser = new QueryParametersParser($parameters);
 
-        self::assertEquals(['resource' => ['a', 'b']], $queryParser->getFields());
+        static::assertEquals(['resource' => ['a', 'b']], $queryParser->getFields());
 
         $queryParser->setFields(['another' => ['c', 'd']]);
-        self::assertEquals(['another' => ['c', 'd']], $queryParser->getFields());
+        static::assertEquals(['another' => ['c', 'd']], $queryParser->getFields());
     }
 
     public function testEmptyIncludes(): void
@@ -80,10 +80,10 @@ class QueryParametersParserTest extends TestCase
 
         $queryParser = new QueryParametersParser($parameters);
 
-        self::assertEquals(['a', 'b'], $queryParser->getIncludes());
+        static::assertEquals(['a', 'b'], $queryParser->getIncludes());
 
         $queryParser->setIncludes(['c', 'd']);
-        self::assertEquals(['c', 'd'], $queryParser->getIncludes());
+        static::assertEquals(['c', 'd'], $queryParser->getIncludes());
     }
 
     public function testSortParsing(): void
@@ -94,10 +94,10 @@ class QueryParametersParserTest extends TestCase
 
         $queryParser = new QueryParametersParser($parameters);
 
-        self::assertEquals(['a' => false, 'b' => true], $queryParser->getSorts());
+        static::assertEquals(['a' => false, 'b' => true], $queryParser->getSorts());
 
         $queryParser->setSorts(['c' => true, 'd' => false]);
-        self::assertEquals(['c' => true, 'd' => false], $queryParser->getSorts());
+        static::assertEquals(['c' => true, 'd' => false], $queryParser->getSorts());
     }
 
     public function testInvalidPage(): void
@@ -120,10 +120,10 @@ class QueryParametersParserTest extends TestCase
 
         $queryParser = new QueryParametersParser($parameters);
 
-        self::assertEquals(['offset' => 10, 'count' => 10], $queryParser->getPaging());
+        static::assertEquals(['offset' => 10, 'count' => 10], $queryParser->getPaging());
 
         $queryParser->setPaging(['page' => 5, 'size' => 10]);
-        self::assertEquals(['page' => 5, 'size' => 10], $queryParser->getPaging());
+        static::assertEquals(['page' => 5, 'size' => 10], $queryParser->getPaging());
     }
 
     public function testFiltersParsing(): void
@@ -134,9 +134,9 @@ class QueryParametersParserTest extends TestCase
 
         $queryParser = new QueryParametersParser($parameters);
 
-        self::assertEquals('anything', $queryParser->getFilters());
+        static::assertEquals('anything', $queryParser->getFilters());
 
         $queryParser->setFilters(['something' => 'anything']);
-        self::assertEquals(['something' => 'anything'], $queryParser->getFilters());
+        static::assertEquals(['something' => 'anything'], $queryParser->getFilters());
     }
 }

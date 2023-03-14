@@ -13,32 +13,31 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Tests\Schema;
 
+use Closure;
 use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Exception\SchemaException;
 use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
 use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
-use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
+use Jgut\JsonApi\Mapping\Metadata\ResourceObjectMetadata;
 use Jgut\JsonApi\Schema\MetadataSchema;
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use stdClass;
 
 /**
- * Routing compiler tests.
+ * @internal
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class MetadataSchemaTest extends TestCase
 {
-    /**
-     * @var Factory
-     */
-    protected $factory;
+    protected Factory $factory;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->factory = $this->getMockBuilder(Factory::class)
@@ -47,36 +46,36 @@ class MetadataSchemaTest extends TestCase
 
     public function testNoId(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Resource "stdClass" does not define an id attribute');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Resource "stdClass" does not define an identifier.');
 
-        $metadata = new ResourceMetadata(\stdClass::class, 'Resource');
+        $metadata = new ResourceObjectMetadata(stdClass::class, 'Resource');
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        $schema->getId(new \stdClass());
+        $schema->getId(new stdClass());
     }
 
     public function testInvalidResource(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage('Class "stdClass" is not a "Class"');
+        $this->expectExceptionMessage('Class "stdClass" is not a "Class".');
 
-        $metadata = new ResourceMetadata('Class', 'Resource');
+        $metadata = new ResourceObjectMetadata('Class', 'Resource');
         $metadata->setIdentifier(new IdentifierMetadata('Class', 'id'));
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        $schema->getId(new \stdClass());
+        $schema->getId(new stdClass());
     }
 
     public function testGetType(): void
     {
-        $metadata = (new ResourceMetadata(\stdClass::class, 'Resource'));
+        $metadata = new ResourceObjectMetadata(stdClass::class, 'Resource');
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        self::assertEquals('Resource', $schema->getType());
+        static::assertEquals('Resource', $schema->getType());
     }
 
     public function testGetId(): void
@@ -88,15 +87,15 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $identifier = (new IdentifierMetadata(\stdClass::class, 'Id'))
+        $identifier = (new IdentifierMetadata(stdClass::class, 'Id'))
             ->setGetter('getId');
 
-        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
             ->setIdentifier($identifier);
 
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        self::assertEquals('aaa', $schema->getId($resource));
+        static::assertEquals('aaa', $schema->getId($resource));
     }
 
     public function testGetUrl(): void
@@ -108,16 +107,16 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $identifier = (new IdentifierMetadata(\stdClass::class, 'Id'))
+        $identifier = (new IdentifierMetadata(stdClass::class, 'Id'))
             ->setGetter('getId');
 
-        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
             ->setIdentifier($identifier)
-            ->setUrlPrefix('/custom/resource');
+            ->setPrefix('/custom/resource');
 
         $schema = new MetadataSchema(new Factory(), $metadata);
 
-        self::assertEquals('/custom/resource/aaa', $schema->getSelfLink($resource)->getStringRepresentation(''));
+        static::assertEquals('/custom/resource/aaa', $schema->getSelfLink($resource)->getStringRepresentation(''));
     }
 
     public function testGetAttributes(): void
@@ -129,30 +128,30 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $attribute = (new AttributeMetadata(\stdClass::class, 'attribute'))
+        $attribute = (new AttributeMetadata(stdClass::class, 'attribute'))
             ->setGetter('getAttribute');
 
-        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
             ->addAttribute($attribute);
 
         /** @var ContextInterface $context */
         $context = $this->getMockBuilder(ContextInterface::class)->disableOriginalConstructor()->getMock();
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        self::assertArrayHasKey('attribute', $schema->getAttributes($resource, $context));
-        self::assertInstanceOf(\Closure::class, $schema->getAttributes($resource, $context)['attribute']);
-        self::assertEquals('aaa', $schema->getAttributes($resource, $context)['attribute']());
+        static::assertArrayHasKey('attribute', $schema->getAttributes($resource, $context));
+        static::assertInstanceOf(Closure::class, $schema->getAttributes($resource, $context)['attribute']);
+        static::assertEquals('aaa', $schema->getAttributes($resource, $context)['attribute']());
     }
 
     public function testNoRelationship(): void
     {
-        $metadata = new ResourceMetadata(\stdClass::class, 'Resource');
+        $metadata = new ResourceObjectMetadata(stdClass::class, 'Resource');
 
         /** @var ContextInterface $context */
         $context = $this->getMockBuilder(ContextInterface::class)->disableOriginalConstructor()->getMock();
         $schema = new MetadataSchema($this->factory, $metadata);
 
-        self::assertEmpty($schema->getRelationships(new \stdClass(), $context));
+        static::assertEmpty($schema->getRelationships(new stdClass(), $context));
     }
 
     public function testGetRelationships(): void
@@ -169,16 +168,16 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $relationshipA = (new RelationshipMetadata(\stdClass::class, 'relationshipA'))
+        $relationshipA = (new RelationshipMetadata(stdClass::class, 'relationshipA'))
             ->setGetter('getRelationshipA')
             ->setGroups(['test'])
             ->addLink(new LinkMetadata('me', '/me'))
             ->setMeta(['meta' => 'data']);
-        $relationshipB = (new RelationshipMetadata(\stdClass::class, 'relationshipB'))
+        $relationshipB = (new RelationshipMetadata(stdClass::class, 'relationshipB'))
             ->setGetter('getRelationshipB')
             ->setGroups(['none']);
 
-        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
             ->addRelationship($relationshipA)
             ->addRelationship($relationshipB)
             ->setGroup('test');
@@ -189,14 +188,14 @@ class MetadataSchemaTest extends TestCase
 
         $relationships = $schema->getRelationships($resource, $context);
 
-        self::assertTrue(isset($relationships['relationshipA']));
-        self::assertInstanceOf(\Closure::class, $relationships['relationshipA'][SchemaInterface::RELATIONSHIP_DATA]);
-        self::assertEquals('aaa', $relationships['relationshipA'][SchemaInterface::RELATIONSHIP_DATA]());
-        self::assertFalse(isset($relationships['relationshipA'][SchemaInterface::RELATIONSHIP_LINKS_SELF]));
-        self::assertFalse(isset($relationships['relationshipA'][SchemaInterface::RELATIONSHIP_LINKS_RELATED]));
-        self::assertTrue(isset($relationships['relationshipA'][SchemaInterface::RELATIONSHIP_LINKS]));
-        self::assertTrue(isset($relationships['relationshipA'][SchemaInterface::RELATIONSHIP_META]));
-        self::assertFalse(isset($relationships['relationshipB']));
+        static::assertArrayHasKey('relationshipA', $relationships);
+        static::assertInstanceOf(Closure::class, $relationships['relationshipA'][SchemaInterface::RELATIONSHIP_DATA]);
+        static::assertEquals('aaa', $relationships['relationshipA'][SchemaInterface::RELATIONSHIP_DATA]());
+        static::assertArrayHasKey(SchemaInterface::RELATIONSHIP_LINKS_SELF, $relationships['relationshipA']);
+        static::assertArrayHasKey(SchemaInterface::RELATIONSHIP_LINKS_RELATED, $relationships['relationshipA']);
+        static::assertArrayHasKey(SchemaInterface::RELATIONSHIP_LINKS, $relationships['relationshipA']);
+        static::assertArrayHasKey(SchemaInterface::RELATIONSHIP_META, $relationships['relationshipA']);
+        static::assertArrayNotHasKey('relationshipB', $relationships);
     }
 
     public function testGetLinks(): void
@@ -208,23 +207,21 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $identifier = (new IdentifierMetadata(\stdClass::class, 'Id'))
+        $identifier = (new IdentifierMetadata(stdClass::class, 'Id'))
             ->setGetter('getId');
 
-        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
             ->setIdentifier($identifier)
-            ->addLink(new LinkMetadata('me', 'https://example.com/me'))
-            ->setSelfLinkIncluded(false)
-            ->setRelatedLinkIncluded(false);
+            ->addLink(new LinkMetadata('https://example.com/me', 'me'))
+            ->setLinkSelf(false)
+            ->setLinkRelated(false);
 
-        /** @var ContextInterface $context */
-        $context = $this->getMockBuilder(ContextInterface::class)->disableOriginalConstructor()->getMock();
         $schema = new MetadataSchema(new Factory(), $metadata);
 
-        self::assertArrayNotHasKey(LinkInterface::SELF, $schema->getLinks($resource));
-        self::assertArrayHasKey('me', $schema->getLinks($resource));
-        self::assertFalse($schema->isAddSelfLinkInRelationshipByDefault('relationship'));
-        self::assertFalse($schema->isAddRelatedLinkInRelationshipByDefault('relationship'));
+        static::assertArrayNotHasKey(LinkInterface::SELF, $schema->getLinks($resource));
+        static::assertArrayHasKey('me', $schema->getLinks($resource));
+        static::assertFalse($schema->isAddSelfLinkInRelationshipByDefault('relationship'));
+        static::assertFalse($schema->isAddRelatedLinkInRelationshipByDefault('relationship'));
     }
 
     public function testGetMeta(): void
@@ -236,19 +233,19 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $identifier = (new IdentifierMetadata(\stdClass::class, 'Id'))
+        $identifier = (new IdentifierMetadata(stdClass::class, 'Id'))
             ->setGetter('getId')
             ->setMeta(['meta' => 'data']);
 
-        $metadata = (new ResourceMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
             ->setIdentifier($identifier)
             ->setMeta(['meta' => 'value']);
 
         $schema = new MetadataSchema(new Factory(), $metadata);
 
-        self::assertTrue($schema->hasIdentifierMeta($resource));
-        self::assertEquals(['meta' => 'data'], $schema->getIdentifierMeta($resource));
-        self::assertTrue($schema->hasResourceMeta($resource));
-        self::assertEquals(['meta' => 'value'], $schema->getResourceMeta($resource));
+        static::assertTrue($schema->hasIdentifierMeta($resource));
+        static::assertEquals(['meta' => 'data'], $schema->getIdentifierMeta($resource));
+        static::assertTrue($schema->hasResourceMeta($resource));
+        static::assertEquals(['meta' => 'value'], $schema->getResourceMeta($resource));
     }
 }

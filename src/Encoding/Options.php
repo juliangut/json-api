@@ -17,9 +17,6 @@ use Jgut\JsonApi\Exception\SchemaException;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Encoder\Encoder;
 
-/**
- * Custom encoder.
- */
 class Options implements OptionsInterface
 {
     public const JSON_ENCODE_OPTIONS = \JSON_UNESCAPED_UNICODE
@@ -30,100 +27,69 @@ class Options implements OptionsInterface
         | \JSON_HEX_QUOT
         | \JSON_HEX_TAG;
 
-    /**
-     * JSON encode options.
-     *
-     * @var int
-     */
-    private $encodeOptions = self::JSON_ENCODE_OPTIONS;
+    private int $encodeOptions = self::JSON_ENCODE_OPTIONS;
+
+    private int $encodeDepth = Encoder::DEFAULT_JSON_ENCODE_DEPTH;
 
     /**
-     * JSON encode depth.
-     *
-     * @var int
+     * @var non-empty-string|null
      */
-    private $encodeDepth = Encoder::DEFAULT_JSON_ENCODE_DEPTH;
+    private ?string $group = null;
 
     /**
-     * @var string|null
+     * @var array<mixed>|null
      */
-    private $group;
+    private ?array $links = null;
 
     /**
-     * @var mixed[]|null
+     * @var array<non-empty-string, mixed>|null
      */
-    private $links;
+    private ?array $meta = null;
 
-    /**
-     * @var string[]|null
-     */
-    private $meta;
-
-    /**
-     * {@inheritdoc}
-     */
     public function getEncodeOptions(): int
     {
         return $this->encodeOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setEncodeOptions(int $encodingOptions): void
     {
         $this->encodeOptions = $encodingOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEncodeDepth(): int
     {
         return $this->encodeDepth;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setEncodeDepth(int $encodingDepth): void
     {
         $this->encodeDepth = $encodingDepth;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getGroup(): ?string
     {
         return $this->group;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setGroup(string $group): void
     {
         $this->group = $group;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLinks(): ?array
     {
         return $this->links;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @throws SchemaException
      */
     public function setLinks(array $links): void
     {
-        if ($links !== [] && \array_keys($links) === \range(0, \count($links) - 1)) {
-            throw new SchemaException('Links keys must be all strings');
+        if ($links !== [] && array_keys($links) === range(0, \count($links) - 1)) {
+            throw new SchemaException('Links keys must be all strings.');
         }
 
         $linkList = [];
@@ -133,23 +99,23 @@ class Options implements OptionsInterface
             } elseif (\is_array($definition)) {
                 $href = $definition['href'];
                 if (!$href instanceof LinkInterface) {
-                    throw new SchemaException(\sprintf(
-                        'Link href must be an instance of %s or array, %s given',
+                    throw new SchemaException(sprintf(
+                        'Link href must be an instance of %s or array, %s given.',
                         LinkInterface::class,
-                        \is_object($href) ? \get_class($href) : \gettype($href)
+                        \is_object($href) ? \get_class($href) : \gettype($href),
                     ));
                 }
                 $this->assertMeta($definition['meta']);
 
                 $link = [
-                    'href' => $definition['href'],
+                    'href' => $href,
                     'meta' => $definition['meta'],
                 ];
             } else {
-                throw new SchemaException(\sprintf(
-                    'Link must be an instance of %s or array, %s given',
+                throw new SchemaException(sprintf(
+                    'Link must be an instance of %s or array, "%s" given.',
                     LinkInterface::class,
-                    \is_object($definition) ? \get_class($definition) : \gettype($definition)
+                    \is_object($definition) ? \get_class($definition) : \gettype($definition),
                 ));
             }
 
@@ -159,16 +125,13 @@ class Options implements OptionsInterface
         $this->links = $linkList;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMeta(): ?array
     {
         return $this->meta;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @throws SchemaException
      */
@@ -180,22 +143,24 @@ class Options implements OptionsInterface
     }
 
     /**
-     * Assert meta data is correct.
-     *
-     * @param mixed[] $meta
+     * @param mixed|array<mixed> $meta
      *
      * @throws SchemaException
      */
-    private function assertMeta(array $meta): void
+    private function assertMeta($meta): void
     {
-        $keys = \array_keys($meta);
-        \array_walk(
+        if (!\is_array($meta)) {
+            throw new SchemaException('Metadata must be an array.');
+        }
+
+        $keys = array_keys($meta);
+        array_walk(
             $keys,
-            function ($key): void {
+            static function ($key): void {
                 if (!\is_string($key)) {
-                    throw new SchemaException('Metadata keys must be all strings');
+                    throw new SchemaException('Metadata keys must be all strings.');
                 }
-            }
+            },
         );
     }
 }

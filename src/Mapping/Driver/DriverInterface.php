@@ -15,9 +15,6 @@ namespace Jgut\JsonApi\Mapping\Driver;
 
 use Jgut\Mapping\Driver\DriverInterface as BaseDriverInterface;
 
-/**
- * Custom driver interface.
- */
 interface DriverInterface extends BaseDriverInterface
 {
 }

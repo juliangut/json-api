@@ -16,42 +16,36 @@ namespace Jgut\JsonApi\Mapping\Driver;
 use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\Mapping\Exception\DriverException;
 
-/**
- * Links definition trait.
- */
 trait LinksTrait
 {
     /**
-     * Get links metadata.
+     * @param LinkMapping $links
      *
-     * @param mixed[] $links
+     * @throws DriverException
      *
-     * @return LinkMetadata[]
+     * @return array<LinkMetadata>
      */
-    protected function getLinksMetadata(array $links): array
+    private function getLinksMetadata(array $links): array
     {
-        if (\count($links) !== 0 && \array_keys($links) === \range(0, \count($links) - 1)) {
-            throw new DriverException('Links keys must be all strings');
-        }
-
         $linkList = [];
-        foreach ($links as $name => $definition) {
-            if (\is_string($definition)) {
-                $link = new LinkMetadata($name, $definition);
-            } elseif (\is_array($definition)) {
-                $link = new LinkMetadata($name, $definition['href']);
-
-                if (isset($definition['meta'])) {
-                    $link->setMeta($definition['meta']);
-                }
+        foreach ($links as $title => $linkDefinition) {
+            if (\is_string($linkDefinition)) {
+                $link = new LinkMetadata($linkDefinition, $title);
+            } elseif (\is_array($linkDefinition)) {
+                /** @var array{href: string, meta?: array<string, mixed>} $linkDefinition */
+                $link = new LinkMetadata(
+                    $linkDefinition['href'],
+                    $title,
+                    \array_key_exists('meta', $linkDefinition) ? $linkDefinition['meta'] : [],
+                );
             } else {
-                throw new DriverException(\sprintf(
-                    'Link definition must be either a string or array, %s given',
-                    \is_object($definition) ? \get_class($definition) : \gettype($definition)
+                throw new DriverException(sprintf(
+                    'Link definition must be either a string or array, %s given.',
+                    \is_object($linkDefinition) ? \get_class($linkDefinition) : \gettype($linkDefinition),
                 ));
             }
 
-            $linkList[$name] = $link;
+            $linkList[$title] = $link;
         }
 
         return $linkList;

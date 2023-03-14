@@ -13,9 +13,8 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Exception;
 
-/**
- * Schema exception.
- */
-class SchemaException extends \RuntimeException
+use RuntimeException;
+
+class SchemaException extends RuntimeException
 {
 }

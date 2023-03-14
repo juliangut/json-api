@@ -17,18 +17,12 @@ use Jgut\JsonApi\Mapping\Metadata\AttributeMetadata;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Attribute metadata tests.
+ * @internal
  */
 class AttributeMetadataTest extends TestCase
 {
-    /**
-     * @var AttributeMetadata
-     */
-    protected $attribute;
+    protected AttributeMetadata $attribute;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->attribute = new AttributeMetadata('Class', 'Name');
@@ -36,29 +30,29 @@ class AttributeMetadataTest extends TestCase
 
     public function testDefaults(): void
     {
-        self::assertNull($this->attribute->getGetter());
-        self::assertNull($this->attribute->getSetter());
-        self::assertEquals([], $this->attribute->getGroups());
+        static::assertNull($this->attribute->getGetter());
+        static::assertNull($this->attribute->getSetter());
+        static::assertEquals([], $this->attribute->getGroups());
     }
 
     public function testGetter(): void
     {
         $this->attribute->setGetter('getAttr');
 
-        self::assertEquals('getAttr', $this->attribute->getGetter());
+        static::assertEquals('getAttr', $this->attribute->getGetter());
     }
 
     public function testSetter(): void
     {
         $this->attribute->setSetter('setAttr');
 
-        self::assertEquals('setAttr', $this->attribute->getSetter());
+        static::assertEquals('setAttr', $this->attribute->getSetter());
     }
 
     public function testGroups(): void
     {
         $this->attribute->setGroups(['one', 'two']);
 
-        self::assertEquals(['one', 'two'], $this->attribute->getGroups());
+        static::assertEquals(['one', 'two'], $this->attribute->getGroups());
     }
 }

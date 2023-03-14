@@ -16,14 +16,8 @@ namespace Jgut\JsonApi\Tests\Stubs;
 use Jgut\JsonApi\Encoding\Encoder;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 
-/**
- * Custom encoder stub.
- */
 class EncoderStub extends Encoder
 {
-    /**
-     * @return FactoryInterface
-     */
     public static function doCreateFactory(): FactoryInterface
     {
         return static::createFactory();

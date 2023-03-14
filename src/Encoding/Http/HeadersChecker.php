@@ -20,29 +20,15 @@ use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Schema\Error;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Request headers validity checker.
- */
 class HeadersChecker implements HeadersCheckerInterface
 {
-    /**
-     * @var HeaderParametersParserInterface
-     */
-    private $headerParser;
+    private HeaderParametersParserInterface $headerParser;
 
-    /**
-     * HeadersChecker constructor.
-     *
-     * @param HeaderParametersParserInterface $headerParser
-     */
     public function __construct(HeaderParametersParserInterface $headerParser)
     {
         $this->headerParser = $headerParser;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function checkHeaders(ServerRequestInterface $request): void
     {
         $this->checkContentTypeHeader($request);
@@ -51,8 +37,6 @@ class HeadersChecker implements HeadersCheckerInterface
 
     /**
      * Check Content-Type header validity.
-     *
-     * @param ServerRequestInterface $request
      *
      * @throws JsonApiException
      */
@@ -72,10 +56,10 @@ class HeadersChecker implements HeadersCheckerInterface
                         (string) JsonApiException::HTTP_CODE_BAD_REQUEST,
                         null,
                         'Content-Type header parse error',
-                        $exception->getMessage()
+                        $exception->getMessage(),
                     ),
                     JsonApiException::HTTP_CODE_BAD_REQUEST,
-                    $exception
+                    $exception,
                 );
             }
 
@@ -94,16 +78,14 @@ class HeadersChecker implements HeadersCheckerInterface
                 (string) JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
                 null,
                 'Unsupported content type',
-                'Content-Type header should be ' . MediaTypeInterface::JSON_API_MEDIA_TYPE
+                'Content-Type header should be ' . MediaTypeInterface::JSON_API_MEDIA_TYPE,
             ),
-            JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE
+            JsonApiException::HTTP_CODE_UNSUPPORTED_MEDIA_TYPE,
         );
     }
 
     /**
      * Check Accept header validity.
-     *
-     * @param ServerRequestInterface $request
      *
      * @throws JsonApiException
      */
@@ -127,10 +109,10 @@ class HeadersChecker implements HeadersCheckerInterface
                     (string) JsonApiException::HTTP_CODE_BAD_REQUEST,
                     null,
                     'Accept header parse error',
-                    $exception->getMessage()
+                    $exception->getMessage(),
                 ),
                 JsonApiException::HTTP_CODE_BAD_REQUEST,
-                $exception
+                $exception,
             );
         }
 
@@ -142,9 +124,9 @@ class HeadersChecker implements HeadersCheckerInterface
                 (string) JsonApiException::HTTP_CODE_NOT_ACCEPTABLE,
                 null,
                 'Unsupported media type',
-                'Accept header value is not valid'
+                'Accept header value is not valid',
             ),
-            JsonApiException::HTTP_CODE_NOT_ACCEPTABLE
+            JsonApiException::HTTP_CODE_NOT_ACCEPTABLE,
         );
     }
 }

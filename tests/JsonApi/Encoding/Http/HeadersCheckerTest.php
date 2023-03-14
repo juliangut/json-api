@@ -23,7 +23,7 @@ use Neomerx\JsonApi\Http\Headers\MediaType;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Request headers validity checker tests.
+ * @internal
  */
 class HeadersCheckerTest extends TestCase
 {
@@ -37,8 +37,8 @@ class HeadersCheckerTest extends TestCase
             ->getMock();
         $headerParser->expects(static::once())
             ->method('parseContentTypeHeader')
-            ->will(self::throwException(new InvalidArgumentException('')));
-        /* @var HeaderParametersParser $headerParser */
+            ->will(static::throwException(new InvalidArgumentException('')));
+        // @var HeaderParametersParser $headerParser
 
         $request = (new ServerRequest())->withHeader('Content-Type', 'notValid');
 
@@ -55,8 +55,8 @@ class HeadersCheckerTest extends TestCase
             ->getMock();
         $headerParser->expects(static::once())
             ->method('parseContentTypeHeader')
-            ->will(self::returnValue(new MediaType('not', 'valid')));
-        /* @var HeaderParametersParser $headerParser */
+            ->willReturn(new MediaType('not', 'valid'));
+        // @var HeaderParametersParser $headerParser
 
         $request = (new ServerRequest())->withHeader('Content-Type', 'not/valid');
 
@@ -75,11 +75,11 @@ class HeadersCheckerTest extends TestCase
             ->getMock();
         $headerParser->expects(static::once())
             ->method('parseContentTypeHeader')
-            ->will(self::returnValue($mediaType));
+            ->willReturn($mediaType);
         $headerParser->expects(static::once())
             ->method('parseAcceptHeader')
-            ->will(self::throwException(new InvalidArgumentException('')));
-        /* @var HeaderParametersParser $headerParser */
+            ->will(static::throwException(new InvalidArgumentException('')));
+        // @var HeaderParametersParser $headerParser
 
         $request = (new ServerRequest())
             ->withHeader('Content-Type', 'application/vnd.api+json')
@@ -100,11 +100,11 @@ class HeadersCheckerTest extends TestCase
             ->getMock();
         $headerParser->expects(static::once())
             ->method('parseContentTypeHeader')
-            ->will(self::returnValue($mediaType));
+            ->willReturn($mediaType);
         $headerParser->expects(static::once())
             ->method('parseAcceptHeader')
-            ->will(self::returnValue([new MediaType('not', 'valid')]));
-        /* @var HeaderParametersParser $headerParser */
+            ->willReturn([new MediaType('not', 'valid')]);
+        // @var HeaderParametersParser $headerParser
 
         $request = (new ServerRequest())
             ->withHeader('Content-Type', 'application/vnd.api+json')
@@ -122,11 +122,11 @@ class HeadersCheckerTest extends TestCase
             ->getMock();
         $headerParser->expects(static::once())
             ->method('parseContentTypeHeader')
-            ->will(self::returnValue($mediaType));
+            ->willReturn($mediaType);
         $headerParser->expects(static::once())
             ->method('parseAcceptHeader')
-            ->will(self::returnValue([$mediaType]));
-        /* @var HeaderParametersParser $headerParser */
+            ->willReturn([$mediaType]);
+        // @var HeaderParametersParser $headerParser
 
         $request = (new ServerRequest())
             ->withHeader('Content-Type', 'application/vnd.api+json')

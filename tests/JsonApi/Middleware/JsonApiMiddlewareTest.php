@@ -27,7 +27,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * JSON API request handler middleware tests.
+ * @internal
  */
 class JsonApiMiddlewareTest extends TestCase
 {
@@ -36,34 +36,34 @@ class JsonApiMiddlewareTest extends TestCase
         $headersChecker = $this->getMockBuilder(HeadersChecker::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $headersChecker->expects(self::once())
+        $headersChecker->expects(static::once())
             ->method('checkHeaders')
-            ->will($this->throwException(new JsonApiException([])));
-        /* @var HeadersChecker $headersChecker */
+            ->will(static::throwException(new JsonApiException([])));
+        // @var HeadersChecker $headersChecker
 
         $factory = $this->getMockBuilder(Factory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $factory->expects(self::once())
+        $factory->expects(static::once())
             ->method('createHeadersChecker')
-            ->will(self::returnValue($headersChecker));
-        /* @var Factory $factory */
+            ->willReturn($headersChecker);
+        // @var Factory $factory
 
         $manager = $this->getMockBuilder(Manager::class)
             ->setConstructorArgs([new Configuration(), $factory])
             ->getMock();
-        $manager->expects(self::once())
+        $manager->expects(static::once())
             ->method('getFactory')
-            ->will(self::returnValue($factory));
-        /* @var Manager $manager */
+            ->willReturn($factory);
+        // @var Manager $manager
 
-        /* @var RequestHandlerInterface $handler */
+        // @var RequestHandlerInterface $handler
         $handler = $this->getMockBuilder(RequestHandlerInterface::class)
             ->getMock();
 
         $response = (new JsonApiMiddleware(new ResponseFactory(), $manager))->process(new ServerRequest(), $handler);
 
-        self::assertEquals(400, $response->getStatusCode());
+        static::assertEquals(400, $response->getStatusCode());
     }
 
     public function testCorrectHeaders(): void
@@ -71,41 +71,41 @@ class JsonApiMiddlewareTest extends TestCase
         $headersChecker = $this->getMockBuilder(HeadersChecker::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $headersChecker->expects(self::once())
+        $headersChecker->expects(static::once())
             ->method('checkHeaders');
-        /* @var HeadersChecker $headersChecker */
+        // @var HeadersChecker $headersChecker
 
         $factory = $this->getMockBuilder(Factory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $factory->expects(self::once())
+        $factory->expects(static::once())
             ->method('createHeadersChecker')
-            ->will(self::returnValue($headersChecker));
-        $factory->expects(self::once())
+            ->willReturn($headersChecker);
+        $factory->expects(static::once())
             ->method('createQueryParametersParser')
-            ->will(self::returnValue(new QueryParametersParser()));
-        /* @var Factory $factory */
+            ->willReturn(new QueryParametersParser());
+        // @var Factory $factory
 
         $manager = $this->getMockBuilder(Manager::class)
             ->setConstructorArgs([new Configuration(), $factory])
             ->getMock();
-        $manager->expects(self::once())
+        $manager->expects(static::once())
             ->method('getFactory')
-            ->will(self::returnValue($factory));
-        $manager->expects(self::once())
+            ->willReturn($factory);
+        $manager->expects(static::once())
             ->method('setRequestQueryParameters')
-            ->will(self::returnArgument(0));
-        /* @var Manager $manager */
+            ->willReturnArgument(0);
+        // @var Manager $manager
 
         $handler = $this->getMockBuilder(RequestHandlerInterface::class)
             ->getMock();
-        $handler->expects(self::once())
+        $handler->expects(static::once())
             ->method('handle')
-            ->will(self::returnValue(new Response()));
-        /* @var RequestHandlerInterface $handler */
+            ->willReturn(new Response());
+        // @var RequestHandlerInterface $handler
 
         $response = (new JsonApiMiddleware(new ResponseFactory(), $manager))->process(new ServerRequest(), $handler);
 
-        self::assertEquals(200, $response->getStatusCode());
+        static::assertEquals(200, $response->getStatusCode());
     }
 }

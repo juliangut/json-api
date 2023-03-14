@@ -13,14 +13,9 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Driver;
 
-use Jgut\Mapping\Driver\AbstractMappingDriver;
-use Jgut\Mapping\Driver\Traits\PhpMappingTrait;
+use Jgut\Mapping\Driver\AbstractMappingPhpDriver;
 
-/**
- * PHP mapping driver.
- */
-class PhpDriver extends AbstractMappingDriver implements DriverInterface
+class PhpDriver extends AbstractMappingPhpDriver implements DriverInterface
 {
-    use PhpMappingTrait;
-    use MappingTrait;
+    use FileMappingTrait;
 }

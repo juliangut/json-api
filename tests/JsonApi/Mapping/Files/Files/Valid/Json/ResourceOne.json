@@ -1,0 +1,42 @@
+[
+    {
+        "class": "Jgut\\JsonApi\\Tests\\Mapping\\Files\\Classes\\Valid\\Annotation\\ResourceOne",
+        "name": "resourceA",
+        "schema": "Jgut\\JsonApi\\Schema\\MetadataSchema",
+        "prefix": "resource",
+        "linkSelf": true,
+        "meta": {
+            "first": "firstValue",
+            "second": "secondValue"
+        },
+        "identifier": {
+            "property": "uuid",
+            "name": "id",
+            "getter": "getId",
+            "setter": "setId"
+        },
+        "attributes": [
+            {
+                "property": "one",
+                "name": "theOne"
+            }
+        ],
+        "relationships": [
+            {
+                "class": "Jgut\\JsonApi\\Tests\\Mapping\\Files\\Classes\\Valid\\Annotation\\ResourceTwo",
+                "property": "relative",
+                "links": {
+                    "custom": {
+                        "href": "/custom/path",
+                        "meta": {
+                            "key": "path"
+                        }
+                    }
+                },
+                "meta": {
+                    "key": "value"
+                }
+            }
+        ]
+    }
+]

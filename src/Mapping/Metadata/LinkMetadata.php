@@ -13,40 +13,33 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Metadata;
 
-/**
- * Link metadata.
- */
-class LinkMetadata extends AbstractMetadata
+use Jgut\Mapping\Metadata\MetadataInterface;
+
+class LinkMetadata implements MetadataInterface
 {
-    use MetasTrait;
+    use MetaTrait;
+
+    protected string $href;
+
+    protected ?string $title;
 
     /**
-     * Link href.
-     *
-     * @var string
+     * @param array<string, mixed> $meta
      */
-    protected $href;
-
-    /**
-     * LinkMetadata constructor.
-     *
-     * @param string $name
-     * @param string $href
-     */
-    public function __construct(string $name, string $href)
+    public function __construct(string $href, ?string $title = null, array $meta = [])
     {
-        parent::__construct('', $name);
-
         $this->href = $href;
+        $this->title = $title;
+        $this->meta = $meta;
     }
 
-    /**
-     * Get href setter.
-     *
-     * @return string|null
-     */
-    public function getHref(): ?string
+    public function getHref(): string
     {
         return $this->href;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
     }
 }

@@ -13,101 +13,18 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Metadata;
 
-/**
- * Attribute metadata.
- */
-class AttributeMetadata extends AbstractMetadata
+class AttributeMetadata extends AbstractFieldMetadata
 {
-    /**
-     * Attribute getter.
-     *
-     * @var string
-     */
-    protected $getter;
+    use GroupTrait;
 
     /**
-     * Attribute setter.
-     *
-     * @var string
+     * @param class-string<object> $class
+     * @param array<string>        $groups
      */
-    protected $setter;
-
-    /**
-     * Attribute encoding groups.
-     *
-     * @var string[]
-     */
-    protected $groups = [];
-
-    /**
-     * Get attribute getter.
-     *
-     * @return string|null
-     */
-    public function getGetter(): ?string
+    public function __construct(string $class, string $name, array $groups = [])
     {
-        return $this->getter;
-    }
+        parent::__construct($class, $name);
 
-    /**
-     * Set attribute getter.
-     *
-     * @param string $getter
-     *
-     * @return self
-     */
-    public function setGetter(string $getter): self
-    {
-        $this->getter = $getter;
-
-        return $this;
-    }
-
-    /**
-     * Get attribute setter.
-     *
-     * @return string|null
-     */
-    public function getSetter(): ?string
-    {
-        return $this->setter;
-    }
-
-    /**
-     * Set attribute setter.
-     *
-     * @param string $setter
-     *
-     * @return self
-     */
-    public function setSetter(string $setter): self
-    {
-        $this->setter = $setter;
-
-        return $this;
-    }
-
-    /**
-     * Get attribute groups.
-     *
-     * @return string[]
-     */
-    public function getGroups(): array
-    {
-        return $this->groups;
-    }
-
-    /**
-     * Set attribute groups.
-     *
-     * @param string[] $groups
-     *
-     * @return self
-     */
-    public function setGroups(array $groups): self
-    {
         $this->groups = $groups;
-
-        return $this;
     }
 }

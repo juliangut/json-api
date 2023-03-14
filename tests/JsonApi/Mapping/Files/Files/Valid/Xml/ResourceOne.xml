@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resource
+        class="Jgut\JsonApi\Tests\Mapping\Files\Classes\Valid\Annotation\ResourceOne"
+        name="resourceA"
+        schema="Jgut\JsonApi\Schema\MetadataSchema"
+        prefix="resource"
+        linkSelf="true"
+    >
+        <meta>
+            <first>firstValue</first>
+            <second>secondValue</second>
+        </meta>
+        <identifier
+            property="uuid"
+            name="id"
+            getter="getId"
+            setter="setId"
+        />
+        <attributes>
+            <attribute1 property="one" name="theOne" />
+        </attributes>
+        <relationships>
+            <relationship1
+                class="Jgut\JsonApi\Tests\Mapping\Files\Classes\Valid\Annotation\ResourceTwo"
+                property="relative"
+            >
+                <links>
+                    <custom href="/custom/path">
+                        <meta key="path" />
+                    </custom>
+                </links>
+                <meta key="value" />
+            </relationship1>
+        </relationships>
+    </resource>
+</root>

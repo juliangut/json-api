@@ -13,10 +13,14 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Tests\Encoding;
 
+use Closure;
 use Jgut\JsonApi\Encoding\FieldSetFilter;
 use Neomerx\JsonApi\Contracts\Parser\ResourceInterface;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ */
 class FieldSetFilterTest extends TestCase
 {
     public function testNoFilter(): void
@@ -34,18 +38,18 @@ class FieldSetFilterTest extends TestCase
             }
         };
         $attributes = [
-            'attributeOne' => \Closure::fromCallable($callableOne),
-            'attributeTwo' => \Closure::fromCallable($callableTwo),
+            'attributeOne' => Closure::fromCallable($callableOne),
+            'attributeTwo' => Closure::fromCallable($callableTwo),
         ];
 
         $resource = $this->getMockBuilder(ResourceInterface::class)
             ->getMock();
         $resource->expects(static::once())
             ->method('getType')
-            ->will(static::returnValue('mock'));
+            ->willReturn('mock');
         $resource->expects(static::once())
             ->method('getAttributes')
-            ->will(static::returnValue($attributes));
+            ->willReturn($attributes);
 
         $filter = new FieldSetFilter([]);
 
@@ -69,18 +73,18 @@ class FieldSetFilterTest extends TestCase
             }
         };
         $attributes = [
-            'attributeOne' => \Closure::fromCallable($callableOne),
-            'attributeTwo' => \Closure::fromCallable($callableTwo),
+            'attributeOne' => Closure::fromCallable($callableOne),
+            'attributeTwo' => Closure::fromCallable($callableTwo),
         ];
 
         $resource = $this->getMockBuilder(ResourceInterface::class)
             ->getMock();
         $resource->expects(static::once())
             ->method('getType')
-            ->will(static::returnValue('mock'));
+            ->willReturn('mock');
         $resource->expects(static::once())
             ->method('getAttributes')
-            ->will(static::returnValue($attributes));
+            ->willReturn($attributes);
 
         $filter = new FieldSetFilter(['mock' => ['attributeOne']]);
 

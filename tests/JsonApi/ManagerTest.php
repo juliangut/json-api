@@ -18,13 +18,20 @@ use Jgut\JsonApi\Encoding\Encoder;
 use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
 use Jgut\JsonApi\Manager;
+use Jgut\JsonApi\Mapping\Driver\DriverFactory;
+use Jgut\Mapping\Driver\DriverFactoryInterface;
+use Jgut\Mapping\Metadata\MetadataResolver;
 use Laminas\Diactoros\ServerRequest;
 use Neomerx\JsonApi\Schema\Error;
+use Neomerx\JsonApi\Schema\ErrorCollection;
 use Neomerx\JsonApi\Schema\SchemaContainer;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
- * JSON-API manager tests.
+ * @internal
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ManagerTest extends TestCase
 {
@@ -36,11 +43,11 @@ class ManagerTest extends TestCase
 
         $manager = new Manager(new Configuration(), $factory);
 
-        self::assertSame($factory, $manager->getFactory());
+        static::assertSame($factory, $manager->getFactory());
 
         $request = $manager->setRequestQueryParameters($request, $queryParameters);
 
-        self::assertSame($queryParameters, $manager->getRequestQueryParameters($request));
+        static::assertSame($queryParameters, $manager->getRequestQueryParameters($request));
     }
 
     public function testEncodeErrors(): void
@@ -48,28 +55,26 @@ class ManagerTest extends TestCase
         $encoder = $this->getMockBuilder(Encoder::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $encoder->expects(self::once())
+        $encoder->expects(static::once())
             ->method('encodeErrors')
-            ->will(self::returnValue('ENCODED'));
-        /* @var Encoder $encoder */
+            ->willReturn('ENCODED');
 
         $container = $this->getMockBuilder(SchemaContainer::class)
             ->disableOriginalConstructor()
             ->getMock();
-        /* @var SchemaContainer $container */
 
         $factory = $this->getMockBuilder(Factory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $factory->expects(self::once())
+        $factory->expects(static::once())
             ->method('createEncoder')
-            ->will(self::returnValue($encoder));
-        $factory->expects(self::once())
+            ->willReturn($encoder);
+        $factory->expects(static::once())
             ->method('createSchemaContainer')
-            ->will(self::returnValue($container));
-        /* @var Factory $factory */
+            ->willReturn($container);
 
-        self::assertEquals('ENCODED', (new Manager(new Configuration(), $factory))->encodeErrors(new Error()));
+        $errors = (new ErrorCollection())->add(new Error());
+        static::assertEquals('ENCODED', (new Manager(new Configuration(), $factory))->encodeErrors($errors));
     }
 
     public function testEncodeResources(): void
@@ -80,52 +85,55 @@ class ManagerTest extends TestCase
         $encoder = $this->getMockBuilder(Encoder::class)
             ->disableOriginalConstructor()
             ->getMock();
-//        $encoder->expects(self::once())
-//            ->method('withMeta');
-//        $encoder->expects(self::once())
-//            ->method('withLinks');
-        $encoder->expects(self::once())
+        $encoder->expects(static::once())
             ->method('encodeData')
-            ->will(self::returnValue('ENCODED'));
-        /* @var Encoder $encoder */
+            ->willReturn('ENCODED');
 
         $container = $this->getMockBuilder(SchemaContainer::class)
             ->disableOriginalConstructor()
             ->getMock();
-        /* @var SchemaContainer $container */
 
         $factory = $this->getMockBuilder(Factory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $factory->expects(self::once())
+        $factory->expects(static::once())
             ->method('createEncoder')
-            ->will(self::returnValue($encoder));
-        $factory->expects(self::once())
+            ->willReturn($encoder);
+        $factory->expects(static::once())
             ->method('createSchemaContainer')
-            ->will(self::returnCallback(function (array $metadata) use ($container) {
+            ->willReturnCallback(static function (array $metadata) use ($container) {
                 self::assertCount(1, $metadata);
 
                 return $container;
-            }));
-        /* @var Factory $factory */
+            });
+
+        $sources = \PHP_VERSION_ID < 80_000
+            ? [
+                [
+                    'type' => DriverFactoryInterface::DRIVER_ANNOTATION,
+                    'path' => __DIR__ . '/Mapping/Files/Classes/Valid/Annotation',
+                ],
+            ]
+            : [__DIR__ . '/Mapping/Files/Classes/Valid/Attribute'];
 
         $configuration = $this->getMockBuilder(Configuration::class)
-            ->setMethods(['getMetadata', 'getLinks', 'getSources'])
+            ->setMethods(['getMetadataResolver', 'getMetadata', 'getLinks', 'getSources'])
             ->getMock();
-        $configuration->expects(self::once())
+        $configuration->expects(static::once())
+            ->method('getMetadataResolver')
+            ->willReturn(new MetadataResolver(new DriverFactory()));
+        $configuration->expects(static::once())
             ->method('getSources')
-            ->will(self::returnValue([__DIR__ . '/Files/Annotation/Valid']));
-        /* @var Configuration $configuration */
+            ->willReturn($sources);
 
         $manager = new Manager($configuration, $factory);
 
         $encoded = $manager->encodeResources(
-            new \stdClass(),
+            new stdClass(),
             $manager->setRequestQueryParameters($request, $queryParameters),
-            ['resourceB'],
-            null
+            ['resourceTwo'],
         );
 
-        self::assertEquals('ENCODED', $encoded);
+        static::assertEquals('ENCODED', $encoded);
     }
 }

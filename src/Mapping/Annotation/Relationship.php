@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace Jgut\JsonApi\Mapping\Annotation;
 
 /**
- * Relationship attribute annotation.
- *
  * @Annotation
+ *
  * @Target("PROPERTY")
  */
-class Relationship extends Attribute
+class Relationship extends AbstractField
 {
-    use LinksTrait, MetasTrait;
+    use GroupTrait;
+    use LinkTrait;
+    use MetaTrait;
 }

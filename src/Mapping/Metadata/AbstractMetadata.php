@@ -15,30 +15,17 @@ namespace Jgut\JsonApi\Mapping\Metadata;
 
 use Jgut\Mapping\Metadata\MetadataInterface;
 
-/**
- * Abstract metadata.
- */
 abstract class AbstractMetadata implements MetadataInterface
 {
     /**
-     * Resource class.
-     *
-     * @var string
+     * @var class-string<object>
      */
-    protected $class;
+    protected string $class;
+
+    protected string $name;
 
     /**
-     * Resource name.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * ResourceMetadata constructor.
-     *
-     * @param string $class
-     * @param string $name
+     * @param class-string<object> $class
      */
     public function __construct(string $class, string $name)
     {
@@ -47,20 +34,13 @@ abstract class AbstractMetadata implements MetadataInterface
     }
 
     /**
-     * Get resource class.
-     *
-     * @return string
+     * @return class-string<object>
      */
     public function getClass(): string
     {
         return $this->class;
     }
 
-    /**
-     * Get resource name.
-     *
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;

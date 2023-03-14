@@ -16,15 +16,10 @@ namespace Jgut\JsonApi\Encoding\Http;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Request headers validity checker interface.
- */
 interface HeadersCheckerInterface
 {
     /**
      * Check request headers validity.
-     *
-     * @param ServerRequestInterface $request
      *
      * @throws JsonApiException
      */

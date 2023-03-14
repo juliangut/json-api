@@ -13,54 +13,42 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Schema;
 
+use Closure;
+use InvalidArgumentException;
 use Jgut\JsonApi\Configuration;
-use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
+use Jgut\JsonApi\Mapping\Metadata\ResourceObjectMetadata;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
+use ReflectionClass;
 
-/**
- * JSON API schema resolver.
- */
 class Resolver
 {
-    /**
-     * JSON API configuration.
-     *
-     * @var Configuration
-     */
-    protected $configuration;
+    protected Configuration $configuration;
 
-    /**
-     * RouteCompiler constructor.
-     *
-     * @param Configuration $configuration
-     */
     public function __construct(Configuration $configuration)
     {
         $this->configuration = $configuration;
     }
 
     /**
-     * Get schema factory callable.
-     *
-     * @param ResourceMetadata $resource
-     *
-     * @return \Closure
+     * @return Closure(FactoryInterface): SchemaInterface
      */
-    public function getSchemaFactory(ResourceMetadata $resource): \Closure
+    public function getSchemaFactory(ResourceObjectMetadata $resource): Closure
     {
         $defaultSchemaClass = $this->configuration->getSchemaClass();
 
-        return function (FactoryInterface $factory) use ($resource, $defaultSchemaClass
-        ): MetadataSchemaInterface {
-            $schemaClass = $resource->getSchemaClass() ?? $defaultSchemaClass;
+        return static function (FactoryInterface $factory) use (
+            $resource,
+            $defaultSchemaClass
+        ): SchemaInterface {
+            $schemaClass = $resource->getSchema() ?? $defaultSchemaClass;
 
-            $reflection = new \ReflectionClass($schemaClass);
+            $reflection = new ReflectionClass($schemaClass);
             if (!$reflection->implementsInterface(SchemaInterface::class)) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'Schema class %s must implement %s',
+                throw new InvalidArgumentException(sprintf(
+                    'Schema class %s must implement %s.',
                     $schemaClass,
-                    SchemaInterface::class
+                    SchemaInterface::class,
                 ));
             }
 

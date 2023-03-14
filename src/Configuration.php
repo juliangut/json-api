@@ -13,136 +13,83 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi;
 
-use Jgut\JsonApi\Encoding\Options;
+use InvalidArgumentException;
 use Jgut\JsonApi\Encoding\OptionsInterface;
 use Jgut\JsonApi\Mapping\Driver\DriverFactory;
 use Jgut\JsonApi\Mapping\Driver\DriverInterface;
 use Jgut\JsonApi\Schema\MetadataSchema;
 use Jgut\JsonApi\Schema\Resolver;
 use Jgut\Mapping\Metadata\MetadataResolver;
+use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 
 /**
- * JSON API configuration.
+ * @phpstan-type Source string|array{driver?: string|object, type?: string, path?: string|array<string>}
  */
 class Configuration
 {
     public const QUERY_PARAMETERS_REQUEST_KEY = 'JSON_API_query_parameters';
 
-    /**
-     * Request attribute name.
-     *
-     * @var string
-     */
-    protected $attributeName = self::QUERY_PARAMETERS_REQUEST_KEY;
+    protected string $attributeName = self::QUERY_PARAMETERS_REQUEST_KEY;
 
     /**
-     * Mapping sources.
-     *
-     * @var string[]|mixed[]|DriverInterface[]
+     * @var array<Source>
      */
-    protected $sources = [];
+    protected array $sources = [];
+
+    protected ?MetadataResolver $metadataResolver = null;
 
     /**
-     * Metadata resolver.
-     *
-     * @var MetadataResolver
+     * @var class-string<SchemaInterface>
      */
-    protected $metadataResolver;
+    protected string $schemaClass = MetadataSchema::class;
+
+    protected ?Resolver $schemaResolver = null;
+
+    protected ?OptionsInterface $encodingOptions = null;
+
+    private ?string $urlPrefix = null;
+
+    private ?string $jsonApiVersion = null;
 
     /**
-     * Metadata resource schema class.
-     *
-     * @var string
+     * @var array<string>|null
      */
-    protected $schemaClass = MetadataSchema::class;
+    private ?array $jsonApiMeta = null;
 
     /**
-     * Schema resolver.
+     * @param array<string, mixed> $configurations
      *
-     * @var Resolver
-     */
-    protected $schemaResolver;
-
-    /**
-     * JSON encoding options.
-     *
-     * @var OptionsInterface
-     */
-    protected $encodingOptions;
-
-    /**
-     * URL prefix for links.
-     *
-     * @var string|null
-     */
-    private $urlPrefix;
-
-    /**
-     * Global JSON API version.
-     *
-     * @var string|null
-     */
-    private $jsonApiVersion;
-
-    /**
-     * Global meta.
-     *
-     * @var string[]|null
-     */
-    private $jsonApiMeta;
-
-    /**
-     * Configuration constructor.
-     *
-     * @param mixed[] $configurations
-     *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function __construct(array $configurations = [])
     {
-        $configs = \array_keys(\get_object_vars($this));
+        $configs = array_keys(get_object_vars($this));
 
-        $unknownParameters = \array_diff(\array_keys($configurations), $configs);
+        $unknownParameters = array_diff(array_keys($configurations), $configs);
         if (\count($unknownParameters) !== 0) {
-            throw new \InvalidArgumentException(
-                \sprintf(
-                    'The following configuration parameters are not recognized: %s',
-                    \implode(', ', $unknownParameters)
-                )
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The following configuration parameters are not recognized: %s.',
+                    implode(', ', $unknownParameters),
+                ),
             );
         }
 
         foreach ($configs as $config) {
-            if (isset($configurations[$config])) {
+            if (\array_key_exists($config, $configurations)) {
                 /** @var callable $callback */
-                $callback = [$this, 'set' . \ucfirst($config)];
+                $callback = [$this, 'set' . ucfirst($config)];
 
-                \call_user_func($callback, $configurations[$config]);
+                $callback($configurations[$config]);
             }
-        }
-
-        if ($this->encodingOptions === null) {
-            $this->encodingOptions = new Options();
         }
     }
 
-    /**
-     * Get request attribute name.
-     *
-     * @return string
-     */
     public function getAttributeName(): string
     {
         return $this->attributeName;
     }
 
-    /**
-     * Set request attribute name.
-     *
-     * @param string $attributeName
-     *
-     * @return self
-     */
     public function setAttributeName(string $attributeName): self
     {
         $this->attributeName = $attributeName;
@@ -151,9 +98,7 @@ class Configuration
     }
 
     /**
-     * Get mapping sources.
-     *
-     * @return string[]|mixed[]|DriverInterface[]
+     * @return array<Source>
      */
     public function getSources(): array
     {
@@ -161,13 +106,9 @@ class Configuration
     }
 
     /**
-     * Set mapping sources.
+     * @param array<Source> $sources
      *
-     * @param mixed[] $sources
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return self
+     * @throws InvalidArgumentException
      */
     public function setSources(array $sources): self
     {
@@ -181,34 +122,26 @@ class Configuration
     }
 
     /**
-     * Add mapping source.
+     * @param Source|mixed $source
      *
-     * @param mixed $source
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return self
+     * @throws InvalidArgumentException
      */
     public function addSource($source): self
     {
         if (!\is_string($source) && !\is_array($source) && !$source instanceof DriverInterface) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Mapping source must be a string, array or %s, %s given',
+            throw new InvalidArgumentException(sprintf(
+                'Mapping source must be a string, array or %s, %s given.',
                 DriverInterface::class,
-                \is_object($source) ? \get_class($source) : \gettype($source)
+                \is_object($source) ? \get_class($source) : \gettype($source),
             ));
         }
 
+        /** @var string|array{driver?: string|DriverInterface, type?: string, path?: string|array<string>} $source */
         $this->sources[] = $source;
 
         return $this;
     }
 
-    /**
-     * Get metadata resolver.
-     *
-     * @return MetadataResolver
-     */
     public function getMetadataResolver(): MetadataResolver
     {
         if ($this->metadataResolver === null) {
@@ -218,13 +151,6 @@ class Configuration
         return $this->metadataResolver;
     }
 
-    /**
-     * Set metadata resolver.
-     *
-     * @param MetadataResolver $metadataResolver
-     *
-     * @return self
-     */
     public function setMetadataResolver(MetadataResolver $metadataResolver): self
     {
         $this->metadataResolver = $metadataResolver;
@@ -233,9 +159,7 @@ class Configuration
     }
 
     /**
-     * Get metadata resource schema class.
-     *
-     * @return string
+     * @return class-string<SchemaInterface>
      */
     public function getSchemaClass(): string
     {
@@ -243,11 +167,7 @@ class Configuration
     }
 
     /**
-     * Set metadata resource schema class.
-     *
-     * @param string $schemaClass
-     *
-     * @return self
+     * @param class-string<SchemaInterface> $schemaClass
      */
     public function setSchemaClass(string $schemaClass): self
     {
@@ -256,11 +176,6 @@ class Configuration
         return $this;
     }
 
-    /**
-     * Get schema resolver.
-     *
-     * @return Resolver
-     */
     public function getSchemaResolver(): Resolver
     {
         if ($this->schemaResolver === null) {
@@ -270,13 +185,6 @@ class Configuration
         return $this->schemaResolver;
     }
 
-    /**
-     * Set schema resolver.
-     *
-     * @param Resolver $schemaResolver
-     *
-     * @return self
-     */
     public function setSchemaResolver(Resolver $schemaResolver): self
     {
         $this->schemaResolver = $schemaResolver;
@@ -284,23 +192,11 @@ class Configuration
         return $this;
     }
 
-    /**
-     * Get JSON encoding options.
-     *
-     * @return OptionsInterface
-     */
-    public function getEncodingOptions(): OptionsInterface
+    public function getEncodingOptions(): ?OptionsInterface
     {
         return $this->encodingOptions;
     }
 
-    /**
-     * Set JSON encoding options.
-     *
-     * @param OptionsInterface $encodingOptions
-     *
-     * @return self
-     */
     public function setEncodingOptions(OptionsInterface $encodingOptions): self
     {
         $this->encodingOptions = $encodingOptions;
@@ -308,50 +204,28 @@ class Configuration
         return $this;
     }
 
-    /**
-     * Get URL prefix.
-     *
-     * @return string|null
-     */
     public function getUrlPrefix(): ?string
     {
         return $this->urlPrefix;
     }
 
-    /**
-     * Set URL prefix.
-     *
-     * @param string $urlPrefix
-     */
     public function setUrlPrefix(string $urlPrefix): void
     {
         $this->urlPrefix = $urlPrefix;
     }
 
-    /**
-     * Get global JSON API version.
-     *
-     * @return string|null
-     */
     public function getJsonApiVersion(): ?string
     {
         return $this->jsonApiVersion;
     }
 
-    /**
-     * Set global JSON API version.
-     *
-     * @param string $jsonApiVersion
-     */
     public function setJsonApiVersion(string $jsonApiVersion): void
     {
         $this->jsonApiVersion = $jsonApiVersion;
     }
 
     /**
-     * Get global meta.
-     *
-     * @return string[]|null
+     * @return array<string>|null
      */
     public function getJsonApiMeta(): ?array
     {
@@ -359,9 +233,7 @@ class Configuration
     }
 
     /**
-     * Set global meta.
-     *
-     * @param string[] $jsonApiMeta
+     * @param array<string> $jsonApiMeta
      */
     public function setJsonApiMeta(array $jsonApiMeta): void
     {

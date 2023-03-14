@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resourceTwo
+        class="Jgut\JsonApi\Tests\Mapping\Files\Classes\Valid\Attribute\ResourceTwo"
+        linkRelated="false"
+    >
+        <links>
+            <me>/me</me>
+            <you>/you</you>
+        </links>
+        <identifier>uuid</identifier>
+        <attributes>
+            <attribute1 property="two">
+                <groups>
+                    <group1>read</group1>
+                </groups>
+            </attribute1>
+        </attributes>
+    </resourceTwo>
+</root>

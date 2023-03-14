@@ -13,14 +13,9 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Driver;
 
-use Jgut\Mapping\Driver\AbstractMappingDriver;
-use Jgut\Mapping\Driver\Traits\YamlMappingTrait;
+use Jgut\Mapping\Driver\AbstractMappingYamlDriver;
 
-/**
- * YAML mapping driver.
- */
-class YamlDriver extends AbstractMappingDriver implements DriverInterface
+class YamlDriver extends AbstractMappingYamlDriver implements DriverInterface
 {
-    use YamlMappingTrait;
-    use MappingTrait;
+    use FileMappingTrait;
 }

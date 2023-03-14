@@ -19,16 +19,13 @@ use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Schema\Link;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ */
 class OptionsTest extends TestCase
 {
-    /**
-     * @var Options
-     */
-    protected $options;
+    protected Options $options;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->options = new Options();
@@ -44,38 +41,38 @@ class OptionsTest extends TestCase
             | \JSON_HEX_QUOT
             | \JSON_HEX_TAG;
 
-        self::assertEquals($defaultEncodeOptions, $this->options->getEncodeOptions());
-        self::assertEquals(512, $this->options->getEncodeDepth());
-        self::assertNull($this->options->getGroup());
-        self::assertNull($this->options->getLinks());
-        self::assertNull($this->options->getMeta());
+        static::assertEquals($defaultEncodeOptions, $this->options->getEncodeOptions());
+        static::assertEquals(512, $this->options->getEncodeDepth());
+        static::assertNull($this->options->getGroup());
+        static::assertNull($this->options->getLinks());
+        static::assertNull($this->options->getMeta());
     }
 
     public function testSetEncodeOptions(): void
     {
         $this->options->setEncodeOptions(\JSON_PRESERVE_ZERO_FRACTION);
 
-        self::assertEquals(\JSON_PRESERVE_ZERO_FRACTION, $this->options->getEncodeOptions());
+        static::assertEquals(\JSON_PRESERVE_ZERO_FRACTION, $this->options->getEncodeOptions());
     }
 
     public function testSetEncodeDepth(): void
     {
         $this->options->setEncodeDepth(100);
 
-        self::assertEquals(100, $this->options->getEncodeDepth());
+        static::assertEquals(100, $this->options->getEncodeDepth());
     }
 
     public function testSetGroup(): void
     {
         $this->options->setGroup('group');
 
-        self::assertEquals('group', $this->options->getGroup());
+        static::assertEquals('group', $this->options->getGroup());
     }
 
     public function testInvalidLinkName(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage('Links keys must be all strings');
+        $this->expectExceptionMessage('Links keys must be all strings.');
 
         $this->options->setLinks(['numericKey']);
     }
@@ -84,7 +81,7 @@ class OptionsTest extends TestCase
     {
         $this->expectException(SchemaException::class);
         $this->expectExceptionMessage(
-            'Link must be an instance of ' . LinkInterface::class . ' or array, string given'
+            'Link must be an instance of ' . LinkInterface::class . ' or array, "string" given.',
         );
 
         $this->options->setLinks(['first' => 'invalid']);
@@ -98,13 +95,13 @@ class OptionsTest extends TestCase
 
         $this->options->setLinks($links);
 
-        self::assertEquals($links, $this->options->getLinks());
+        static::assertEquals($links, $this->options->getLinks());
     }
 
     public function testInvalidMetadataKeys(): void
     {
         $this->expectException(SchemaException::class);
-        $this->expectExceptionMessage('Metadata keys must be all strings');
+        $this->expectExceptionMessage('Metadata keys must be all strings.');
 
         $this->options->setMeta(['meta' => 'value', 'anotherValue']);
     }
@@ -113,6 +110,6 @@ class OptionsTest extends TestCase
     {
         $this->options->setMeta(['meta' => 'value']);
 
-        self::assertEquals(['meta' => 'value'], $this->options->getMeta());
+        static::assertEquals(['meta' => 'value'], $this->options->getMeta());
     }
 }

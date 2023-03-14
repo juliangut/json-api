@@ -20,31 +20,11 @@ use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface
 use Neomerx\JsonApi\Contracts\Schema\SchemaContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Custom factory interface.
- */
 interface FactoryInterface extends BaseFactoryInterface
 {
-    /**
-     * {@inheritdoc}
-     *
-     * @return Encoder
-     */
     public function createEncoder(SchemaContainerInterface $container): EncoderInterface;
 
-    /**
-     * Create request query parameters parser.
-     *
-     * @param ServerRequestInterface $request
-     *
-     * @return QueryParametersParserInterface
-     */
     public function createQueryParametersParser(ServerRequestInterface $request): QueryParametersParserInterface;
 
-    /**
-     * Create headers checker.
-     *
-     * @return HeadersCheckerInterface
-     */
     public function createHeadersChecker(): HeadersCheckerInterface;
 }

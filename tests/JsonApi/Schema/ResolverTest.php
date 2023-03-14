@@ -13,26 +13,21 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Tests\Schema;
 
+use InvalidArgumentException;
 use Jgut\JsonApi\Configuration;
 use Jgut\JsonApi\Encoding\Factory;
-use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
+use Jgut\JsonApi\Mapping\Metadata\ResourceObjectMetadata;
 use Jgut\JsonApi\Schema\MetadataSchemaInterface;
 use Jgut\JsonApi\Schema\Resolver;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Schema resolver tests.
+ * @internal
  */
 class ResolverTest extends TestCase
 {
-    /**
-     * @var Resolver
-     */
-    protected $resolver;
+    protected Resolver $resolver;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->resolver = new Resolver(new Configuration());
@@ -40,14 +35,14 @@ class ResolverTest extends TestCase
 
     public function testInvalidSchemaClass(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/Schema class .+ must implement .+/');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^Schema class .+ must implement .+\.$/');
 
         $factory = $this->getMockBuilder(Factory::class)
             ->getMock();
         /** @var Factory $factory */
-        $resource = (new ResourceMetadata('Class', 'Name'))
-            ->setSchemaClass(self::class);
+        $resource = (new ResourceObjectMetadata('Class', 'Name'))
+            ->setSchema(self::class);
 
         $schemaFactory = $this->resolver->getSchemaFactory($resource);
 
@@ -59,10 +54,10 @@ class ResolverTest extends TestCase
         $factory = $this->getMockBuilder(Factory::class)
             ->getMock();
         /** @var Factory $factory */
-        $resource = new ResourceMetadata('Class', 'Name');
+        $resource = new ResourceObjectMetadata('Class', 'Name');
 
         $schemaFactory = $this->resolver->getSchemaFactory($resource);
 
-        self::assertInstanceOf(MetadataSchemaInterface::class, $schemaFactory($factory));
+        static::assertInstanceOf(MetadataSchemaInterface::class, $schemaFactory($factory));
     }
 }

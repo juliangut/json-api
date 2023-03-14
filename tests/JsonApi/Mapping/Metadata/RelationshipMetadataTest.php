@@ -18,18 +18,12 @@ use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Relationship metadata tests.
+ * @internal
  */
 class RelationshipMetadataTest extends TestCase
 {
-    /**
-     * @var RelationshipMetadata
-     */
-    protected $relationship;
+    protected RelationshipMetadata $relationship;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->relationship = new RelationshipMetadata('Class', 'Name');
@@ -37,32 +31,32 @@ class RelationshipMetadataTest extends TestCase
 
     public function testDefaults(): void
     {
-        self::assertNull($this->relationship->isSelfLinkIncluded());
-        self::assertNull($this->relationship->isRelatedLinkIncluded());
-        self::assertEmpty($this->relationship->getLinks());
-        self::assertEmpty($this->relationship->getMeta());
+        static::assertNull($this->relationship->isLinkSelf());
+        static::assertNull($this->relationship->isLinkRelated());
+        static::assertEmpty($this->relationship->getLinks());
+        static::assertEmpty($this->relationship->getMeta());
     }
 
     public function testSelfLinkIncluded(): void
     {
-        $this->relationship->setSelfLinkIncluded(true);
+        $this->relationship->setLinkSelf(true);
 
-        self::assertTrue($this->relationship->isSelfLinkIncluded());
+        static::assertTrue($this->relationship->isLinkSelf());
     }
 
     public function testRelatedLinkIncluded(): void
     {
-        $this->relationship->setRelatedLinkIncluded(true);
+        $this->relationship->setLinkRelated(true);
 
-        self::assertTrue($this->relationship->isRelatedLinkIncluded());
+        static::assertTrue($this->relationship->isLinkRelated());
     }
 
     public function testLinks(): void
     {
-        $link = new LinkMetadata('custom', '/custom');
+        $link = new LinkMetadata('/custom', 'custom');
 
         $this->relationship->addLink($link);
 
-        self::assertEquals(['custom' => $link], $this->relationship->getLinks());
+        static::assertEquals(['custom' => $link], $this->relationship->getLinks());
     }
 }

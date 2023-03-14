@@ -1,0 +1,9 @@
+- class: "Jgut\\JsonApi\\Tests\\Mapping\\Files\\Classes\\Valid\\Attribute\\ResourceTwo"
+  linkRelated: false
+  links:
+    me: "/me"
+    you: "/you"
+  identifier: "uuid"
+  attributes:
+    - property: "two"
+      groups: ["read"]

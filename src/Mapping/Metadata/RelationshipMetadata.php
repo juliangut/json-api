@@ -13,10 +13,20 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Metadata;
 
-/**
- * Relationship attribute metadata.
- */
-class RelationshipMetadata extends AttributeMetadata
+class RelationshipMetadata extends AbstractFieldMetadata
 {
-    use LinksTrait, MetasTrait;
+    use GroupTrait;
+    use LinkTrait;
+    use MetaTrait;
+
+    /**
+     * @param class-string<object> $class
+     * @param array<string>        $groups
+     */
+    public function __construct(string $class, string $name, array $groups = [])
+    {
+        parent::__construct($class, $name);
+
+        $this->groups = $groups;
+    }
 }

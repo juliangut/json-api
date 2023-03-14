@@ -24,7 +24,7 @@ use Neomerx\JsonApi\Schema\SchemaContainer;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Custom factory tests.
+ * @internal
  */
 class FactoryTest extends TestCase
 {
@@ -37,14 +37,14 @@ class FactoryTest extends TestCase
 
         $factory = new Factory();
 
-        self::assertInstanceOf(Encoder::class, $factory->createEncoder($container));
+        static::assertInstanceOf(Encoder::class, $factory->createEncoder($container));
     }
 
     public function testCreateFieldSetFilter(): void
     {
         $factory = new Factory();
 
-        self::assertInstanceOf(FieldSetFilter::class, $factory->createFieldSetFilter([]));
+        static::assertInstanceOf(FieldSetFilter::class, $factory->createFieldSetFilter([]));
     }
 
     public function testQueryParametersParser(): void
@@ -58,17 +58,17 @@ class FactoryTest extends TestCase
 
         $factory = new Factory();
 
-        $queryParametersParser = $factory->createQueryParametersParser($request);
+        $queryParser = $factory->createQueryParametersParser($request);
 
-        self::assertInstanceOf(QueryParametersParser::class, $queryParametersParser);
-        self::assertEquals(['resource' => ['a', 'b']], $queryParametersParser->getFields());
-        self::assertEquals(['a' => false, 'b' => true], $queryParametersParser->getSorts());
+        static::assertInstanceOf(QueryParametersParser::class, $queryParser);
+        static::assertEquals(['resource' => ['a', 'b']], $queryParser->getFields());
+        static::assertEquals(['a' => false, 'b' => true], $queryParser->getSorts());
     }
 
     public function testCreateHeadersChecker(): void
     {
         $factory = new Factory();
 
-        self::assertInstanceOf(HeadersChecker::class, $factory->createHeadersChecker());
+        static::assertInstanceOf(HeadersChecker::class, $factory->createHeadersChecker());
     }
 }

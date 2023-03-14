@@ -21,38 +21,18 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-/**
- * JSON API request handler middleware.
- */
 class JsonApiMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var ResponseFactoryInterface
-     */
-    protected $responseFactory;
+    protected ResponseFactoryInterface $responseFactory;
 
-    /**
-     * JSON API manager.
-     *
-     * @var Manager
-     */
-    protected $manager;
+    protected Manager $manager;
 
-    /**
-     * JsonApiMiddleware constructor.
-     *
-     * @param ResponseFactoryInterface $responseFactory
-     * @param Manager                  $manager
-     */
     public function __construct(ResponseFactoryInterface $responseFactory, Manager $manager)
     {
         $this->responseFactory = $responseFactory;
         $this->manager = $manager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
@@ -65,36 +45,25 @@ class JsonApiMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Get request bundled with query parameters parser.
-     *
-     * @param ServerRequestInterface $request
-     *
      * @throws JsonApiException
-     *
-     * @return ServerRequestInterface
      */
     protected function getRequestWithQueryParameters(ServerRequestInterface $request): ServerRequestInterface
     {
         $factory = $this->manager->getFactory();
 
-        $factory->createHeadersChecker()->checkHeaders($request);
+        $factory->createHeadersChecker()
+            ->checkHeaders($request);
 
         $queryParameters = $factory->createQueryParametersParser($request);
 
         return $this->manager->setRequestQueryParameters($request, $queryParameters);
     }
 
-    /**
-     * Get new response object from exception.
-     *
-     * @param JsonApiException $exception
-     *
-     * @return ResponseInterface
-     */
     protected function getResponseFromException(JsonApiException $exception): ResponseInterface
     {
         $response = $this->responseFactory->createResponse($exception->getHttpCode());
-        $response->getBody()->write($this->manager->encodeErrors($exception->getErrors()));
+        $response->getBody()
+            ->write($this->manager->encodeErrors($exception->getErrors()));
 
         return $response;
     }

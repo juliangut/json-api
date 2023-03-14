@@ -13,77 +13,56 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi;
 
+use Closure;
+use InvalidArgumentException;
 use Jgut\JsonApi\Encoding\FactoryInterface;
+use Jgut\JsonApi\Encoding\Options;
 use Jgut\JsonApi\Encoding\OptionsInterface;
 use Jgut\JsonApi\Exception\SchemaException;
+use Jgut\JsonApi\Mapping\Metadata\ResourceObjectMetadata;
+use Jgut\Mapping\Metadata\MetadataInterface;
 use Neomerx\JsonApi\Contracts\Encoder\EncoderInterface;
+use Neomerx\JsonApi\Contracts\Factories\FactoryInterface as BaseFactoryInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
-use Neomerx\JsonApi\Contracts\Schema\ErrorInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 use Neomerx\JsonApi\Schema\ErrorCollection;
 use Psr\Http\Message\ServerRequestInterface;
+use Traversable;
 
 /**
- * JSON-API manager.
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Manager
 {
-    /**
-     * JSON API configuration.
-     *
-     * @var Configuration
-     */
-    protected $configuration;
+    protected Configuration $configuration;
 
-    /**
-     * JSON API factory.
-     *
-     * @var FactoryInterface
-     */
-    protected $factory;
+    protected FactoryInterface $factory;
 
-    /**
-     * JSON API manager constructor.
-     *
-     * @param Configuration    $configuration
-     * @param FactoryInterface $factory
-     */
     public function __construct(Configuration $configuration, FactoryInterface $factory)
     {
         $this->configuration = $configuration;
         $this->factory = $factory;
     }
 
-    /**
-     * Get JSON API factory.
-     *
-     * @return FactoryInterface
-     */
     public function getFactory(): FactoryInterface
     {
         return $this->factory;
     }
 
-    /**
-     * Get query parameters from request.
-     *
-     * @param ServerRequestInterface $request
-     *
-     * @return BaseQueryParserInterface|null
-     */
     public function getRequestQueryParameters(ServerRequestInterface $request): ?BaseQueryParserInterface
     {
-        return $request->getAttribute($this->configuration->getAttributeName());
+        $parser = $request->getAttribute($this->configuration->getAttributeName());
+        if ($parser !== null && !$parser instanceof BaseQueryParserInterface) {
+            throw new InvalidArgumentException(sprintf(
+                'Query parameters parser from request is not a %s. "%s" given.',
+                BaseQueryParserInterface::class,
+                \is_object($parser) ? \get_class($parser) : \gettype($parser),
+            ));
+        }
+
+        return $parser;
     }
 
-    /**
-     * Set query parameters on request.
-     *
-     * @param ServerRequestInterface   $request
-     * @param BaseQueryParserInterface $queryParameterParser
-     *
-     * @return ServerRequestInterface
-     */
     public function setRequestQueryParameters(
         ServerRequestInterface $request,
         BaseQueryParserInterface $queryParameterParser
@@ -92,16 +71,10 @@ class Manager
     }
 
     /**
-     * Encode resources to JSON API.
-     *
-     * @param object|object[]        $resources
-     * @param ServerRequestInterface $request
-     * @param string[]               $resourceTypes
-     * @param OptionsInterface|null  $encodingOptions
+     * @param object|array<object>    $resources
+     * @param array<non-empty-string> $resourceTypes
      *
      * @throws SchemaException
-     *
-     * @return string
      */
     final public function encodeResources(
         $resources,
@@ -111,47 +84,42 @@ class Manager
     ): string {
         $queryParameters = $this->getRequestQueryParameters($request);
 
-        $encodingOptions = $encodingOptions ?? $this->configuration->getEncodingOptions();
+        $encodingOptions ??= ($this->configuration->getEncodingOptions() ?? new Options());
+
+        /** @var iterable<non-empty-string> $includes */
+        $includes = $queryParameters !== null ? $queryParameters->getIncludes() : null;
+        /** @var iterable<string, non-empty-string> $fieldSets */
+        $fieldSets = $queryParameters !== null ? $queryParameters->getFields() : null;
 
         $encoder = $this->getEncoder(
             $this->getSchemaFactories($resourceTypes, $encodingOptions->getGroup()),
             $encodingOptions,
-            $queryParameters !== null ? $queryParameters->getIncludes() : null,
-            $queryParameters !== null ? $queryParameters->getFields() : null
+            $includes,
+            $fieldSets,
         );
 
         return $encoder->encodeData($resources);
     }
 
-    /**
-     * Encode errors to JSON API.
-     *
-     * @param ErrorInterface|ErrorCollection $errors
-     * @param OptionsInterface               $encodingOptions
-     *
-     * @throws SchemaException
-     *
-     * @return string
-     */
-    final public function encodeErrors($errors, ?OptionsInterface $encodingOptions = null): string
+    final public function encodeErrors(ErrorCollection $errors, ?OptionsInterface $encodingOptions = null): string
     {
-        if (!$errors instanceof ErrorCollection) {
-            $errors = (new ErrorCollection())->add($errors);
+        if ($encodingOptions !== null) {
+            $encodingOptions = clone $encodingOptions;
+        } else {
+            $encodingOptions = $this->configuration->getEncodingOptions() !== null
+                ? clone $this->configuration->getEncodingOptions()
+                : new Options();
         }
-
-        $encodingOptions = clone ($encodingOptions ?? $this->configuration->getEncodingOptions());
         $encodingOptions->setEncodeOptions($encodingOptions->getEncodeOptions() | \JSON_PARTIAL_OUTPUT_ON_ERROR);
 
         return $this->getEncoder([], $encodingOptions)->encodeErrors($errors);
     }
 
     /**
-     * Get schema factories.
+     * @param array<non-empty-string> $resourceTypes
+     * @param non-empty-string|null   $group
      *
-     * @param string[]    $resourceTypes
-     * @param string|null $group
-     *
-     * @return \Closure[]
+     * @return array<Closure(BaseFactoryInterface): SchemaInterface>
      */
     private function getSchemaFactories(array $resourceTypes, ?string $group): array
     {
@@ -173,29 +141,25 @@ class Manager
     }
 
     /**
-     * Get list of resources metadata.
-     *
-     * @return \Jgut\JsonApi\Mapping\Metadata\ResourceMetadata[]
+     * @return array<ResourceObjectMetadata>
      */
     private function getResourceMetadata(): array
     {
-        /** @var \Jgut\JsonApi\Mapping\Metadata\ResourceMetadata[] $resources */
-        $resources = $this->configuration->getMetadataResolver()->getMetadata($this->configuration->getSources());
+        $sources = $this->configuration->getSources();
 
-        return $resources;
+        return array_filter(
+            $this->configuration->getMetadataResolver()
+                ->getMetadata($sources),
+            static fn(MetadataInterface $metadata): bool => $metadata instanceof ResourceObjectMetadata,
+        );
     }
 
     /**
-     * Get JSON API encoder.
-     *
-     * @param SchemaInterface[]|\Closure[] $schemaFactories
-     * @param OptionsInterface             $encodingOptions
-     * @param iterable|null                $includePaths
-     * @param iterable|null                $fieldSets
+     * @param array<Closure(BaseFactoryInterface): SchemaInterface|SchemaInterface> $schemaFactories
+     * @param iterable<non-empty-string>|null                                       $includePaths
+     * @param iterable<string, non-empty-string>|null                               $fieldSets
      *
      * @throws SchemaException
-     *
-     * @return EncoderInterface
      */
     private function getEncoder(
         array $schemaFactories,
@@ -225,7 +189,7 @@ class Manager
         if ($links !== null) {
             $encoder->withLinks($links);
         }
-        // TODO add profile ($encoder->withProfile())
+
         $meta = $encodingOptions->getMeta();
         if ($meta !== null) {
             $encoder->withMeta($meta);
@@ -235,8 +199,8 @@ class Manager
             $encoder->withIncludedPaths($includePaths);
         }
         if ($fieldSets !== null) {
-            if ($fieldSets instanceof \Traversable) {
-                $fieldSets = \iterator_to_array($fieldSets);
+            if ($fieldSets instanceof Traversable) {
+                $fieldSets = iterator_to_array($fieldSets);
             }
 
             $encoder->withFieldSets($fieldSets);

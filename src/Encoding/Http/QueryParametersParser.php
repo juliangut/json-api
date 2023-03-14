@@ -13,20 +13,17 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Encoding\Http;
 
+use Exception;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Neomerx\JsonApi\Schema\Error;
+use TypeError;
 
-/**
- * Request query parameters parser.
- */
 class QueryParametersParser implements QueryParametersParserInterface
 {
     /**
-     * Known query parameters.
-     *
-     * @var array
+     * @var array<string>
      */
-    protected $knownParameters = [
+    protected array $knownParameters = [
         self::PARAM_FIELDS,
         self::PARAM_INCLUDE,
         self::PARAM_SORT,
@@ -35,44 +32,32 @@ class QueryParametersParser implements QueryParametersParserInterface
     ];
 
     /**
-     * Query field sets.
-     *
-     * @var array
+     * @var array<non-empty-string>
      */
-    protected $fields = [];
+    protected array $fields = [];
 
     /**
-     * Query includes list.
-     *
-     * @var array
+     * @var array<non-empty-string>
      */
-    protected $includes = [];
+    protected array $includes = [];
 
     /**
-     * Query sorting.
-     *
-     * @var array
+     * @var array<string, bool>
      */
-    protected $sorts = [];
+    protected array $sorts = [];
 
     /**
-     * Query paging.
-     *
-     * @var array
+     * @var array<string, int>
      */
-    protected $paging = [];
+    protected array $paging = [];
 
     /**
-     * Query filters.
-     *
-     * @var mixed
+     * @var mixed|array<string, mixed>
      */
     protected $filters;
 
     /**
-     * QueryParametersParser constructor.
-     *
-     * @param mixed[] $parameters
+     * @param array<mixed> $parameters
      *
      * @throws JsonApiException
      */
@@ -93,20 +78,20 @@ class QueryParametersParser implements QueryParametersParserInterface
         foreach ($parameters as $parameter => $value) {
             if (\in_array($parameter, $this->knownParameters, true)) {
                 try {
-                    $method = 'parse' . \ucfirst($parameter) . 'Parameter';
+                    $method = 'parse' . ucfirst($parameter) . 'Parameter';
 
                     /** @var callable $callable */
                     $callable = [$this, $method];
 
-                    \call_user_func($callable, $value);
-                } catch (\TypeError $error) {
+                    $callable($value);
+                } catch (TypeError $error) {
                     throw new JsonApiException(
                         $this->getJsonApiError(
                             'Invalid parameter',
-                            \sprintf('Parameter "%s" has an invalid value', $parameter)
+                            sprintf('Parameter "%s" has an invalid value', $parameter),
                         ),
                         JsonApiException::HTTP_CODE_BAD_REQUEST,
-                        new \Exception($error->getMessage(), $error->getCode(), $error)
+                        new Exception($error->getMessage(), $error->getCode(), $error),
                     );
                 }
             }
@@ -114,7 +99,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return iterable<non-empty-string>
      */
     public function getFields(): iterable
     {
@@ -122,11 +107,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Set fields.
-     *
-     * @param string[] $fields
-     *
-     * @return self
+     * @param array<non-empty-string> $fields
      */
     public function setFields(array $fields): self
     {
@@ -136,28 +117,24 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Parse fields.
-     *
-     * @param string[] $fields
+     * @param array<non-empty-string> $fields
      *
      * @throws JsonApiException
-     *
-     * @return self
      */
     protected function parseFieldsParameter(array $fields): self
     {
-        \array_walk(
+        array_walk(
             $fields,
             function (&$fieldList, $resourceName): void {
-                if (\is_numeric($resourceName)) {
+                if (is_numeric($resourceName)) {
                     throw new JsonApiException($this->getJsonApiError(
                         'Invalid parameter',
-                        \sprintf('Parameter "%s" has an invalid value', static::PARAM_FIELDS)
+                        sprintf('Parameter "%s" has an invalid value', self::PARAM_FIELDS),
                     ));
                 }
 
-                $fieldList = $this->splitString(static::PARAM_FIELDS, $fieldList, ',');
-            }
+                $fieldList = $this->splitString(self::PARAM_FIELDS, $fieldList, ',');
+            },
         );
 
         $this->fields = $fields;
@@ -166,7 +143,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return iterable<non-empty-string>
      */
     public function getIncludes(): iterable
     {
@@ -174,11 +151,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Set includes.
-     *
-     * @param string[] $includes
-     *
-     * @return self
+     * @param array<non-empty-string> $includes
      */
     public function setIncludes(array $includes): self
     {
@@ -188,23 +161,17 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Parse include query parameter.
-     *
-     * @param string $includes
-     *
      * @throws JsonApiException
-     *
-     * @return self
      */
     public function parseIncludeParameter(string $includes): self
     {
-        $this->includes = $this->splitString(static::PARAM_INCLUDE, $includes, ',');
+        $this->includes = $this->splitString(self::PARAM_INCLUDE, $includes, ',');
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @return iterable<string, bool>
      */
     public function getSorts(): iterable
     {
@@ -212,11 +179,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Set sorts.
-     *
-     * @param bool[] $sorts
-     *
-     * @return self
+     * @param array<string, bool> $sorts
      */
     public function setSorts(array $sorts): self
     {
@@ -226,22 +189,16 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Parse sorts query parameter.
-     *
-     * @param string $sorts
-     *
      * @throws JsonApiException
-     *
-     * @return self
      */
     public function parseSortParameter(string $sorts): self
     {
         $sortList = [];
 
-        foreach ($this->splitString(static::PARAM_SORT, $sorts, ',') as $field) {
+        foreach ($this->splitString(self::PARAM_SORT, $sorts, ',') as $field) {
             $isAsc = $field[0] !== '-';
             if (\in_array($field[0], ['-', '+'], true)) {
-                $field = \substr($field, 1);
+                $field = mb_substr($field, 1);
             }
 
             $sortList[$field] = $isAsc;
@@ -253,9 +210,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Get query paging.
-     *
-     * @return mixed[]
+     * @return array<string, int>
      */
     public function getPaging(): array
     {
@@ -263,11 +218,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Set query paging.
-     *
-     * @param mixed[] $paging
-     *
-     * @return self
+     * @param array<string, int> $paging
      */
     public function setPaging(array $paging): self
     {
@@ -277,39 +228,34 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Parse page query parameter.
-     *
      * @param array<string, mixed> $paging
      *
      * @throws JsonApiException
-     *
-     * @return self
      */
     public function parsePageParameter(array $paging): self
     {
-        \array_walk(
+        array_walk(
             $paging,
             function (&$value, $key): void {
-                if (\is_numeric($key) || !\is_numeric($value) || ($value + 0) !== (int) $value) {
+                if (is_numeric($key) || !is_numeric($value) || ($value + 0) !== (int) $value) {
                     throw new JsonApiException($this->getJsonApiError(
                         'Invalid parameter',
-                        \sprintf('Parameter %s has an invalid value', static::PARAM_PAGE)
+                        sprintf('Parameter %s has an invalid value', self::PARAM_PAGE),
                     ));
                 }
 
                 $value = (int) $value;
-            }
+            },
         );
 
+        /** @var array<string, int> $paging */
         $this->paging = $paging;
 
         return $this;
     }
 
     /**
-     * Get query filters.
-     *
-     * @return mixed
+     * @return mixed|array<string, mixed>
      */
     public function getFilters()
     {
@@ -317,11 +263,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Set query filters.
-     *
-     * @param mixed $filters
-     *
-     * @return self
+     * @param mixed|array<string, mixed> $filters
      */
     public function setFilters($filters): self
     {
@@ -331,13 +273,9 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * Parse filter query parameters.
-     *
-     * @param mixed $filters
+     * @param mixed|array<string, mixed> $filters
      *
      * @throws JsonApiException
-     *
-     * @return self
      */
     public function parseFilterParameter($filters): self
     {
@@ -347,44 +285,33 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * @param string $parameter
-     * @param string $string
-     * @param string $separator
+     * @param non-empty-string $separator
      *
      * @throws JsonApiException
      *
-     * @return string[]
+     * @return array<non-empty-string>
      */
     protected function splitString(string $parameter, string $string, string $separator): array
     {
-        /** @var string[] $strings */
-        $strings = \explode($separator, $string);
+        $strings = explode($separator, $string);
 
-        return \array_filter(\array_map(
+        return array_filter(array_map(
             function (string $value) use ($parameter): string {
-                $value = \trim($value);
+                $value = trim($value);
 
                 if ($value === '') {
                     throw new JsonApiException($this->getJsonApiError(
                         'Invalid parameter',
-                        \sprintf('Parameter "%s" has an invalid value', $parameter)
+                        sprintf('Parameter "%s" has an invalid value', $parameter),
                     ));
                 }
 
                 return $value;
             },
-            $strings
+            $strings,
         ));
     }
 
-    /**
-     * Get a JSON API error.
-     *
-     * @param string $title
-     * @param string $detail
-     *
-     * @return Error
-     */
     protected function getJsonApiError(string $title, string $detail): Error
     {
         return new Error(
@@ -394,7 +321,7 @@ class QueryParametersParser implements QueryParametersParserInterface
             (string) JsonApiException::HTTP_CODE_BAD_REQUEST,
             null,
             $title,
-            $detail
+            $detail,
         );
     }
 }

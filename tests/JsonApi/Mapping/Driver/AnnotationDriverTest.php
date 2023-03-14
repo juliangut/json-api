@@ -11,31 +11,19 @@
 
 declare(strict_types=1);
 
-namespace Jgut\Slim\Routing\Tests\Mapping\Driver;
+namespace Jgut\JsonApi\Tests\Mapping\Driver;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Jgut\JsonApi\Mapping\Driver\AnnotationDriver;
-use Jgut\JsonApi\Mapping\Metadata\IdentifierMetadata;
-use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
-use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
-use Jgut\JsonApi\Mapping\Metadata\ResourceMetadata;
-use Jgut\JsonApi\Tests\Files\Annotation\Valid\ResourceOne;
-use Jgut\JsonApi\Tests\Files\Annotation\Valid\ResourceTwo;
-use PHPUnit\Framework\TestCase;
+use Jgut\Mapping\Exception\DriverException;
 
 /**
- * Annotation mapping driver factory tests.
+ * @internal
  */
-class AnnotationDriverTest extends TestCase
+class AnnotationDriverTest extends AbstractDriverTest
 {
-    /**
-     * @var AnnotationReader
-     */
-    protected $reader;
+    protected AnnotationReader $reader;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->reader = new AnnotationReader();
@@ -43,62 +31,43 @@ class AnnotationDriverTest extends TestCase
 
     public function testNoIdResource(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageRegExp('/^Resource ".+" does not define an id attribute$/');
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessageMatches('/^Resource ".+" does not define an identifier\.$/');
 
-        $paths = [
-            \dirname(__DIR__, 2) . '/Files/Annotation/Invalid/NoIdResource.php',
-        ];
-
-        $driver = new AnnotationDriver($paths, $this->reader);
+        $driver = new AnnotationDriver(
+            [
+                __DIR__ . '/../Files/Classes/Invalid/Annotation/NoIdResource.php',
+            ],
+            $this->reader,
+        );
 
         $driver->getMetadata();
     }
 
-    public function testResources(): void
+    public function testMultipleIdResource(): void
     {
-        $paths = [
-            \dirname(__DIR__, 2) . '/Files/Annotation/Valid/ResourceOne.php',
-            \dirname(__DIR__, 2) . '/Files/Annotation/Valid/ResourceTwo.php',
-        ];
+        $this->expectException(DriverException::class);
+        $this->expectExceptionMessageMatches('/^Resource ".+" cannot define more than one identifier\.$/');
 
-        $driver = new AnnotationDriver($paths, $this->reader);
+        $driver = new AnnotationDriver(
+            [
+                __DIR__ . '/../Files/Classes/Invalid/Annotation/MultipleIdResource.php',
+            ],
+            $this->reader,
+        );
 
-        /* @var ResourceMetadata[] $resources */
-        $resources = $driver->getMetadata();
+        $driver->getMetadata();
+    }
 
-        $resource = $resources['resourceA'];
-        self::assertInstanceOf(ResourceMetadata::class, $resource);
-        self::assertEquals(ResourceOne::class, $resource->getClass());
-        self::assertEquals('resourceA', $resource->getName());
-        self::assertNull($resource->getUrlPrefix());
-        self::assertNull($resource->getSchemaClass());
-        self::assertInstanceOf(IdentifierMetadata::class, $resource->getIdentifier());
-        self::assertEquals(ResourceOne::class, $resource->getIdentifier()->getClass());
-        self::assertEquals('id', $resource->getIdentifier()->getName());
-        self::assertEquals('getId', $resource->getIdentifier()->getGetter());
-        self::assertEquals('isTheOne', $resource->getAttributes()['theOne']->getGetter());
-        self::assertEquals('setTheOne', $resource->getAttributes()['theOne']->getSetter());
-        self::assertArrayHasKey('relative', $resource->getRelationships());
-        self::assertInstanceOf(RelationshipMetadata::class, $resource->getRelationships()['relative']);
-        self::assertArrayHasKey('custom', $resource->getRelationships()['relative']->getLinks());
-        self::assertInstanceOf(LinkMetadata::class, $resource->getRelationships()['relative']->getLinks()['custom']);
-        self::assertArrayHasKey('data', $resource->getMeta());
-        self::assertEquals('value', $resource->getMeta()['data']);
+    public function testAnnotationResources(): void
+    {
+        $driver = new AnnotationDriver(
+            [
+                __DIR__ . '/../Files/Classes/Valid/Annotation',
+            ],
+            $this->reader,
+        );
 
-        $resource = $resources['resourceB'];
-        self::assertInstanceOf(ResourceMetadata::class, $resource);
-        self::assertEquals(ResourceTwo::class, $resource->getClass());
-        self::assertEquals('resourceB', $resource->getName());
-        self::assertEquals('resource', $resource->getUrlPrefix());
-        self::assertEquals('\Jgut\JsonApi\Test\Stubs\Schema', $resource->getSchemaClass());
-        self::assertInstanceOf(IdentifierMetadata::class, $resource->getIdentifier());
-        self::assertEquals(ResourceTwo::class, $resource->getIdentifier()->getClass());
-        self::assertEquals('uuid', $resource->getIdentifier()->getName());
-        self::assertEquals('getUuid', $resource->getIdentifier()->getGetter());
-        self::assertEquals('getTwo', $resource->getAttributes()['two']->getGetter());
-        self::assertEquals('setTwo', $resource->getAttributes()['two']->getSetter());
-        self::assertArrayHasKey('me', $resource->getLinks());
-        self::assertInstanceOf(LinkMetadata::class, $resource->getLinks()['me']);
+        $this->checkResources($driver);
     }
 }

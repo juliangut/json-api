@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Tests\Mapping\Metadata;
 
-use Jgut\JsonApi\Tests\Stubs\AbstractMetadataStub;
+use Jgut\JsonApi\Tests\Stubs\AbstractFieldMetadataStub;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Abstract metadata tests.
+ * @internal
  */
 class AbstractMetadataTest extends TestCase
 {
     public function testCreation(): void
     {
-        $metadata = new AbstractMetadataStub('Class', 'Name');
+        $metadata = new AbstractFieldMetadataStub('Class', 'Name');
 
-        self::assertEquals('Class', $metadata->getClass());
-        self::assertEquals('Name', $metadata->getName());
+        static::assertEquals('Class', $metadata->getClass());
+        static::assertEquals('Name', $metadata->getName());
     }
 }

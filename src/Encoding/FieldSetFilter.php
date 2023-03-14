@@ -13,21 +13,21 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Encoding;
 
+use Closure;
 use Neomerx\JsonApi\Representation\FieldSetFilter as BaseFieldSetFilter;
 
-/**
- * Custom factory.
- */
 class FieldSetFilter extends BaseFieldSetFilter
 {
     /**
-     * {@inheritdoc}
+     * @param iterable<string, string|mixed> $fields
+     *
+     * @return iterable<string, string>
      */
     protected function filterFields(string $type, iterable $fields): iterable
     {
         if ($this->hasFilter($type) === false) {
             foreach ($fields as $name => $value) {
-                if ($value instanceof \Closure) {
+                if ($value instanceof Closure) {
                     $value = $value();
                 }
 
@@ -39,8 +39,8 @@ class FieldSetFilter extends BaseFieldSetFilter
 
         $allowedFields = $this->getAllowedFields($type);
         foreach ($fields as $name => $value) {
-            if (isset($allowedFields[$name]) === true) {
-                if ($value instanceof \Closure) {
+            if (\array_key_exists($name, $allowedFields) === true) {
+                if ($value instanceof Closure) {
                     $value = $value();
                 }
 
