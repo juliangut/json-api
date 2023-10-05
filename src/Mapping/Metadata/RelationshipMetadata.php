@@ -16,6 +16,7 @@ namespace Jgut\JsonApi\Mapping\Metadata;
 final class RelationshipMetadata extends AbstractFieldMetadata
 {
     use LinkTrait;
+    use MetaTrait;
 
     /**
      * @param class-string<object> $class
@@ -24,50 +25,18 @@ final class RelationshipMetadata extends AbstractFieldMetadata
         string $class,
         string $name,
         /**
-         * @var array<string>
+         * @var list<string>
          */
         protected array $groups = [],
-        /**
-         * @var array<string, mixed>
-         */
-        protected array $meta = [],
     ) {
         parent::__construct($class, $name);
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     public function getGroups(): array
     {
         return $this->groups;
-    }
-
-    /**
-     * @param array<string> $groups
-     */
-    public function setGroups(array $groups): self
-    {
-        $this->groups = $groups;
-
-        return $this;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function getMeta(): array
-    {
-        return $this->meta;
-    }
-
-    /**
-     * @param array<string, mixed> $meta
-     */
-    public function setMeta(array $meta): self
-    {
-        $this->meta = $meta;
-
-        return $this;
     }
 }

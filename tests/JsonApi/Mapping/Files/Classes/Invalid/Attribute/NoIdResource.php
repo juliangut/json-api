@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Tests\Mapping\Files\Classes\Invalid\Attribute;
 
-use Jgut\JsonApi\Mapping\Attribute as JSONAPI;
+use Jgut\JsonApi\Mapping\Attribute\ResourceObject;
 
-#[JSONAPI\ResourceObject]
+#[ResourceObject]
 class NoIdResource {}

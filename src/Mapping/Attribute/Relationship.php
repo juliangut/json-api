@@ -23,7 +23,7 @@ final class Relationship
         protected ?string $getter = null,
         protected ?string $setter = null,
         /**
-         * @var array<string>
+         * @var list<string>
          */  protected array $groups = [],
     ) {}
 
@@ -43,7 +43,7 @@ final class Relationship
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     public function getGroups(): array
     {

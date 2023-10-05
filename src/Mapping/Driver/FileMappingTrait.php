@@ -264,7 +264,7 @@ trait FileMappingTrait
      *
      * @throws DriverException
      *
-     * @return array<string>
+     * @return list<string>
      */
     protected function getGroups(array $mapping): array
     {
@@ -327,14 +327,13 @@ trait FileMappingTrait
     }
 
     /**
-     * @param IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata
-     * @param ReflectionClass<object>                                   $class
-     * @param IdentifierMapping|AttributeMapping|RelationshipMapping    $mapping
+     * @param ReflectionClass<object>                                $class
+     * @param IdentifierMapping|AttributeMapping|RelationshipMapping $mapping
      *
      * @throws DriverException
      */
     protected function populateGetter(
-        $metadata,
+        IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
         array $mapping,
@@ -359,14 +358,13 @@ trait FileMappingTrait
     }
 
     /**
-     * @param IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata
-     * @param ReflectionClass<object>                                   $class
-     * @param IdentifierMapping|AttributeMapping|RelationshipMapping    $mapping
+     * @param ReflectionClass<object>                                $class
+     * @param IdentifierMapping|AttributeMapping|RelationshipMapping $mapping
      *
      * @throws DriverException
      */
     protected function populateSetter(
-        $metadata,
+        IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
         array $mapping,
@@ -391,11 +389,12 @@ trait FileMappingTrait
     }
 
     /**
-     * @param ResourceObjectMetadata|RelationshipMetadata $metadata
-     * @param ResourceMapping|RelationshipMapping         $mapping
+     * @param ResourceMapping|RelationshipMapping $mapping
      */
-    protected function populateLinks($metadata, array $mapping): void
-    {
+    protected function populateLinks(
+        ResourceObjectMetadata|RelationshipMetadata $metadata,
+        array $mapping,
+    ): void {
         if (\array_key_exists('linkSelf', $mapping)) {
             $metadata->setLinkSelf((bool) $mapping['linkSelf']);
         }
@@ -412,13 +411,14 @@ trait FileMappingTrait
     }
 
     /**
-     * @param ResourceObjectMetadata|IdentifierMetadata|RelationshipMetadata $metadata
-     * @param ResourceMapping|IdentifierMapping|RelationshipMapping          $mapping
+     * @param ResourceMapping|IdentifierMapping|RelationshipMapping $mapping
      *
      * @throws DriverException
      */
-    protected function populateMeta($metadata, array $mapping): void
-    {
+    protected function populateMeta(
+        ResourceObjectMetadata|IdentifierMetadata|RelationshipMetadata $metadata,
+        array $mapping,
+    ): void {
         if (!\array_key_exists('meta', $mapping)) {
             return;
         }

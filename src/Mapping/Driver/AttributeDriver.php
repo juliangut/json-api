@@ -225,17 +225,15 @@ final class AttributeDriver extends AbstractClassDriver
     }
 
     /**
-     * @param IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata
-     * @param ReflectionClass<object>                                   $class
-     * @param Identifier|Attribute|Relationship                         $attribute
+     * @param ReflectionClass<object> $class
      *
      * @throws DriverException
      */
     protected function populateGetter(
-        $metadata,
+        IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        $attribute,
+        Identifier|Attribute|Relationship $attribute,
     ): void {
         $method = $this->getDefaultGetterMethod($property);
 
@@ -256,17 +254,15 @@ final class AttributeDriver extends AbstractClassDriver
     }
 
     /**
-     * @param IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata
-     * @param ReflectionClass<object>                                   $class
-     * @param Identifier|Attribute|Relationship                         $attribute
+     * @param ReflectionClass<object> $class
      *
      * @throws DriverException
      */
     protected function populateSetter(
-        $metadata,
+        IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        $attribute,
+        Identifier|Attribute|Relationship $attribute,
     ): void {
         $method = $this->getDefaultSetterMethod($property);
 
@@ -287,11 +283,12 @@ final class AttributeDriver extends AbstractClassDriver
     }
 
     /**
-     * @param ResourceObjectMetadata|RelationshipMetadata $metadata
-     * @param ReflectionClass<object>|ReflectionProperty  $reflector
+     * @param ReflectionClass<object>|ReflectionProperty $reflector
      */
-    protected function populateLinks($metadata, $reflector): void
-    {
+    protected function populateLinks(
+        ResourceObjectMetadata|RelationshipMetadata $metadata,
+        ReflectionClass|ReflectionProperty $reflector,
+    ): void {
         $linkSelfAttribute = $reflector->getAttributes(LinkSelf::class)[0] ?? null;
         if ($linkSelfAttribute !== null) {
             /** @var LinkSelf $link */
@@ -312,16 +309,20 @@ final class AttributeDriver extends AbstractClassDriver
             /** @var Link $link */
             $link = $linkAttribute->newInstance();
 
-            $metadata->addLink(new LinkMetadata($link->getHref(), $link->getTitle(), $link->getMeta()));
+            $linkMetadata = new LinkMetadata($link->getHref(), $link->getTitle());
+            $linkMetadata->setMeta($link->getMeta());
+
+            $metadata->addLink($linkMetadata);
         }
     }
 
     /**
-     * @param ResourceObjectMetadata|IdentifierMetadata|RelationshipMetadata $metadata
-     * @param ReflectionClass<object>|ReflectionProperty                     $reflector
+     * @param ReflectionClass<object>|ReflectionProperty $reflector
      */
-    protected function populateMeta($metadata, $reflector): void
-    {
+    protected function populateMeta(
+        ResourceObjectMetadata|IdentifierMetadata|RelationshipMetadata $metadata,
+        ReflectionClass|ReflectionProperty $reflector,
+    ): void {
         $metaList = [];
 
         foreach ($reflector->getAttributes(Meta::class) as $metaAttribute) {

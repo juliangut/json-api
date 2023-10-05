@@ -13,14 +13,15 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Tests\Mapping\Files\Classes\Invalid\Attribute;
 
-use Jgut\JsonApi\Mapping\Attribute as JSONAPI;
+use Jgut\JsonApi\Mapping\Attribute\Identifier;
+use Jgut\JsonApi\Mapping\Attribute\ResourceObject;
 
-#[JSONAPI\ResourceObject]
+#[ResourceObject]
 class MultipleIdResource
 {
-    #[JSONAPI\Identifier]
+    #[Identifier]
     protected string $uuid;
 
-    #[JSONAPI\Identifier]
+    #[Identifier]
     protected string $objectId;
 }

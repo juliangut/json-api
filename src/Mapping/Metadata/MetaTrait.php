@@ -11,29 +11,29 @@
 
 declare(strict_types=1);
 
-namespace Jgut\JsonApi\Mapping\Annotation;
+namespace Jgut\JsonApi\Mapping\Metadata;
 
-trait GroupTrait
+trait MetaTrait
 {
     /**
-     * @var list<string>
+     * @var array<string, mixed>
      */
-    protected array $groups = [];
+    protected array $meta = [];
 
     /**
-     * @return list<string>
+     * @return array<string, mixed>
      */
-    public function getGroups(): array
+    public function getMeta(): array
     {
-        return $this->groups;
+        return $this->meta;
     }
 
     /**
-     * @param list<string> $groups
+     * @param array<string, mixed> $meta
      */
-    public function setGroups(array $groups): self
+    public function setMeta(array $meta): self
     {
-        $this->groups = $groups;
+        $this->meta = $meta;
 
         return $this;
     }

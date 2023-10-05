@@ -22,7 +22,7 @@ final class AttributeMetadata extends AbstractFieldMetadata
         string $class,
         string $name,
         /**
-         * @var array<string>
+         * @var list<string>
          */
         protected array $groups = [],
     ) {
@@ -30,7 +30,7 @@ final class AttributeMetadata extends AbstractFieldMetadata
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     public function getGroups(): array
     {
@@ -38,7 +38,7 @@ final class AttributeMetadata extends AbstractFieldMetadata
     }
 
     /**
-     * @param array<string> $groups
+     * @param list<string> $groups
      */
     public function setGroups(array $groups): self
     {

@@ -33,11 +33,11 @@ trait LinksTrait
                 $link = new LinkMetadata($linkDefinition, $title);
             } elseif (\is_array($linkDefinition)) {
                 /** @var array{href: string, meta?: array<string, mixed>} $linkDefinition */
-                $link = new LinkMetadata(
-                    $linkDefinition['href'],
-                    $title,
-                    \array_key_exists('meta', $linkDefinition) ? $linkDefinition['meta'] : [],
-                );
+                $link = new LinkMetadata($linkDefinition['href'], $title);
+
+                if (\array_key_exists('meta', $linkDefinition)) {
+                    $link->setMeta($linkDefinition['meta']);
+                }
             } else {
                 throw new DriverException(sprintf(
                     'Link definition must be either a string or array, %s given.',

@@ -168,14 +168,12 @@ class MetadataSchemaTest extends TestCase
             }
         };
 
-        $relationshipA = (new RelationshipMetadata(stdClass::class, 'relationshipA'))
+        $relationshipA = (new RelationshipMetadata(stdClass::class, 'relationshipA', ['test']))
             ->setGetter('getRelationshipA')
-            ->setGroups(['test'])
             ->addLink(new LinkMetadata('me', '/me'))
             ->setMeta(['meta' => 'data']);
-        $relationshipB = (new RelationshipMetadata(stdClass::class, 'relationshipB'))
-            ->setGetter('getRelationshipB')
-            ->setGroups(['none']);
+        $relationshipB = (new RelationshipMetadata(stdClass::class, 'relationshipB', ['none']))
+            ->setGetter('getRelationshipB');
 
         $metadata = (new ResourceObjectMetadata($resource::class, 'Resource'))
             ->addRelationship($relationshipA)

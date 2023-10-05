@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Attribute;
 
-use Attribute as PHPAttribute;
+use Attribute;
 
-#[PHPAttribute(PHPAttribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PROPERTY)]
 final class Identifier
 {
     public function __construct(

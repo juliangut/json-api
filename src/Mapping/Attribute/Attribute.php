@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Attribute;
 
-use Attribute as NativeAttribute;
+use Attribute as PHPAttribute;
 
-#[NativeAttribute(NativeAttribute::TARGET_PROPERTY)]
+#[PHPAttribute(PHPAttribute::TARGET_PROPERTY)]
 final class Attribute
 {
     public function __construct(
@@ -23,7 +23,7 @@ final class Attribute
         protected ?string $getter = null,
         protected ?string $setter = null,
         /**
-         * @var array<string>
+         * @var list<string>
          */  protected array $groups = [],
     ) {}
 
@@ -43,7 +43,7 @@ final class Attribute
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     public function getGroups(): array
     {

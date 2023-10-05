@@ -19,6 +19,7 @@ use RuntimeException;
 final class ResourceObjectMetadata extends AbstractMetadata
 {
     use LinkTrait;
+    use MetaTrait;
 
     /**
      * @var class-string<SchemaInterface>|null
@@ -40,20 +41,6 @@ final class ResourceObjectMetadata extends AbstractMetadata
      * @var array<RelationshipMetadata>
      */
     protected array $relationships = [];
-
-    /**
-     * @param class-string<object> $class
-     */
-    public function __construct(
-        protected string $class,
-        protected string $name,
-        /**
-         * @var array<string, mixed>
-         */
-        protected array $meta = [],
-    ) {
-        parent::__construct($class, $name);
-    }
 
     /**
      * @return class-string<SchemaInterface>|null
@@ -149,24 +136,6 @@ final class ResourceObjectMetadata extends AbstractMetadata
     public function addRelationship(RelationshipMetadata $relationship): self
     {
         $this->relationships[$relationship->getName()] = $relationship;
-
-        return $this;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function getMeta(): array
-    {
-        return $this->meta;
-    }
-
-    /**
-     * @param array<string, mixed> $meta
-     */
-    public function setMeta(array $meta): self
-    {
-        $this->meta = $meta;
 
         return $this;
     }

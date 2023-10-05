@@ -15,35 +15,5 @@ namespace Jgut\JsonApi\Mapping\Metadata;
 
 final class IdentifierMetadata extends AbstractFieldMetadata
 {
-    /**
-     * @param class-string<object> $class
-     */
-    public function __construct(
-        protected string $class,
-        protected string $name,
-        /**
-         * @var array<string, mixed>
-         */
-        protected array $meta = [],
-    ) {
-        parent::__construct($class, $name);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function getMeta(): array
-    {
-        return $this->meta;
-    }
-
-    /**
-     * @param array<string, mixed> $meta
-     */
-    public function setMeta(array $meta): self
-    {
-        $this->meta = $meta;
-
-        return $this;
-    }
+    use MetaTrait;
 }

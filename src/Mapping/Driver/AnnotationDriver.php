@@ -205,17 +205,15 @@ final class AnnotationDriver extends AbstractAnnotationDriver implements DriverI
     }
 
     /**
-     * @param IdentifierMetadata|AttributeMetadata|RelationshipMetadata       $metadata
-     * @param ReflectionClass<object>                                         $class
-     * @param IdentifierAnnotation|AttributeAnnotation|RelationshipAnnotation $annotation
+     * @param ReflectionClass<object> $class
      *
      * @throws DriverException
      */
     protected function populateGetter(
-        $metadata,
+        IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        $annotation,
+        IdentifierAnnotation|AttributeAnnotation|RelationshipAnnotation $annotation,
     ): void {
         $method = $this->getDefaultGetterMethod($property);
 
@@ -236,17 +234,15 @@ final class AnnotationDriver extends AbstractAnnotationDriver implements DriverI
     }
 
     /**
-     * @param IdentifierMetadata|AttributeMetadata|RelationshipMetadata       $metadata
-     * @param ReflectionClass<object>                                         $class
-     * @param IdentifierAnnotation|AttributeAnnotation|RelationshipAnnotation $annotation
+     * @param ReflectionClass<object> $class
      *
      * @throws DriverException
      */
     protected function populateSetter(
-        $metadata,
+        IdentifierMetadata|AttributeMetadata|RelationshipMetadata $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        $annotation,
+        IdentifierAnnotation|AttributeAnnotation|RelationshipAnnotation $annotation,
     ): void {
         $method = $this->getDefaultSetterMethod($property);
 
@@ -266,12 +262,10 @@ final class AnnotationDriver extends AbstractAnnotationDriver implements DriverI
         $metadata->setSetter($method);
     }
 
-    /**
-     * @param ResourceObjectMetadata|RelationshipMetadata     $metadata
-     * @param ResourceObjectAnnotation|RelationshipAnnotation $annotation
-     */
-    protected function populateLinks($metadata, $annotation): void
-    {
+    protected function populateLinks(
+        ResourceObjectMetadata|RelationshipMetadata $metadata,
+        ResourceObjectAnnotation|RelationshipAnnotation $annotation,
+    ): void {
         $selfLinkIncluded = $annotation->isLinkSelf();
         if ($selfLinkIncluded !== null) {
             $metadata->setLinkSelf($selfLinkIncluded);
@@ -288,13 +282,12 @@ final class AnnotationDriver extends AbstractAnnotationDriver implements DriverI
     }
 
     /**
-     * @param ResourceObjectMetadata|IdentifierMetadata|RelationshipMetadata       $metadata
-     * @param ResourceObjectAnnotation|IdentifierAnnotation|RelationshipAnnotation $annotation
-     *
      * @throws DriverException
      */
-    protected function populateMeta($metadata, $annotation): void
-    {
+    protected function populateMeta(
+        ResourceObjectMetadata|IdentifierMetadata|RelationshipMetadata $metadata,
+        ResourceObjectAnnotation|IdentifierAnnotation|RelationshipAnnotation $annotation,
+    ): void {
         $metaList = $annotation->getMeta();
         if (\count($metaList) !== 0) {
             $metadata->setMeta($metaList);

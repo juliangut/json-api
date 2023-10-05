@@ -36,14 +36,11 @@ trait PropertyTrait
             ->getProperty($property->getName())
             ->getType();
         if ($reflectionType !== null) {
-            if (
-                (\PHP_VERSION_ID >= 80_100 && $reflectionType instanceof ReflectionIntersectionType)
-                || (\PHP_VERSION_ID >= 80_000 && $reflectionType instanceof ReflectionUnionType)
-            ) {
-                $types = $reflectionType->getTypes();
-            } else {
-                $types = [$reflectionType];
-            }
+            $types = (\PHP_VERSION_ID >= 80_100 && $reflectionType instanceof ReflectionIntersectionType)
+                || ($reflectionType instanceof ReflectionUnionType)
+                ? $reflectionType->getTypes()
+                : [$reflectionType];
+
             $attributeType = implode(
                 '|',
                 array_map(
@@ -52,7 +49,7 @@ trait PropertyTrait
                 ),
             );
 
-            return mb_strpos($attributeType, 'bool') !== false;
+            return str_contains($attributeType, 'bool');
         }
 
         $docComment = $property->getDeclaringClass()
