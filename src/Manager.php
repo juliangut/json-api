@@ -81,10 +81,10 @@ class Manager
 
         $encodingOptions ??= ($this->configuration->getEncodingOptions() ?? new Options());
 
-        /** @var iterable<non-empty-string> $includes */
-        $includes = $queryParameters !== null ? $queryParameters->getIncludes() : null;
-        /** @var iterable<string, non-empty-string> $fieldSets */
-        $fieldSets = $queryParameters !== null ? $queryParameters->getFields() : null;
+        /** @var iterable<non-empty-string>|null $includes */
+        $includes = $queryParameters?->getIncludes();
+        /** @var iterable<string, non-empty-string>|null $fieldSets */
+        $fieldSets = $queryParameters?->getFields();
 
         $encoder = $this->getEncoder(
             $this->getSchemaFactories($resourceTypes, $encodingOptions->getGroup()),
