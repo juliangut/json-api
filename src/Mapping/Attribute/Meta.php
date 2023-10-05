@@ -20,9 +20,6 @@ final class Meta
 {
     public function __construct(
         protected string $key,
-        /**
-         * @var mixed|array<mixed>
-         */
         protected mixed $value,
     ) {}
 
@@ -31,10 +28,7 @@ final class Meta
         return $this->key;
     }
 
-    /**
-     * @return mixed|array<mixed>
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

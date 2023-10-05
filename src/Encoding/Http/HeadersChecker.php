@@ -41,7 +41,6 @@ class HeadersChecker implements HeadersCheckerInterface
     {
         if (\count($request->getHeader('Content-Type')) === 1) {
             try {
-                /** @var MediaTypeInterface $contentType */
                 $contentType = $this->headerParser
                     ->parseContentTypeHeader($request->getHeaderLine('Content-Type'));
             } catch (InvalidArgumentException $exception) {
