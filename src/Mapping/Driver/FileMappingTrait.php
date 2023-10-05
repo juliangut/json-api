@@ -424,7 +424,7 @@ trait FileMappingTrait
         }
 
         $meta = $mapping['meta'];
-        if (!\is_array($meta) || ($meta !== [] && array_keys($meta) === range(0, \count($meta) - 1))) {
+        if (!\is_array($meta) || ($meta !== [] && array_is_list($meta))) {
             throw new DriverException('Metadata must be an array which keys are all strings.');
         }
 

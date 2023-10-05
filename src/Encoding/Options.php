@@ -86,7 +86,7 @@ class Options implements OptionsInterface
      */
     public function setLinks(array $links): void
     {
-        if ($links !== [] && array_keys($links) === range(0, \count($links) - 1)) {
+        if ($links !== [] && array_is_list($links)) {
             throw new SchemaException('Links keys must be all strings.');
         }
 
