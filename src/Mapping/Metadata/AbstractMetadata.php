@@ -17,21 +17,13 @@ use Jgut\Mapping\Metadata\MetadataInterface;
 
 abstract class AbstractMetadata implements MetadataInterface
 {
-    /**
-     * @var class-string<object>
-     */
-    protected string $class;
-
-    protected string $name;
-
-    /**
-     * @param class-string<object> $class
-     */
-    public function __construct(string $class, string $name)
-    {
-        $this->class = $class;
-        $this->name = $name;
-    }
+    public function __construct(
+        /**
+         * @var class-string<object> $class
+         */
+        protected string $class,
+        protected string $name,
+    ) {}
 
     /**
      * @return class-string<object>

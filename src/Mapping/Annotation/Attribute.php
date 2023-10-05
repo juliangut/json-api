@@ -18,7 +18,7 @@ namespace Jgut\JsonApi\Mapping\Annotation;
  *
  * @Target("PROPERTY")
  */
-class Attribute extends AbstractField
+final class Attribute extends AbstractField
 {
     use GroupTrait;
 }

@@ -18,6 +18,7 @@ use Jgut\JsonApi\Mapping\Driver\DriverFactory;
 use Jgut\Mapping\Driver\AbstractMappingDriver;
 use Jgut\Mapping\Exception\DriverException;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 /**
  * @internal
@@ -34,9 +35,11 @@ class DriverFactoryTest extends TestCase
     public function testInvalidDriver(): void
     {
         $this->expectException(DriverException::class);
-        $this->expectExceptionMessageMatches('/^Metadata mapping driver should be of the type .+, "string" given\.$/');
+        $this->expectExceptionMessageMatches(
+            '/^Metadata mapping driver should be of the type .+, "stdClass" given\.$/',
+        );
 
-        $this->factory->getDriver(['driver' => 'invalid']);
+        $this->factory->getDriver(['driver' => new stdClass()]);
     }
 
     public function testAnnotationDriver(): void

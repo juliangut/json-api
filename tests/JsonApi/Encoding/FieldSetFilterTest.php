@@ -25,13 +25,13 @@ class FieldSetFilterTest extends TestCase
 {
     public function testNoFilter(): void
     {
-        $callableOne = new class() {
+        $callableOne = new class () {
             public function __invoke(): string
             {
                 return 'aaa';
             }
         };
-        $callableTwo = new class() {
+        $callableTwo = new class () {
             public function __invoke(): string
             {
                 return 'aaa';
@@ -60,13 +60,13 @@ class FieldSetFilterTest extends TestCase
 
     public function testFilter(): void
     {
-        $callableOne = new class() {
+        $callableOne = new class () {
             public function __invoke(): string
             {
                 return 'aaa';
             }
         };
-        $callableTwo = new class() {
+        $callableTwo = new class () {
             public function __invoke(): string
             {
                 return 'bbb';

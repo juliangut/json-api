@@ -15,7 +15,7 @@ namespace Jgut\JsonApi\Mapping\Driver;
 
 use Jgut\Mapping\Driver\AbstractMappingXmlDriver;
 
-class XmlDriver extends AbstractMappingXmlDriver implements DriverInterface
+final class XmlDriver extends AbstractMappingXmlDriver implements DriverInterface
 {
     use FileMappingTrait;
 }

@@ -80,7 +80,7 @@ class MetadataSchemaTest extends TestCase
 
     public function testGetId(): void
     {
-        $resource = new class() {
+        $resource = new class () {
             public function getId(): string
             {
                 return 'aaa';
@@ -90,7 +90,7 @@ class MetadataSchemaTest extends TestCase
         $identifier = (new IdentifierMetadata(stdClass::class, 'Id'))
             ->setGetter('getId');
 
-        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata($resource::class, 'Resource'))
             ->setIdentifier($identifier);
 
         $schema = new MetadataSchema($this->factory, $metadata);
@@ -100,7 +100,7 @@ class MetadataSchemaTest extends TestCase
 
     public function testGetUrl(): void
     {
-        $resource = new class() {
+        $resource = new class () {
             public function getId(): string
             {
                 return 'aaa';
@@ -110,7 +110,7 @@ class MetadataSchemaTest extends TestCase
         $identifier = (new IdentifierMetadata(stdClass::class, 'Id'))
             ->setGetter('getId');
 
-        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata($resource::class, 'Resource'))
             ->setIdentifier($identifier)
             ->setPrefix('/custom/resource');
 
@@ -121,7 +121,7 @@ class MetadataSchemaTest extends TestCase
 
     public function testGetAttributes(): void
     {
-        $resource = new class() {
+        $resource = new class () {
             public function getAttribute(): string
             {
                 return 'aaa';
@@ -131,7 +131,7 @@ class MetadataSchemaTest extends TestCase
         $attribute = (new AttributeMetadata(stdClass::class, 'attribute'))
             ->setGetter('getAttribute');
 
-        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata($resource::class, 'Resource'))
             ->addAttribute($attribute);
 
         /** @var ContextInterface $context */
@@ -156,7 +156,7 @@ class MetadataSchemaTest extends TestCase
 
     public function testGetRelationships(): void
     {
-        $resource = new class() {
+        $resource = new class () {
             public function getRelationshipA(): string
             {
                 return 'aaa';
@@ -177,7 +177,7 @@ class MetadataSchemaTest extends TestCase
             ->setGetter('getRelationshipB')
             ->setGroups(['none']);
 
-        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata($resource::class, 'Resource'))
             ->addRelationship($relationshipA)
             ->addRelationship($relationshipB)
             ->setGroup('test');
@@ -200,7 +200,7 @@ class MetadataSchemaTest extends TestCase
 
     public function testGetLinks(): void
     {
-        $resource = new class() {
+        $resource = new class () {
             public function getId(): string
             {
                 return 'aaa';
@@ -210,7 +210,7 @@ class MetadataSchemaTest extends TestCase
         $identifier = (new IdentifierMetadata(stdClass::class, 'Id'))
             ->setGetter('getId');
 
-        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata($resource::class, 'Resource'))
             ->setIdentifier($identifier)
             ->addLink(new LinkMetadata('https://example.com/me', 'me'))
             ->setLinkSelf(false)
@@ -226,7 +226,7 @@ class MetadataSchemaTest extends TestCase
 
     public function testGetMeta(): void
     {
-        $resource = new class() {
+        $resource = new class () {
             public function getId(): string
             {
                 return 'aaa';
@@ -237,7 +237,7 @@ class MetadataSchemaTest extends TestCase
             ->setGetter('getId')
             ->setMeta(['meta' => 'data']);
 
-        $metadata = (new ResourceObjectMetadata(\get_class($resource), 'Resource'))
+        $metadata = (new ResourceObjectMetadata($resource::class, 'Resource'))
             ->setIdentifier($identifier)
             ->setMeta(['meta' => 'value']);
 

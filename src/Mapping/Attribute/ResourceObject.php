@@ -17,27 +17,20 @@ use Attribute;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 
 #[Attribute(Attribute::TARGET_CLASS)]
-class ResourceObject
+final class ResourceObject
 {
-    use NameTrait {
-        __construct as protected nameConstruct;
-    }
+    public function __construct(
+        protected ?string $name = null,
+        protected ?string $prefix = null,
+        /**
+         * @var class-string<SchemaInterface>|null
+         */
+        protected ?string $schema = null,
+    ) {}
 
-    protected ?string $prefix;
-
-    /**
-     * @var class-string<SchemaInterface>|null
-     */
-    protected ?string $schema;
-
-    /**
-     * @param class-string<SchemaInterface>|null $schema
-     */
-    public function __construct(?string $name = null, ?string $prefix = null, ?string $schema = null)
+    public function getName(): ?string
     {
-        $this->nameConstruct($name);
-        $this->prefix = $prefix;
-        $this->schema = $schema;
+        return $this->name;
     }
 
     public function getPrefix(): ?string

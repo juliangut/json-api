@@ -15,6 +15,4 @@ namespace Jgut\JsonApi\Exception;
 
 use RuntimeException;
 
-class SchemaException extends RuntimeException
-{
-}
+class SchemaException extends RuntimeException {}

@@ -15,7 +15,7 @@ namespace Jgut\JsonApi\Mapping\Driver;
 
 use Jgut\Mapping\Driver\AbstractMappingJsonDriver;
 
-class JsonDriver extends AbstractMappingJsonDriver implements DriverInterface
+final class JsonDriver extends AbstractMappingJsonDriver implements DriverInterface
 {
     use FileMappingTrait;
 }

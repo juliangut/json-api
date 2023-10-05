@@ -15,6 +15,7 @@ namespace Jgut\JsonApi\Tests\Stubs;
 
 use Jgut\JsonApi\Mapping\Metadata\AbstractFieldMetadata;
 
-class AbstractFieldMetadataStub extends AbstractFieldMetadata
-{
-}
+/**
+ * @internal
+ */
+class AbstractFieldMetadataStub extends AbstractFieldMetadata {}

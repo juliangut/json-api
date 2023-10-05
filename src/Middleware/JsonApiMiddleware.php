@@ -23,15 +23,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class JsonApiMiddleware implements MiddlewareInterface
 {
-    protected ResponseFactoryInterface $responseFactory;
-
-    protected Manager $manager;
-
-    public function __construct(ResponseFactoryInterface $responseFactory, Manager $manager)
-    {
-        $this->responseFactory = $responseFactory;
-        $this->manager = $manager;
-    }
+    public function __construct(
+        protected ResponseFactoryInterface $responseFactory,
+        protected Manager $manager,
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

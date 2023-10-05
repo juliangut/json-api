@@ -16,26 +16,16 @@ namespace Jgut\JsonApi\Mapping\Attribute;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
-class Link
+final class Link
 {
-    protected string $href;
-
-    protected ?string $title;
-
-    /**
-     * @var array<string, mixed>|null
-     */
-    protected ?array $meta;
-
-    /**
-     * @param array<string, mixed>|null $meta
-     */
-    public function __construct(string $href, ?string $title = null, ?array $meta = null)
-    {
-        $this->href = $href;
-        $this->title = $title;
-        $this->meta = $meta;
-    }
+    public function __construct(
+        protected string $href,
+        protected ?string $title = null,
+        /**
+         * @var array<string, mixed>
+         */
+        protected array $meta = [],
+    ) {}
 
     public function getHref(): string
     {
@@ -48,9 +38,9 @@ class Link
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array<string, mixed>
      */
-    public function getMeta(): ?array
+    public function getMeta(): array
     {
         return $this->meta;
     }

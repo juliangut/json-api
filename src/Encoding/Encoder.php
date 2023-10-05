@@ -27,13 +27,13 @@ class Encoder extends BaseEncoder
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * Prevent usage. Use an instance of Manager instead
+     * Prevent usage. Use an instance of Manager instead.
      *
      * @param array<mixed> $schemas
      *
      * @throws BadMethodCallException
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public static function instance(array $schemas = []): EncoderInterface
     {

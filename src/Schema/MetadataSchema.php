@@ -26,13 +26,11 @@ use Neomerx\JsonApi\Schema\BaseSchema;
 
 class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
 {
-    protected ResourceObjectMetadata $resourceMetadata;
-
-    public function __construct(FactoryInterface $factory, ResourceObjectMetadata $resourceMetadata)
-    {
+    public function __construct(
+        FactoryInterface $factory,
+        protected ResourceObjectMetadata $resourceMetadata,
+    ) {
         parent::__construct($factory);
-
-        $this->resourceMetadata = $resourceMetadata;
     }
 
     public function getType(): string
@@ -56,7 +54,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
         if (!\is_string($identifier)) {
             throw new SchemaException(sprintf(
                 'Identifier of resource "%s" is not a string, "%s" given.',
-                \get_class($resource),
+                $resource::class,
                 \gettype($identifier),
             ));
         }
@@ -269,7 +267,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
         if (!\is_object($resource) || !is_a($resource, $class)) {
             throw new SchemaException(sprintf(
                 '%s is not a "%s".',
-                \is_object($resource) ? 'Class "' . \get_class($resource) . '"' : \gettype($resource),
+                \is_object($resource) ? 'Class "' . $resource::class . '"' : \gettype($resource),
                 $class,
             ));
         }

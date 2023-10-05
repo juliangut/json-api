@@ -23,29 +23,29 @@ use Jgut\Mapping\Metadata\MetadataResolver;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
 
 /**
- * @phpstan-type Source string|array{driver?: string|object, type?: string, path?: string|array<string>}
+ * @phpstan-type Source array{driver?: object, type?: string, path?: string|list<string>}
  */
-class Configuration
+final class Configuration
 {
     public const QUERY_PARAMETERS_REQUEST_KEY = 'JSON_API_query_parameters';
 
-    protected string $attributeName = self::QUERY_PARAMETERS_REQUEST_KEY;
+    private string $attributeName = self::QUERY_PARAMETERS_REQUEST_KEY;
 
     /**
-     * @var array<Source>
+     * @var list<Source>
      */
-    protected array $sources = [];
+    private array $sources = [];
 
-    protected ?MetadataResolver $metadataResolver = null;
+    private ?MetadataResolver $metadataResolver = null;
 
     /**
      * @var class-string<SchemaInterface>
      */
-    protected string $schemaClass = MetadataSchema::class;
+    private string $schemaClass = MetadataSchema::class;
 
-    protected ?Resolver $schemaResolver = null;
+    private ?Resolver $schemaResolver = null;
 
-    protected ?OptionsInterface $encodingOptions = null;
+    private ?OptionsInterface $encodingOptions = null;
 
     private ?string $urlPrefix = null;
 
@@ -98,7 +98,7 @@ class Configuration
     }
 
     /**
-     * @return array<Source>
+     * @return list<Source>
      */
     public function getSources(): array
     {
@@ -106,9 +106,7 @@ class Configuration
     }
 
     /**
-     * @param array<Source> $sources
-     *
-     * @throws InvalidArgumentException
+     * @param list<Source> $sources
      */
     public function setSources(array $sources): self
     {
@@ -132,11 +130,11 @@ class Configuration
             throw new InvalidArgumentException(sprintf(
                 'Mapping source must be a string, array or %s, %s given.',
                 DriverInterface::class,
-                \is_object($source) ? \get_class($source) : \gettype($source),
+                \is_object($source) ? $source::class : \gettype($source),
             ));
         }
 
-        /** @var string|array{driver?: string|DriverInterface, type?: string, path?: string|array<string>} $source */
+        /** @var Source $source */
         $this->sources[] = $source;
 
         return $this;

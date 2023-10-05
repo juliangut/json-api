@@ -30,15 +30,13 @@ use ReflectionProperty;
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterface
+final class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterface
 {
     use PropertyTrait;
     use LinksTrait;
 
     /**
-     * {@inheritDoc}
-     *
-     * @return array<ResourceObjectMetadata>
+     * @return list<ResourceObjectMetadata>
      */
     public function getMetadata(): array
     {
@@ -70,7 +68,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
             }
         }
 
-        return $resources;
+        return array_values($resources);
     }
 
     /**
@@ -81,7 +79,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
     protected function populateResource(
         ResourceObjectMetadata $resource,
         ReflectionClass $class,
-        ResourceObjectAnnotation $annotation
+        ResourceObjectAnnotation $annotation,
     ): void {
         foreach ($class->getProperties() as $property) {
             // @codeCoverageIgnoreStart
@@ -122,7 +120,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         ResourceObjectMetadata $resource,
         ReflectionClass $class,
         ReflectionProperty $property,
-        IdentifierAnnotation $annotation
+        IdentifierAnnotation $annotation,
     ): void {
         if ($resource->hasIdentifier()) {
             throw new DriverException(sprintf(
@@ -151,7 +149,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         ResourceObjectMetadata $resource,
         ReflectionClass $class,
         ReflectionProperty $property,
-        AttributeAnnotation $annotation
+        AttributeAnnotation $annotation,
     ): void {
         $attribute = new AttributeMetadata(
             $property->getDeclaringClass()
@@ -173,7 +171,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         ResourceObjectMetadata $resource,
         ReflectionClass $class,
         ReflectionProperty $property,
-        RelationshipAnnotation $annotation
+        RelationshipAnnotation $annotation,
     ): void {
         $relationship = new RelationshipMetadata(
             $property->getDeclaringClass()
@@ -217,7 +215,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        $annotation
+        $annotation,
     ): void {
         $method = $this->getDefaultGetterMethod($property);
 
@@ -248,7 +246,7 @@ class AnnotationDriver extends AbstractAnnotationDriver implements DriverInterfa
         $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        $annotation
+        $annotation,
     ): void {
         $method = $this->getDefaultSetterMethod($property);
 

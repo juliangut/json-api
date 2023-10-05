@@ -30,7 +30,7 @@ trait FileMappingTrait
     use PropertyTrait;
 
     /**
-     * @return array<ResourceObjectMetadata>
+     * @return list<ResourceObjectMetadata>
      */
     public function getMetadata(): array
     {
@@ -48,9 +48,9 @@ trait FileMappingTrait
     /**
      * @param array<ResourceMapping|mixed> $mappingData
      *
-     *@throws DriverException
+     * @throws DriverException
      *
-     *@return array<ResourceObjectMetadata>
+     * @return list<ResourceObjectMetadata>
      */
     protected function getResourcesMetadata(array $mappingData): array
     {
@@ -80,7 +80,7 @@ trait FileMappingTrait
             $resources[$resourceName] = $this->populateResource($resource, $class, $mapping);
         }
 
-        return $resources;
+        return array_values($resources);
     }
 
     /**
@@ -107,7 +107,7 @@ trait FileMappingTrait
     protected function populateResource(
         ResourceObjectMetadata $resource,
         ReflectionClass $class,
-        array $mapping
+        array $mapping,
     ): ResourceObjectMetadata {
         $this->setResourceIdentifier($resource, $class, $mapping);
 
@@ -139,7 +139,7 @@ trait FileMappingTrait
     protected function setResourceIdentifier(
         ResourceObjectMetadata $metadata,
         ReflectionClass $class,
-        array $mapping
+        array $mapping,
     ): void {
         if (!\array_key_exists('identifier', $mapping)) {
             throw new DriverException('Resource does not define an identifier.');
@@ -188,7 +188,7 @@ trait FileMappingTrait
     protected function addResourceAttribute(
         ResourceObjectMetadata $metadata,
         ReflectionClass $class,
-        array $mapping
+        array $mapping,
     ): void {
         if (!\array_key_exists('property', $mapping)) {
             throw new DriverException('Resource attribute property missing.');
@@ -225,7 +225,7 @@ trait FileMappingTrait
     protected function addResourceRelationship(
         ResourceObjectMetadata $metadata,
         ReflectionClass $class,
-        array $mapping
+        array $mapping,
     ): void {
         if (!\array_key_exists('property', $mapping)) {
             throw new DriverException('Resource relationship property missing.');
@@ -337,7 +337,7 @@ trait FileMappingTrait
         $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        array $mapping
+        array $mapping,
     ): void {
         $method = $this->getDefaultGetterMethod($property);
 
@@ -369,7 +369,7 @@ trait FileMappingTrait
         $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        array $mapping
+        array $mapping,
     ): void {
         $method = $this->getDefaultSetterMethod($property);
 

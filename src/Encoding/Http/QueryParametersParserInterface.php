@@ -15,6 +15,4 @@ namespace Jgut\JsonApi\Encoding\Http;
 
 use Neomerx\JsonApi\Contracts\Http\Query\BaseQueryParserInterface;
 
-interface QueryParametersParserInterface extends BaseQueryParserInterface
-{
-}
+interface QueryParametersParserInterface extends BaseQueryParserInterface {}

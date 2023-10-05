@@ -21,7 +21,7 @@ use Jgut\Mapping\Annotation\AbstractAnnotation;
  *
  * @Target("CLASS")
  */
-class ResourceObject extends AbstractAnnotation
+final class ResourceObject extends AbstractAnnotation
 {
     use LinkTrait;
     use MetaTrait;

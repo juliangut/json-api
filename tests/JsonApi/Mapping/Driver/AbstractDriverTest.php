@@ -39,7 +39,7 @@ abstract class AbstractDriverTest extends TestCase
     {
         $resources = $driver->getMetadata();
 
-        $resource = $resources['resourceA'];
+        $resource = $resources[0];
         static::assertInstanceOf(ResourceObjectMetadata::class, $resource);
         static::assertEquals('resourceA', $resource->getName());
         static::assertEquals(MetadataSchema::class, $resource->getSchema());
@@ -86,7 +86,7 @@ abstract class AbstractDriverTest extends TestCase
         static::assertEquals('custom', $relationshipLink->getTitle());
         static::assertEquals(['key' => 'path'], $relationshipLink->getMeta());
 
-        $resource = $resources['resourceTwo'];
+        $resource = $resources[1];
         static::assertInstanceOf(ResourceObjectMetadata::class, $resource);
         static::assertEquals('resourceTwo', $resource->getName());
         static::assertNull($resource->getSchema());

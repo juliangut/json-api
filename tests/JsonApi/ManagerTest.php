@@ -18,9 +18,7 @@ use Jgut\JsonApi\Encoding\Encoder;
 use Jgut\JsonApi\Encoding\Factory;
 use Jgut\JsonApi\Encoding\Http\QueryParametersParser;
 use Jgut\JsonApi\Manager;
-use Jgut\JsonApi\Mapping\Driver\DriverFactory;
 use Jgut\Mapping\Driver\DriverFactoryInterface;
-use Jgut\Mapping\Metadata\MetadataResolver;
 use Laminas\Diactoros\ServerRequest;
 use Neomerx\JsonApi\Schema\Error;
 use Neomerx\JsonApi\Schema\ErrorCollection;
@@ -116,15 +114,7 @@ class ManagerTest extends TestCase
             ]
             : [__DIR__ . '/Mapping/Files/Classes/Valid/Attribute'];
 
-        $configuration = $this->getMockBuilder(Configuration::class)
-            ->setMethods(['getMetadataResolver', 'getMetadata', 'getLinks', 'getSources'])
-            ->getMock();
-        $configuration->expects(static::once())
-            ->method('getMetadataResolver')
-            ->willReturn(new MetadataResolver(new DriverFactory()));
-        $configuration->expects(static::once())
-            ->method('getSources')
-            ->willReturn($sources);
+        $configuration = new Configuration(['sources' => $sources]);
 
         $manager = new Manager($configuration, $factory);
 

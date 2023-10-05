@@ -18,6 +18,4 @@ use Jgut\JsonApi\Mapping\Annotation as JJA;
 /**
  * @JJA\ResourceObject()
  */
-class NoIdResource
-{
-}
+class NoIdResource {}

@@ -41,7 +41,7 @@ class AssertResourceType implements MethodTypeSpecifyingExtension, TypeSpecifier
     public function isMethodSupported(
         MethodReflection $methodReflection,
         MethodCall $node,
-        TypeSpecifierContext $context
+        TypeSpecifierContext $context,
     ): bool {
         return $methodReflection->getName() === 'assertResourceType'
             && $context->null()
@@ -55,7 +55,7 @@ class AssertResourceType implements MethodTypeSpecifyingExtension, TypeSpecifier
         MethodReflection $methodReflection,
         MethodCall $node,
         Scope $scope,
-        TypeSpecifierContext $context
+        TypeSpecifierContext $context,
     ): SpecifiedTypes {
         $resource = $node->getArgs()[0];
 

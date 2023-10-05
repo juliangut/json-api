@@ -22,12 +22,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class HeadersChecker implements HeadersCheckerInterface
 {
-    private HeaderParametersParserInterface $headerParser;
-
-    public function __construct(HeaderParametersParserInterface $headerParser)
-    {
-        $this->headerParser = $headerParser;
-    }
+    public function __construct(
+        private HeaderParametersParserInterface $headerParser,
+    ) {}
 
     public function checkHeaders(ServerRequestInterface $request): void
     {

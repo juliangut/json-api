@@ -18,7 +18,7 @@ namespace Jgut\JsonApi\Mapping\Annotation;
  *
  * @Target("PROPERTY")
  */
-class Relationship extends AbstractField
+final class Relationship extends AbstractField
 {
     use GroupTrait;
     use LinkTrait;

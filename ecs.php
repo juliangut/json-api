@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-use Jgut\ECS\Config\ConfigSet74;
+use Jgut\ECS\Config\ConfigSet80;
 use PhpCsFixerCustomFixers\Fixer\NoNullableBooleanTypeFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
@@ -31,26 +31,14 @@ return static function (ECSConfig $ecsConfig) use ($header): void {
         __DIR__ . '/tests',
     ]);
 
-    $skips = [
-        NoNullableBooleanTypeFixer::class => [
-            __DIR__ . '/src/Mapping/Annotation/LinkTrait.php',
-            __DIR__ . '/src/Mapping/Metadata/LinkTrait.php',
-        ],
-    ];
-
-    if (\PHP_VERSION_ID < 80_000) {
-        $skips = array_merge(
-            $skips,
-            [
-                __DIR__ . '/tests/JsonApi/Mapping/Files/Classes/Invalid/Attribute',
-                __DIR__ . '/tests/JsonApi/Mapping/Files/Classes/Valid/Attribute',
-            ],
-        );
-    }
-
-    (new ConfigSet74())
+    (new ConfigSet80())
         ->setHeader($header)
         ->enablePhpUnitRules()
-        ->setAdditionalSkips($skips)
+        ->setAdditionalSkips([
+            NoNullableBooleanTypeFixer::class => [
+                __DIR__ . '/src/Mapping/Annotation/LinkTrait.php',
+                __DIR__ . '/src/Mapping/Metadata/LinkTrait.php',
+            ],
+        ])
         ->configure($ecsConfig);
 };

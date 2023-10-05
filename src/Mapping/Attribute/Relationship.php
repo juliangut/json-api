@@ -16,38 +16,36 @@ namespace Jgut\JsonApi\Mapping\Attribute;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Relationship
+final class Relationship
 {
-    use NameTrait {
-        NameTrait::__construct as protected nameConstruct;
-    }
-    use AccessorTrait {
-        AccessorTrait::__construct as protected accessorConstruct;
-    }
-
-    /**
-     * @var array<string>
-     */
-    protected ?array $groups;
-
-    /**
-     * @param array<string>|null $groups
-     */
     public function __construct(
-        ?string $name = null,
-        ?string $getter = null,
-        ?string $setter = null,
-        ?array $groups = null
-    ) {
-        $this->nameConstruct($name);
-        $this->accessorConstruct($getter, $setter);
-        $this->groups = $groups;
+        protected ?string $name = null,
+        protected ?string $getter = null,
+        protected ?string $setter = null,
+        /**
+         * @var array<string>
+         */  protected array $groups = [],
+    ) {}
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function getGetter(): ?string
+    {
+        return $this->getter;
+    }
+
+    public function getSetter(): ?string
+    {
+        return $this->setter;
     }
 
     /**
-     * @return array<string>|null
+     * @return array<string>
      */
-    public function getGroups(): ?array
+    public function getGroups(): array
     {
         return $this->groups;
     }

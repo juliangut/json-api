@@ -15,7 +15,7 @@ namespace Jgut\JsonApi\Mapping\Driver;
 
 use Jgut\Mapping\Driver\AbstractMappingPhpDriver;
 
-class PhpDriver extends AbstractMappingPhpDriver implements DriverInterface
+final class PhpDriver extends AbstractMappingPhpDriver implements DriverInterface
 {
     use FileMappingTrait;
 }

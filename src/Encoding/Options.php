@@ -82,8 +82,6 @@ class Options implements OptionsInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws SchemaException
      */
     public function setLinks(array $links): void
@@ -102,7 +100,7 @@ class Options implements OptionsInterface
                     throw new SchemaException(sprintf(
                         'Link href must be an instance of %s or array, %s given.',
                         LinkInterface::class,
-                        \is_object($href) ? \get_class($href) : \gettype($href),
+                        \is_object($href) ? $href::class : \gettype($href),
                     ));
                 }
                 $this->assertMeta($definition['meta']);
@@ -115,7 +113,7 @@ class Options implements OptionsInterface
                 throw new SchemaException(sprintf(
                     'Link must be an instance of %s or array, "%s" given.',
                     LinkInterface::class,
-                    \is_object($definition) ? \get_class($definition) : \gettype($definition),
+                    \is_object($definition) ? $definition::class : \gettype($definition),
                 ));
             }
 
@@ -131,8 +129,6 @@ class Options implements OptionsInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @throws SchemaException
      */
     public function setMeta(array $meta): void

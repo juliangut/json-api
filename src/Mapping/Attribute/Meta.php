@@ -16,23 +16,15 @@ namespace Jgut\JsonApi\Mapping\Attribute;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
-class Meta
+final class Meta
 {
-    protected string $key;
-
-    /**
-     * @var mixed|array<mixed>
-     */
-    protected $value;
-
-    /**
-     * @param mixed|array<mixed> $value
-     */
-    public function __construct(string $key, $value)
-    {
-        $this->key = $key;
-        $this->value = $value;
-    }
+    public function __construct(
+        protected string $key,
+        /**
+         * @var mixed|array<mixed>
+         */
+        protected mixed $value,
+    ) {}
 
     public function getKey(): string
     {

@@ -18,7 +18,7 @@ namespace Jgut\JsonApi\Mapping\Annotation;
  *
  * @Target("PROPERTY")
  */
-class Identifier extends AbstractField
+final class Identifier extends AbstractField
 {
     use MetaTrait;
 }

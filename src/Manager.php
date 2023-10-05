@@ -34,15 +34,10 @@ use Traversable;
  */
 class Manager
 {
-    protected Configuration $configuration;
-
-    protected FactoryInterface $factory;
-
-    public function __construct(Configuration $configuration, FactoryInterface $factory)
-    {
-        $this->configuration = $configuration;
-        $this->factory = $factory;
-    }
+    public function __construct(
+        protected Configuration $configuration,
+        protected FactoryInterface $factory,
+    ) {}
 
     public function getFactory(): FactoryInterface
     {
@@ -56,7 +51,7 @@ class Manager
             throw new InvalidArgumentException(sprintf(
                 'Query parameters parser from request is not a %s. "%s" given.',
                 BaseQueryParserInterface::class,
-                \is_object($parser) ? \get_class($parser) : \gettype($parser),
+                \is_object($parser) ? $parser::class : \gettype($parser),
             ));
         }
 
@@ -65,7 +60,7 @@ class Manager
 
     public function setRequestQueryParameters(
         ServerRequestInterface $request,
-        BaseQueryParserInterface $queryParameterParser
+        BaseQueryParserInterface $queryParameterParser,
     ): ServerRequestInterface {
         return $request->withAttribute($this->configuration->getAttributeName(), $queryParameterParser);
     }
@@ -80,7 +75,7 @@ class Manager
         $resources,
         ServerRequestInterface $request,
         array $resourceTypes = [],
-        ?OptionsInterface $encodingOptions = null
+        ?OptionsInterface $encodingOptions = null,
     ): string {
         $queryParameters = $this->getRequestQueryParameters($request);
 
@@ -145,11 +140,11 @@ class Manager
      */
     private function getResourceMetadata(): array
     {
-        $sources = $this->configuration->getSources();
+        $mappingSources = $this->configuration->getSources();
 
         return array_filter(
             $this->configuration->getMetadataResolver()
-                ->getMetadata($sources),
+                ->getMetadata($mappingSources),
             static fn(MetadataInterface $metadata): bool => $metadata instanceof ResourceObjectMetadata,
         );
     }
@@ -165,7 +160,7 @@ class Manager
         array $schemaFactories,
         OptionsInterface $encodingOptions,
         ?iterable $includePaths = null,
-        ?iterable $fieldSets = null
+        ?iterable $fieldSets = null,
     ): EncoderInterface {
         $encoder = $this->factory->createEncoder($this->factory->createSchemaContainer($schemaFactories));
 

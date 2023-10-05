@@ -35,14 +35,12 @@ use ReflectionProperty;
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class AttributeDriver extends AbstractClassDriver
+final class AttributeDriver extends AbstractClassDriver
 {
     use PropertyTrait;
 
     /**
-     * {@inheritDoc}
-     *
-     * @return array<ResourceObjectMetadata>
+     * @return list<ResourceObjectMetadata>
      */
     public function getMetadata(): array
     {
@@ -76,7 +74,7 @@ class AttributeDriver extends AbstractClassDriver
             }
         }
 
-        return $resources;
+        return array_values($resources);
     }
 
     /**
@@ -87,7 +85,7 @@ class AttributeDriver extends AbstractClassDriver
     protected function populateResource(
         ResourceObjectMetadata $resource,
         ReflectionClass $class,
-        ResourceObject $resourceAttribute
+        ResourceObject $resourceAttribute,
     ): void {
         foreach ($class->getProperties() as $property) {
             // @codeCoverageIgnoreStart
@@ -142,7 +140,7 @@ class AttributeDriver extends AbstractClassDriver
         ResourceObjectMetadata $resource,
         ReflectionClass $class,
         ReflectionProperty $property,
-        Identifier $identifier
+        Identifier $identifier,
     ): void {
         if ($resource->hasIdentifier()) {
             throw new DriverException(sprintf(
@@ -171,13 +169,13 @@ class AttributeDriver extends AbstractClassDriver
         ResourceObjectMetadata $resource,
         ReflectionClass $class,
         ReflectionProperty $property,
-        Attribute $attribute
+        Attribute $attribute,
     ): void {
         $attributeMetadata = new AttributeMetadata(
             $property->getDeclaringClass()
                 ->getName(),
             $attribute->getName() ?? $property->getName(),
-            $attribute->getGroups() ?? [],
+            $attribute->getGroups(),
         );
 
         $this->populateGetter($attributeMetadata, $class, $property, $attribute);
@@ -193,13 +191,13 @@ class AttributeDriver extends AbstractClassDriver
         ResourceObjectMetadata $resource,
         ReflectionClass $class,
         ReflectionProperty $property,
-        Relationship $relationship
+        Relationship $relationship,
     ): void {
         $relationshipMetadata = new RelationshipMetadata(
             $property->getDeclaringClass()
                 ->getName(),
             $relationship->getName() ?? $property->getName(),
-            $relationship->getGroups() ?? [],
+            $relationship->getGroups(),
         );
 
         $this->populateGetter($relationshipMetadata, $class, $property, $relationship);
@@ -237,7 +235,7 @@ class AttributeDriver extends AbstractClassDriver
         $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        $attribute
+        $attribute,
     ): void {
         $method = $this->getDefaultGetterMethod($property);
 
@@ -268,7 +266,7 @@ class AttributeDriver extends AbstractClassDriver
         $metadata,
         ReflectionClass $class,
         ReflectionProperty $property,
-        $attribute
+        $attribute,
     ): void {
         $method = $this->getDefaultSetterMethod($property);
 
@@ -314,7 +312,7 @@ class AttributeDriver extends AbstractClassDriver
             /** @var Link $link */
             $link = $linkAttribute->newInstance();
 
-            $metadata->addLink(new LinkMetadata($link->getHref(), $link->getTitle(), $link->getMeta() ?? []));
+            $metadata->addLink(new LinkMetadata($link->getHref(), $link->getTitle(), $link->getMeta()));
         }
     }
 

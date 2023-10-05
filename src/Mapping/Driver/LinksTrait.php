@@ -41,7 +41,7 @@ trait LinksTrait
             } else {
                 throw new DriverException(sprintf(
                     'Link definition must be either a string or array, %s given.',
-                    \is_object($linkDefinition) ? \get_class($linkDefinition) : \gettype($linkDefinition),
+                    \is_object($linkDefinition) ? $linkDefinition::class : \gettype($linkDefinition),
                 ));
             }
 

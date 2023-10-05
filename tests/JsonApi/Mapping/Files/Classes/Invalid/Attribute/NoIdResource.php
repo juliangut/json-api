@@ -16,6 +16,4 @@ namespace Jgut\JsonApi\Tests\Mapping\Files\Classes\Invalid\Attribute;
 use Jgut\JsonApi\Mapping\Attribute as JSONAPI;
 
 #[JSONAPI\ResourceObject]
-class NoIdResource
-{
-}
+class NoIdResource {}

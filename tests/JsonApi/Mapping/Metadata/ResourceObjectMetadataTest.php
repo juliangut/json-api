@@ -65,10 +65,7 @@ class ResourceObjectMetadataTest extends TestCase
 
     public function testIdentifier(): void
     {
-        $identifier = $this->getMockBuilder(IdentifierMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        // @var IdentifierMetadata $identifier
+        $identifier = new IdentifierMetadata(IdentifierMetadata::class, '');
 
         $this->resource->setIdentifier($identifier);
 
@@ -77,13 +74,7 @@ class ResourceObjectMetadataTest extends TestCase
 
     public function testAttributes(): void
     {
-        $attribute = $this->getMockBuilder(AttributeMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $attribute->expects(static::once())
-            ->method('getName')
-            ->willReturn('attribute');
-        // @var AttributeMetadata $attribute
+        $attribute = new AttributeMetadata(AttributeMetadata::class, 'attribute');
 
         $this->resource->addAttribute($attribute);
 
@@ -92,13 +83,7 @@ class ResourceObjectMetadataTest extends TestCase
 
     public function testRelationships(): void
     {
-        $relationship = $this->getMockBuilder(RelationshipMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $relationship->expects(static::once())
-            ->method('getName')
-            ->willReturn('relationship');
-        // @var RelationshipMetadata $relationship
+        $relationship = new RelationshipMetadata(RelationshipMetadata::class, 'relationship');
 
         $this->resource->addRelationship($relationship);
 

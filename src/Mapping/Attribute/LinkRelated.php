@@ -16,14 +16,11 @@ namespace Jgut\JsonApi\Mapping\Attribute;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
-class LinkRelated
+final class LinkRelated
 {
-    protected bool $included;
-
-    public function __construct(bool $included = true)
-    {
-        $this->included = $included;
-    }
+    public function __construct(
+        protected bool $included = true,
+    ) {}
 
     public function isIncluded(): bool
     {

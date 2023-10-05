@@ -16,6 +16,9 @@ namespace Jgut\JsonApi\Tests\Stubs;
 use Jgut\JsonApi\Encoding\Encoder;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
 
+/**
+ * @internal
+ */
 class EncoderStub extends Encoder
 {
     public static function doCreateFactory(): FactoryInterface

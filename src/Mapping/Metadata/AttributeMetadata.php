@@ -13,18 +13,37 @@ declare(strict_types=1);
 
 namespace Jgut\JsonApi\Mapping\Metadata;
 
-class AttributeMetadata extends AbstractFieldMetadata
+final class AttributeMetadata extends AbstractFieldMetadata
 {
-    use GroupTrait;
-
     /**
      * @param class-string<object> $class
-     * @param array<string>        $groups
      */
-    public function __construct(string $class, string $name, array $groups = [])
-    {
+    public function __construct(
+        string $class,
+        string $name,
+        /**
+         * @var array<string>
+         */
+        protected array $groups = [],
+    ) {
         parent::__construct($class, $name);
+    }
 
+    /**
+     * @return array<string>
+     */
+    public function getGroups(): array
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param array<string> $groups
+     */
+    public function setGroups(array $groups): self
+    {
         $this->groups = $groups;
+
+        return $this;
     }
 }

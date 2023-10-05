@@ -23,12 +23,9 @@ use ReflectionClass;
 
 class Resolver
 {
-    protected Configuration $configuration;
-
-    public function __construct(Configuration $configuration)
-    {
-        $this->configuration = $configuration;
-    }
+    public function __construct(
+        protected Configuration $configuration,
+    ) {}
 
     /**
      * @return Closure(FactoryInterface): SchemaInterface
@@ -39,7 +36,7 @@ class Resolver
 
         return static function (FactoryInterface $factory) use (
             $resource,
-            $defaultSchemaClass
+            $defaultSchemaClass,
         ): SchemaInterface {
             $schemaClass = $resource->getSchema() ?? $defaultSchemaClass;
 

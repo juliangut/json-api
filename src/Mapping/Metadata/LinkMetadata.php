@@ -15,23 +15,16 @@ namespace Jgut\JsonApi\Mapping\Metadata;
 
 use Jgut\Mapping\Metadata\MetadataInterface;
 
-class LinkMetadata implements MetadataInterface
+final class LinkMetadata implements MetadataInterface
 {
-    use MetaTrait;
-
-    protected string $href;
-
-    protected ?string $title;
-
-    /**
-     * @param array<string, mixed> $meta
-     */
-    public function __construct(string $href, ?string $title = null, array $meta = [])
-    {
-        $this->href = $href;
-        $this->title = $title;
-        $this->meta = $meta;
-    }
+    public function __construct(
+        protected string $href,
+        protected ?string $title = null,
+        /**
+         * @var array<string, mixed>
+         */
+        protected array $meta = [],
+    ) {}
 
     public function getHref(): string
     {
@@ -41,5 +34,23 @@ class LinkMetadata implements MetadataInterface
     public function getTitle(): ?string
     {
         return $this->title;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getMeta(): array
+    {
+        return $this->meta;
+    }
+
+    /**
+     * @param array<string, mixed> $meta
+     */
+    public function setMeta(array $meta): self
+    {
+        $this->meta = $meta;
+
+        return $this;
     }
 }

@@ -15,6 +15,4 @@ namespace Jgut\JsonApi\Mapping\Driver;
 
 use Jgut\Mapping\Driver\DriverInterface as BaseDriverInterface;
 
-interface DriverInterface extends BaseDriverInterface
-{
-}
+interface DriverInterface extends BaseDriverInterface {}
