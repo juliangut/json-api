@@ -1,4 +1,4 @@
-[![PHP version](https://img.shields.io/badge/PHP-%3E%3D7.4-8892BF.svg?style=flat-square)](http://php.net)
+[![PHP version](https://img.shields.io/badge/PHP-%3E%3D8.0-8892BF.svg?style=flat-square)](http://php.net)
 [![Latest Version](https://img.shields.io/packagist/v/juliangut/json-api.svg?style=flat-square)](https://packagist.org/packages/juliangut/json-api)
 [![License](https://img.shields.io/github/license/juliangut/json-api.svg?style=flat-square)](https://github.com/juliangut/json-api/blob/master/LICENSE)
 
@@ -15,12 +15,6 @@ Easy JSON:API integration.
 
 ```
 composer require juliangut/json-api
-```
-
-doctrine/annotations to parse annotations
-
-```
-composer require doctrine/annotations
 ```
 
 symfony/yaml to parse yaml files
@@ -58,7 +52,7 @@ $jsonApiManager->encodeResources(new MyClass(), new ServerRequestInstance());
 ### Configuration
 
 * `sources` must be an array containing arrays of configurations to create MappingDriver objects:
-    * `type` one of \Jgut\JsonApi\Mapping\Driver\DriverFactory constants: `DRIVER_ATTRIBUTE`, `DRIVER_PHP`, `DRIVER_JSON`, `DRIVER_XML`, `DRIVER_YAML` or `DRIVER_ANNOTATION` **if no driver, defaults to DRIVER_ATTRIBUTE in PHP >=8.0 or DRIVER_ANNOTATION PHP < 8.0**
+    * `type` one of \Jgut\JsonApi\Mapping\Driver\DriverFactory constants: `DRIVER_ATTRIBUTE`, `DRIVER_PHP`, `DRIVER_JSON`, `DRIVER_XML`, `DRIVER_YAML` or `DRIVER_ANNOTATION` **if no driver, defaults to DRIVER_ATTRIBUTE**
     * `path` a string path or array of paths to where mapping files are located (files or directories) **REQUIRED if no driver**
     * `driver` an already created \Jgut\JsonApi\Mapping\Driver\DriverInterface object **REQUIRED if no type AND path**
 * `attributeName` name of the PSR-7 Request attribute that will hold query parameters for resource encoding, defaults to 'JSON_API_query_parameters'
@@ -69,15 +63,49 @@ $jsonApiManager->encodeResources(new MyClass(), new ServerRequestInstance());
 * `jsonApiVersion` none by default
 * `jsonApiMeta` optional global metadata
 
-### Resource mapping
+## Middleware
+
+Use PSR-15 middleware `Jgut\JsonApi\Middleware\JsonApiMiddleware` in order to validate request being a valid JSON:API specification request
+
+```php
+use Jgut\JsonApi\Manager;
+use Jgut\JsonApi\Middleware\JsonApiMiddleware;
+use Psr\Http\Message\ResponseFactoryInterface;
+
+/** @var ResponseFactoryInterface $responseFactory */
+/** @var Manager $jsonApiManager */
+
+$middleware = new JsonApiMiddleware($responseFactory, $jsonApiManager);
+
+// Add the middleware to any PSR-15 compatible library/framework, such as Slim, Mezzio, etc 
+```
+
+## Console command
+
+```php
+use Symfony\Component\Console\Application;
+use Jgut\Slim\PHPDI\Command\ListCommand;
+
+/** @var \Slim\App $app */
+$container = $app->getContainer();
+
+$cli = new Application('Slim CLI');
+$cli->add(new ListCommand($container));
+
+$app->run();
+```
+
+### List container definitions
+
+List defined container definitions supporting searching
+
+## Resource mapping
 
 Resources can be defined in two basic ways: by writing them down in definition files of various types or directly defined in attributes on classes
 
-#### Attributes
+### Attributes
 
-_Available from PHP8.0. If you're still on PHP 7.x use file mappings or annotations_
-
-##### ResourceObject (Class level)
+#### ResourceObject (Class level)
 
 Identifies each JSON:API resource. Its presence is mandatory in each resource class
 
@@ -103,7 +131,7 @@ class Company
 * `prefix`, optional, resource url prefix when links are included
 * `schema`, optional, class name implementing \Jgut\JsonApi\Schema\MetadataSchemaInterface. Override default one
 
-##### Identifier (Property level)
+#### Identifier (Property level)
 
 The resource identifier
 
@@ -131,7 +159,7 @@ class Owner
 * `setter`, optional, method in the class that sets the value for the property, uppercase first letter property name prefixed by "set"
 * `meta`, optional, list of optional array/value array of identifier metadata
 
-##### Attribute (Property level)
+#### Attribute (Property level)
 
 A resource attribute
 
@@ -159,7 +187,7 @@ class Company
 * `setter`, optional, method in the class that sets the value for the property, uppercase first letter property name prefixed by "set"
 * `groups`, optional, array of groups to which the attribute belongs
 
-##### Relationship (Property level)
+#### Relationship (Property level)
 
 A resource relationship
 
@@ -175,7 +203,6 @@ class Company
         getter: 'getOwner',
         setter: 'setOwner',
         groups: ['view'],
-        meta: ['meta1' => 'value'],
     )]
     protected Owner $companyOwner;
 }
@@ -186,7 +213,7 @@ class Company
 * `setter`, optional, method in the class that sets the value for the property, uppercase first letter property name prefixed by "set"
 * `groups`, optional, array of groups to which the relationship belongs
 
-##### Links
+#### Links
 
 ```php
 use Jgut\JsonApi\Mapping\Attribute\Link;
@@ -217,15 +244,15 @@ class Company
 }
 ```
 
-###### LinkSelf (Class level)
+##### LinkSelf (Class level)
 
 Determines whether self link is included in the response
 
-###### LinkRelated (Class level)
+##### LinkRelated (Class level)
 
 Determines whether self link is included in the response when the resource is included as a relationship
 
-###### Link (Class and Property level)
+##### Link (Class and Property level)
 
 Adds as many custom link to the resource or field as needed
 
@@ -233,7 +260,7 @@ Adds as many custom link to the resource or field as needed
 * `title`, optional, link title
 * `meta`, optional, list of optional link metadata (see metadata section below)
 
-##### Metadata
+#### Metadata
 
 ```php
 use Jgut\JsonApi\Mapping\Attribute\Attribute;
@@ -258,20 +285,20 @@ class Company
 
 There are two kinds of metadata:
 
-###### Meta Attribute (Class level)
+##### Meta Attribute (Class and Property level)
 
 Assign one or more metadata to a resource, identifier or relationship
 
 * `key`, required, metadata key
 * `value`, required, metadata value
 
-###### Other metadata
+##### Other metadata
 
 Link attributes accept metadata as a key/value array
 
-#### Definition files
+### Definition files
 
-###### PHP
+##### PHP
 
 ```php
 return [
@@ -326,7 +353,7 @@ return [
 ];
 ```
 
-###### JSON
+##### JSON
 
 ```json
 [
@@ -381,7 +408,7 @@ return [
 ]
 ```
 
-###### XML
+##### XML
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -423,7 +450,7 @@ return [
 </root>
 ```
 
-###### YAML
+##### YAML
 
 ```yaml
 - class: "CompanyClass"
@@ -461,9 +488,9 @@ return [
         meta4: "value"
 ```
 
-#### Annotations
+### Annotations
 
-_Annotations are deprecated and will be removed when support for PHP 7.4 is dropped. Use Attribute mapping instead_
+__Annotations are deprecated and will be removed eventually. Use Attribute mapping when possible__.
 
 You need to require Doctrine's annotation package
 
@@ -471,7 +498,7 @@ You need to require Doctrine's annotation package
 composer require doctrine/annotations
 ```
 
-##### ResourceObject (Class level)
+#### ResourceObject (Class level)
 
 Identifies each resource. Its presence is mandatory on each resource class
 
@@ -502,7 +529,7 @@ class Company
 * `links`, optional, list of optional key/value array of resource links
 * `meta`, optional, list of optional array/value array of resource metadata
 
-##### Identifier (Property level)
+#### Identifier (Property level)
 
 The resource identifier
 
@@ -531,7 +558,7 @@ class Owner
 * `setter`, optional, method in the class that sets the value for the property, uppercase first letter property name prefixed by "set"
 * `meta`, optional, list of optional array/value array of identifier metadata
 
-##### Attribute (Property level)
+#### Attribute (Property level)
 
 Defines each and every attribute accessible on the resource
 
@@ -560,7 +587,7 @@ class Company
 * `setter`, optional, method in the class that sets the value for the property, uppercase first letter property name prefixed by "set"
 * `groups`, optional, array of groups to which the attribute belongs
 
-##### Relationship (Property level)
+#### Relationship (Property level)
 
 Identifies this resource relationships
 
@@ -596,21 +623,6 @@ class Company
 * `linkRelated`, optional bool, display self link when included, null by default
 * `links`, optional, list of optional key/value array of resource links
 * `meta`, optional, list of optional array/value array of relationship metadata
-
-### Middleware
-
-Use PSR-15 middleware `Jgut\JsonApi\Middleware\JsonApiMiddleware` in order to validate request being a valid JSON:API specification request
-
-```php
-use Jgut\JsonApi\Middleware\JsonApiMiddleware;
-
-/** @var \Psr\Http\Message\ResponseFactoryInterface $responseFactory */
-/** @var \Jgut\JsonApi\Manager $jsonApiManager */
-
-$middleware = new JsonApiMiddleware($responseFactory, $jsonApiManager);
-
-// Add the middleware to PSR-15 compatible library/framework, such as Slim, Mezzio, etc 
-```
 
 ## Contributing
 
