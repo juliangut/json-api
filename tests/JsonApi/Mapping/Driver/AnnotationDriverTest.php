@@ -20,7 +20,7 @@ use Jgut\Mapping\Exception\DriverException;
 /**
  * @internal
  */
-class AnnotationDriverTest extends AbstractDriverTest
+class AnnotationDriverTest extends AbstractDriverTestCase
 {
     protected AnnotationReader $reader;
 

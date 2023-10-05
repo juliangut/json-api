@@ -27,7 +27,7 @@ use Jgut\Mapping\Exception\DriverException;
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileMappingTraitTest extends AbstractDriverTest
+class FileMappingTraitTest extends AbstractDriverTestCase
 {
     public function testNoClass(): void
     {

@@ -19,7 +19,7 @@ use Jgut\Mapping\Exception\DriverException;
 /**
  * @internal
  */
-class AttributeDriverTest extends AbstractDriverTest
+class AttributeDriverTest extends AbstractDriverTestCase
 {
     protected function setUp(): void
     {

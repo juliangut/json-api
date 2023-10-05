@@ -30,7 +30,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  */
-abstract class AbstractDriverTest extends TestCase
+abstract class AbstractDriverTestCase extends TestCase
 {
     /**
      * @param AttributeDriver|PhpDriver|JsonDriver|XmlDriver|YamlDriver|AnnotationDriver $driver
