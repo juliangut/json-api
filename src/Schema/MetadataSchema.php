@@ -19,6 +19,7 @@ use Jgut\JsonApi\Mapping\Metadata\LinkMetadata;
 use Jgut\JsonApi\Mapping\Metadata\RelationshipMetadata;
 use Jgut\JsonApi\Mapping\Metadata\ResourceObjectMetadata;
 use Neomerx\JsonApi\Contracts\Factories\FactoryInterface;
+use Neomerx\JsonApi\Contracts\Schema\BaseLinkInterface;
 use Neomerx\JsonApi\Contracts\Schema\ContextInterface;
 use Neomerx\JsonApi\Contracts\Schema\LinkInterface;
 use Neomerx\JsonApi\Contracts\Schema\SchemaInterface;
@@ -153,7 +154,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     {
         $defaultLinks = [];
         if ($this->resourceMetadata->isLinkSelf() !== false) {
-            $defaultLinks[LinkInterface::SELF] = $this->getSelfLink($resource);
+            $defaultLinks[BaseLinkInterface::SELF] = $this->getSelfLink($resource);
         }
 
         return array_merge($defaultLinks, $this->normalizeLinks($this->resourceMetadata->getLinks()));
@@ -256,11 +257,9 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
-     * @param object|mixed $resource
-     *
      * @throws SchemaException
      */
-    private function assertResourceType($resource): void
+    private function assertResourceType(mixed $resource): void
     {
         $class = $this->resourceMetadata->getClass();
 
