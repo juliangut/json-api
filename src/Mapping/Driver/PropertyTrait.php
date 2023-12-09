@@ -14,6 +14,7 @@ namespace Jgut\JsonApi\Mapping\Driver;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionProperty;
+use ReflectionType;
 use ReflectionUnionType;
 
 trait PropertyTrait
@@ -34,20 +35,7 @@ trait PropertyTrait
             ->getProperty($property->getName())
             ->getType();
         if ($reflectionType !== null) {
-            $types = (\PHP_VERSION_ID >= 80_100 && $reflectionType instanceof ReflectionIntersectionType)
-                || ($reflectionType instanceof ReflectionUnionType)
-                ? $reflectionType->getTypes()
-                : [$reflectionType];
-
-            $attributeType = implode(
-                '|',
-                array_map(
-                    static fn(ReflectionNamedType $reflectionType): string => $reflectionType->getName(),
-                    $types,
-                ),
-            );
-
-            return str_contains($attributeType, 'bool');
+            return \in_array('bool', $this->extractTypes($reflectionType), true);
         }
 
         $docComment = $property->getDeclaringClass()
@@ -57,5 +45,28 @@ trait PropertyTrait
         return \is_string($docComment)
             && preg_match('/@var\s+([a-zA-Z]+)(\s|\n)/', $docComment, $matches) === 1
             && \in_array('bool', explode('|', $matches[1]), true);
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function extractTypes(ReflectionType $reflectionType): array
+    {
+        if ($reflectionType instanceof ReflectionNamedType) {
+            return [$reflectionType->getName()];
+        }
+
+        if ((\PHP_VERSION_ID >= 80_100 && $reflectionType instanceof ReflectionIntersectionType)
+            || ($reflectionType instanceof ReflectionUnionType)
+        ) {
+            $types = [];
+            foreach ($reflectionType->getTypes() as $type) {
+                array_push($types, ...$this->extractTypes($type));
+            }
+
+            return $types;
+        }
+
+        return [];
     }
 }
