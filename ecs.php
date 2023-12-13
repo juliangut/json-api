@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 use Jgut\ECS\Config\ConfigSet80;
+use PedroTroller\CS\Fixer\CodingStyle\LineBreakBetweenMethodArgumentsFixer;
 use PhpCsFixerCustomFixers\Fixer\NoNullableBooleanTypeFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
@@ -28,14 +29,23 @@ return static function (ECSConfig $ecsConfig): void {
     ]);
     $ecsConfig->cacheDirectory('.ecs.cache');
 
+    $skipRules = [
+        NoNullableBooleanTypeFixer::class => [
+            __DIR__ . '/src/Mapping/Annotation/LinkTrait.php',
+            __DIR__ . '/src/Mapping/Metadata/LinkTrait.php',
+        ],
+    ];
+    if (\PHP_VERSION_ID < 80_100) {
+        $skipRules[LineBreakBetweenMethodArgumentsFixer::class] = [
+            __DIR__ . '/src/Mapping/Attribute/Attribute.php',
+            __DIR__ . '/src/Mapping/Attribute/Identifier.php',
+            __DIR__ . '/src/Mapping/Attribute/Relationship.php',
+        ];
+    }
+
     (new ConfigSet80())
         ->setHeader($header)
         ->enablePhpUnitRules()
-        ->setAdditionalSkips([
-            NoNullableBooleanTypeFixer::class => [
-                __DIR__ . '/src/Mapping/Annotation/LinkTrait.php',
-                __DIR__ . '/src/Mapping/Metadata/LinkTrait.php',
-            ],
-        ])
+        ->setAdditionalSkips($skipRules)
         ->configure($ecsConfig);
 };
