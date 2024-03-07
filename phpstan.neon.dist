@@ -24,3 +24,9 @@ parameters:
       path: src/Schema/MetadataSchema.php
     - message: '/^Parameter #2 \$fields \(iterable<string, mixed>\) of method Jgut\\JsonApi\\Encoding\\FieldSetFilter::filterFields\(\) should be contravariant with parameter \$fields \(iterable\) of method Neomerx\\JsonApi\\Representation\\FieldSetFilter::filterFields\(\)$/'
       path: src/Encoding/FieldSetFilter.php
+    - message: '/^Parameter #1 \$schemas \(list<mixed>\) of method Jgut\\JsonApi\\Encoding\\Encoder::instance\(\) should be contravariant with parameter \$schemas \(array\) of method Neomerx\\JsonApi\\Encoder\\Encoder::instance\(\)$/'
+      path: src/Encoding/Encoder.php
+    - message: '/^Parameter #1 \$fieldSets \(array<string, mixed>\) of method Jgut\\JsonApi\\Encoding\\Factory::createFieldSetFilter\(\) should be contravariant with parameter \$fieldSets \(array\) of method Neomerx\\JsonApi(\\Contracts)?\\Factories\\Factory(Interface)?::createFieldSetFilter\(\)$/'
+      path: src/Encoding/Factory.php
+    - message: '/^Return type \(array<string, mixed>\|null\) of method Jgut\\JsonApi\\Encoding\\Options::getLinks\(\) should be covariant with return type \(list<mixed>\|null\) of method Jgut\\JsonApi\\Encoding\\OptionsInterface::getLinks\(\)$/'
+      path: src/Encoding/Options.php

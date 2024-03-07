@@ -44,12 +44,12 @@ interface OptionsInterface
     public function setGroup(string $group): void;
 
     /**
-     * @return array<mixed>|null
+     * @return list<mixed>|null
      */
     public function getLinks(): ?array;
 
     /**
-     * @param array<mixed> $links
+     * @param list<mixed> $links
      */
     public function setLinks(array $links): void;
 

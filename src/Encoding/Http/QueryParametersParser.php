@@ -19,7 +19,7 @@ use TypeError;
 class QueryParametersParser implements QueryParametersParserInterface
 {
     /**
-     * @var array<string>
+     * @var list<string>
      */
     protected array $knownParameters = [
         self::PARAM_FIELDS,
@@ -30,12 +30,12 @@ class QueryParametersParser implements QueryParametersParserInterface
     ];
 
     /**
-     * @var array<non-empty-string>
+     * @var array<string, non-empty-string>
      */
     protected array $fields = [];
 
     /**
-     * @var array<non-empty-string>
+     * @var list<non-empty-string>
      */
     protected array $includes = [];
 
@@ -52,10 +52,10 @@ class QueryParametersParser implements QueryParametersParserInterface
     /**
      * @var mixed|array<string, mixed>
      */
-    protected $filters;
+    protected mixed $filters;
 
     /**
-     * @param array<mixed> $parameters
+     * @param array<string, mixed> $parameters
      *
      * @throws JsonApiException
      */
@@ -105,7 +105,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * @param array<non-empty-string> $fields
+     * @param array<string, non-empty-string> $fields
      */
     public function setFields(array $fields): self
     {
@@ -115,7 +115,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * @param array<non-empty-string> $fields
+     * @param array<string, non-empty-string> $fields
      *
      * @throws JsonApiException
      */
@@ -149,7 +149,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     }
 
     /**
-     * @param array<non-empty-string> $includes
+     * @param list<non-empty-string> $includes
      */
     public function setIncludes(array $includes): self
     {
@@ -255,7 +255,7 @@ class QueryParametersParser implements QueryParametersParserInterface
     /**
      * @return mixed|array<string, mixed>
      */
-    public function getFilters()
+    public function getFilters(): mixed
     {
         return $this->filters;
     }
@@ -287,13 +287,13 @@ class QueryParametersParser implements QueryParametersParserInterface
      *
      * @throws JsonApiException
      *
-     * @return array<non-empty-string>
+     * @return list<non-empty-string>
      */
     protected function splitString(string $parameter, string $string, string $separator): array
     {
         $strings = explode($separator, $string);
 
-        return array_filter(array_map(
+        return array_values(array_filter(array_map(
             function (string $value) use ($parameter): string {
                 $value = trim($value);
 
@@ -307,7 +307,7 @@ class QueryParametersParser implements QueryParametersParserInterface
                 return $value;
             },
             $strings,
-        ));
+        )));
     }
 
     protected function getJsonApiError(string $title, string $detail): Error

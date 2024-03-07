@@ -156,13 +156,13 @@ class ListCommand extends SymfonyCommand
     /**
      * Get resources formatted for table.
      *
-     * @param array<ResourceObjectMetadata> $resources
+     * @param list<ResourceObjectMetadata> $resources
      *
      * @return list<list<string|null>>
      */
     private function getTableRows(array $resources): array
     {
-        return array_values(array_map(
+        return array_map(
             static function (ResourceObjectMetadata $resource): array {
                 return [
                     $resource->getName(),
@@ -173,6 +173,6 @@ class ListCommand extends SymfonyCommand
                 ];
             },
             $resources,
-        ));
+        );
     }
 }

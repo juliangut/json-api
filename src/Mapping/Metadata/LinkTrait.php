@@ -18,7 +18,7 @@ trait LinkTrait
     protected ?bool $linkRelated = null;
 
     /**
-     * @var array<LinkMetadata>
+     * @var array<int|string, LinkMetadata>
      */
     protected array $links = [];
 
@@ -47,7 +47,7 @@ trait LinkTrait
     }
 
     /**
-     * @return array<string, LinkMetadata>
+     * @return array<int|string, LinkMetadata>
      */
     public function getLinks(): array
     {

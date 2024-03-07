@@ -30,7 +30,7 @@ class Factory extends BaseFactory implements FactoryInterface
     }
 
     /**
-     * @param array<mixed> $fieldSets
+     * @param array<string, mixed> $fieldSets
      */
     public function createFieldSetFilter(array $fieldSets): FieldSetFilterInterface
     {

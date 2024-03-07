@@ -31,12 +31,12 @@ final class ResourceObjectMetadata extends AbstractMetadata
     protected ?IdentifierMetadata $identifier = null;
 
     /**
-     * @var array<AttributeMetadata>
+     * @var array<string, AttributeMetadata>
      */
     protected array $attributes = [];
 
     /**
-     * @var array<RelationshipMetadata>
+     * @var array<string, RelationshipMetadata>
      */
     protected array $relationships = [];
 
@@ -109,7 +109,7 @@ final class ResourceObjectMetadata extends AbstractMetadata
     }
 
     /**
-     * @return array<AttributeMetadata>
+     * @return array<string, AttributeMetadata>
      */
     public function getAttributes(): array
     {
@@ -124,7 +124,7 @@ final class ResourceObjectMetadata extends AbstractMetadata
     }
 
     /**
-     * @return array<RelationshipMetadata>
+     * @return array<string, RelationshipMetadata>
      */
     public function getRelationships(): array
     {

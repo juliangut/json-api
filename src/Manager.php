@@ -64,8 +64,8 @@ class Manager
     }
 
     /**
-     * @param object|array<object>    $resources
-     * @param array<non-empty-string> $resourceTypes
+     * @param object|list<object>    $resources
+     * @param list<non-empty-string> $resourceTypes
      *
      * @throws SchemaException
      */
@@ -109,10 +109,10 @@ class Manager
     }
 
     /**
-     * @param array<non-empty-string> $resourceTypes
-     * @param non-empty-string|null   $group
+     * @param list<non-empty-string> $resourceTypes
+     * @param non-empty-string|null  $group
      *
-     * @return array<Closure(BaseFactoryInterface): SchemaInterface>
+     * @return list<Closure(BaseFactoryInterface): SchemaInterface>
      */
     private function getSchemaFactories(array $resourceTypes, ?string $group): array
     {
@@ -126,7 +126,7 @@ class Manager
                     $resource->setGroup($group);
                 }
 
-                $schemaFactories[$resource->getClass()] = $resolver->getSchemaFactory($resource);
+                $schemaFactories[] = $resolver->getSchemaFactory($resource);
             }
         }
 
@@ -134,23 +134,23 @@ class Manager
     }
 
     /**
-     * @return array<ResourceObjectMetadata>
+     * @return list<ResourceObjectMetadata>
      */
     private function getResourceMetadata(): array
     {
         $mappingSources = $this->configuration->getSources();
 
-        return array_filter(
+        return array_values(array_filter(
             $this->configuration->getMetadataResolver()
                 ->getMetadata($mappingSources),
             static fn(MetadataInterface $metadata): bool => $metadata instanceof ResourceObjectMetadata,
-        );
+        ));
     }
 
     /**
-     * @param array<Closure(BaseFactoryInterface): SchemaInterface|SchemaInterface> $schemaFactories
-     * @param iterable<non-empty-string>|null                                       $includePaths
-     * @param iterable<string, non-empty-string>|null                               $fieldSets
+     * @param list<Closure(BaseFactoryInterface): SchemaInterface|SchemaInterface> $schemaFactories
+     * @param iterable<non-empty-string>|null                                      $includePaths
+     * @param iterable<string, non-empty-string>|null                              $fieldSets
      *
      * @throws SchemaException
      */

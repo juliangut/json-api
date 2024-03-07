@@ -27,7 +27,7 @@ class Encoder extends BaseEncoder
     /**
      * Prevent usage. Use an instance of Manager instead.
      *
-     * @param array<mixed> $schemas
+     * @param list<mixed> $schemas
      *
      * @throws BadMethodCallException
      *

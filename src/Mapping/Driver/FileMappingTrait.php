@@ -32,19 +32,19 @@ trait FileMappingTrait
      */
     public function getMetadata(): array
     {
-        /** @var array<ResourceMapping|mixed> $mappingData */
+        /** @var list<ResourceMapping|mixed> $mappingData */
         $mappingData = $this->getMappingData();
 
         return $this->getResourcesMetadata($mappingData);
     }
 
     /**
-     * @return array<ResourceMapping>
+     * @return list<ResourceMapping>
      */
     abstract protected function getMappingData(): array;
 
     /**
-     * @param array<ResourceMapping|mixed> $mappingData
+     * @param list<ResourceMapping|mixed> $mappingData
      *
      * @throws DriverException
      *
@@ -281,7 +281,7 @@ trait FileMappingTrait
             }
         }
 
-        /** @var array<string> $groups */
+        /** @var array<int|string, string> $groups */
         return array_values($groups);
     }
 

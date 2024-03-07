@@ -35,7 +35,7 @@ class Options implements OptionsInterface
     private ?string $group = null;
 
     /**
-     * @var array<mixed>|null
+     * @var array<string, mixed>|null
      */
     private ?array $links = null;
 
@@ -74,12 +74,17 @@ class Options implements OptionsInterface
         $this->group = $group;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getLinks(): ?array
     {
         return $this->links;
     }
 
     /**
+     * @param array<int|string, mixed> $links
+     *
      * @throws SchemaException
      */
     public function setLinks(array $links): void
@@ -115,6 +120,7 @@ class Options implements OptionsInterface
                 ));
             }
 
+            /** @var string $name */
             $linkList[$name] = $link;
         }
 
@@ -137,7 +143,7 @@ class Options implements OptionsInterface
     }
 
     /**
-     * @param mixed|array<mixed> $meta
+     * @param mixed|list<mixed> $meta
      *
      * @throws SchemaException
      */

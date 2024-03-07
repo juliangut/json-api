@@ -50,7 +50,7 @@ final class Configuration
     private ?string $jsonApiVersion = null;
 
     /**
-     * @var array<string>|null
+     * @var list<string>|null
      */
     private ?array $jsonApiMeta = null;
 
@@ -221,7 +221,7 @@ final class Configuration
     }
 
     /**
-     * @return array<string>|null
+     * @return list<string>|null
      */
     public function getJsonApiMeta(): ?array
     {
@@ -229,7 +229,7 @@ final class Configuration
     }
 
     /**
-     * @param array<string> $jsonApiMeta
+     * @param list<string> $jsonApiMeta
      */
     public function setJsonApiMeta(array $jsonApiMeta): void
     {

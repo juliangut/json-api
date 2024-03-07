@@ -146,7 +146,7 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     /**
      * @param object|mixed $resource
      *
-     * @return iterable<string, LinkInterface>
+     * @return iterable<int|string, LinkInterface>
      */
     public function getLinks($resource): iterable
     {
@@ -231,9 +231,9 @@ class MetadataSchema extends BaseSchema implements MetadataSchemaInterface
     }
 
     /**
-     * @param array<string, LinkMetadata> $links
+     * @param array<int|string, LinkMetadata> $links
      *
-     * @return array<string, LinkInterface>
+     * @return array<int|string, LinkInterface>
      */
     private function normalizeLinks(array $links): array
     {

@@ -48,7 +48,7 @@ trait PropertyTrait
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     private function extractTypes(ReflectionType $reflectionType): array
     {
@@ -64,7 +64,7 @@ trait PropertyTrait
                 array_push($types, ...$this->extractTypes($type));
             }
 
-            return $types;
+            return array_values($types);
         }
 
         return [];

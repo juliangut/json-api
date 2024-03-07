@@ -21,7 +21,7 @@ trait LinksTrait
      *
      * @throws DriverException
      *
-     * @return array<LinkMetadata>
+     * @return array<string, LinkMetadata>
      */
     private function getLinksMetadata(array $links): array
     {
