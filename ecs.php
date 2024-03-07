@@ -14,19 +14,17 @@ use PedroTroller\CS\Fixer\CodingStyle\LineBreakBetweenMethodArgumentsFixer;
 use PhpCsFixerCustomFixers\Fixer\NoNullableBooleanTypeFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-$skipRules = [
+$skips = [
     NoNullableBooleanTypeFixer::class => [
         __DIR__ . '/src/Mapping/Annotation/LinkTrait.php',
         __DIR__ . '/src/Mapping/Metadata/LinkTrait.php',
     ],
-];
-if (\PHP_VERSION_ID < 80_100) {
-    $skipRules[LineBreakBetweenMethodArgumentsFixer::class] = [
+    LineBreakBetweenMethodArgumentsFixer::class => [
         __DIR__ . '/src/Mapping/Attribute/Attribute.php',
         __DIR__ . '/src/Mapping/Attribute/Identifier.php',
         __DIR__ . '/src/Mapping/Attribute/Relationship.php',
-    ];
-}
+    ],
+];
 
 $configSet = (new ConfigSet80())
     ->setHeader(<<<'HEADER'
@@ -36,7 +34,7 @@ $configSet = (new ConfigSet80())
     @link https://github.com/juliangut/json-api
     HEADER)
     ->enablePhpUnitRules()
-    ->setAdditionalSkips($skipRules);
+    ->setAdditionalSkips($skips);
 $paths = [
     __FILE__,
     __DIR__ . '/src',

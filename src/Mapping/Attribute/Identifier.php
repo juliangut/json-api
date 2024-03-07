@@ -22,7 +22,8 @@ final class Identifier
         protected ?string $setter = null,
         /**
          * @var array<string, mixed>
-         */ protected array $meta = [],
+         */
+        protected array $meta = [],
     ) {}
 
     public function getName(): ?string

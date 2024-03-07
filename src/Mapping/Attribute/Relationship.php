@@ -22,7 +22,8 @@ final class Relationship
         protected ?string $setter = null,
         /**
          * @var list<string>
-         */ protected array $groups = [],
+         */
+        protected array $groups = [],
     ) {}
 
     public function getName(): ?string
