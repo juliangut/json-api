@@ -1,7 +1,7 @@
 <?php
 
 /*
- * (c) 2018-2023 Julián Gutiérrez <juliangut@gmail.com>
+ * (c) 2018-2024 Julián Gutiérrez <juliangut@gmail.com>
  *
  * @license BSD-3-Clause
  * @link https://github.com/juliangut/json-api
