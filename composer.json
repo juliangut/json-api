@@ -45,7 +45,7 @@
     "povils/phpmnd": "^3.2",
     "roave/security-advisories": "dev-master",
     "symfony/console": "^6.0",
-    "symfony/yaml": "^6.0"
+    "symfony/yaml": "^7.1"
   },
   "suggest": {
     "symfony/yaml": "In order to load resource mapping from YAML files (>=5.1)",
