@@ -44,7 +44,7 @@
     "phpunit/phpunit": "^9.6|^10.4",
     "povils/phpmnd": "^3.2",
     "roave/security-advisories": "dev-master",
-    "symfony/console": "^6.0",
+    "symfony/console": "^7.1",
     "symfony/yaml": "^6.0"
   },
   "suggest": {
